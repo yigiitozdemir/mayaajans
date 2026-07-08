@@ -1,0 +1,86 @@
+# Maya Ajans — Decap CMS ayarları
+# NOT: "repo" satırındaki KULLANICIADI kısmını GitHub kullanıcı adınızla değiştirin.
+# "base_url" satırını OAuth kurulumundan sonra dolduracağız (birlikte yapacağız).
+
+backend:
+  name: github
+  repo: KULLANICIADI/mayaajans
+  branch: main
+  base_url: https://OAUTH-ADRESI-BURAYA.workers.dev
+
+locale: tr
+site_url: https://mayaajans.net
+media_folder: "images"
+public_folder: "/images"
+
+collections:
+  - name: "site"
+    label: "Site İçeriği"
+    files:
+      - name: "icerik"
+        label: "Sayfa İçeriği"
+        file: "content.json"
+        fields:
+          - label: "Logo"
+            name: "logo"
+            widget: "image"
+            required: false
+            hint: "Üst menü ve alt bölümde görünen logo (PNG önerilir)"
+          - label: "Giriş Bölümü (Hero)"
+            name: "hero"
+            widget: "object"
+            fields:
+              - { label: "Üst etiket", name: "eyebrow", widget: "string" }
+              - { label: "Ana başlık", name: "baslik", widget: "string" }
+              - { label: "El yazısı kısım", name: "baslik_el_yazisi", widget: "string" }
+              - { label: "Açıklama", name: "aciklama", widget: "text" }
+          - label: "Hizmetler"
+            name: "hizmetler"
+            widget: "list"
+            allow_add: false
+            fields:
+              - { label: "Başlık", name: "baslik", widget: "string" }
+              - { label: "Açıklama", name: "aciklama", widget: "text" }
+          - label: "Süreç Adımları"
+            name: "surec"
+            widget: "list"
+            allow_add: false
+            fields:
+              - { label: "Başlık", name: "baslik", widget: "string" }
+              - { label: "Açıklama", name: "aciklama", widget: "text" }
+          - label: "İstatistikler"
+            name: "istatistikler"
+            widget: "list"
+            allow_add: false
+            fields:
+              - { label: "Sayı", name: "deger", widget: "number" }
+              - { label: "Etiket", name: "etiket", widget: "string" }
+          - { label: "Hakkımızda yazısı", name: "hakkimizda", widget: "text" }
+          - label: "Referanslar"
+            name: "referanslar"
+            widget: "list"
+            required: false
+            summary: "{{fields.firma}}"
+            hint: "Firma logosu ekledikçe sitede 'Referanslarımız' bölümü otomatik görünür"
+            fields:
+              - { label: "Firma logosu", name: "logo", widget: "image" }
+              - { label: "Firma adı", name: "firma", widget: "string", required: false }
+          - label: "Çalışmalarımız (Galeri)"
+            name: "galeri"
+            widget: "list"
+            required: false
+            summary: "{{fields.baslik}}"
+            hint: "Fotoğraf ekledikçe sitede 'Çalışmalarımız' bölümü otomatik görünür"
+            fields:
+              - { label: "Fotoğraf", name: "gorsel", widget: "image" }
+              - { label: "Başlık (isteğe bağlı)", name: "baslik", widget: "string", required: false }
+          - label: "İletişim Bilgileri"
+            name: "iletisim"
+            widget: "object"
+            fields:
+              - { label: "Telefon (görünen)", name: "telefon", widget: "string" }
+              - { label: "Telefon (aranacak, +90...)", name: "telefon_link", widget: "string" }
+              - { label: "E-posta", name: "eposta", widget: "string" }
+              - { label: "Adres", name: "adres", widget: "text" }
+              - { label: "Instagram kullanıcı adı (@'sız)", name: "instagram", widget: "string" }
+              - { label: "WhatsApp numarası (90 ile, boşluksuz)", name: "whatsapp", widget: "string" }

@@ -1,0 +1,62 @@
+{
+  "hero": {
+    "eyebrow": "Tekirdağ / Çorlu — Sosyal Medya Ajansı",
+    "baslik": "Markanızı dijitalde",
+    "baslik_el_yazisi": "büyütüyoruz.",
+    "aciklama": "Sosyal medya yönetiminden video prodüksiyona, reklam kampanyalarından kurumsal kimliğe — markanızın dijital yolculuğunu baştan sona tasarlıyor ve yönetiyoruz."
+  },
+  "hizmetler": [
+    {
+      "baslik": "Sosyal Medya Yönetimi",
+      "aciklama": "İçerik planı, özgün tasarımlar, paylaşım takvimi ve topluluk yönetimi ile hesaplarınızı profesyonelce yönetiyoruz."
+    },
+    {
+      "baslik": "Video Prodüksiyon",
+      "aciklama": "Reels, tanıtım filmi ve drone çekimleri dahil; senaryodan kurguya tüm prodüksiyonu kendi ekibimizle üretiyoruz."
+    },
+    {
+      "baslik": "Reklam Yönetimi",
+      "aciklama": "Meta ve Google reklamlarını hedef kitlenize göre kurguluyor, bütçenizi ölçülebilir sonuçlara dönüştürüyoruz."
+    },
+    {
+      "baslik": "Kurumsal Kimlik",
+      "aciklama": "Logo, renk paleti ve marka dili ile işletmenizin her mecrada tutarlı ve akılda kalıcı görünmesini sağlıyoruz."
+    }
+  ],
+  "surec": [
+    {
+      "baslik": "Tanışma & Analiz",
+      "aciklama": "Markanızı, hedef kitlenizi ve rakiplerinizi analiz ederek yol haritası çıkarıyoruz."
+    },
+    {
+      "baslik": "Strateji",
+      "aciklama": "İçerik ve kampanya stratejinizi hedeflerinize göre planlıyoruz."
+    },
+    {
+      "baslik": "Üretim",
+      "aciklama": "Tasarım, çekim ve kurgu ile markanıza özel içerikleri hayata geçiriyoruz."
+    },
+    {
+      "baslik": "Yayın & Raporlama",
+      "aciklama": "İçerikleri yayınlıyor, performansı ölçüyor ve düzenli raporluyoruz."
+    }
+  ],
+  "istatistikler": [
+    { "deger": 70, "etiket": "Mutlu Müşteri" },
+    { "deger": 3500, "etiket": "Üretilen İçerik" },
+    { "deger": 850, "etiket": "Video Prodüksiyon" },
+    { "deger": 450, "etiket": "Yönetilen Kampanya" }
+  ],
+  "hakkimizda": "Çorlu merkezli ekibimizle markaların dijitalde görünür, akılda kalıcı ve ölçülebilir şekilde büyümesi için çalışıyoruz.",
+  "galeri": [],
+  "referanslar": [],
+  "iletisim": {
+    "telefon": "0544 763 14 06",
+    "telefon_link": "+905447631406",
+    "eposta": "yigit@mayaajans.net",
+    "adres": "Kazımiye Mah. Dumlupınar Cad. No:6/18B Daire 37, Çorlu / Tekirdağ",
+    "instagram": "mayaajans_",
+    "whatsapp": "905447631406"
+  },
+  "logo": ""
+}
