@@ -4,9 +4,9 @@
 
 backend:
   name: github
-  repo: KULLANICIADI/mayaajans
+  repo: yigiitozdemir/mayaajans
   branch: main
-  base_url: https://OAUTH-ADRESI-BURAYA.workers.dev
+  base_url: https://sveltia-cms-auth.yigit-7c4.workers.dev
 
 locale: tr
 site_url: https://mayaajans.net
