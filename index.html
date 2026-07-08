@@ -89,12 +89,15 @@ h2{font-family:'Archivo Black',sans-serif;font-size:clamp(1.8rem,4vw,2.8rem);lin
 .stat .label{color:var(--cream-dim);font-size:.95rem;margin-top:6px}
 
 /* Referanslar */
-.ref-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:18px}
-.ref-item{background:var(--bg2);border:1px solid var(--line);border-radius:var(--radius);padding:26px 18px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;transition:transform .3s,border-color .3s}
-.ref-item:hover{transform:translateY(-4px);border-color:rgba(165,96,74,.5)}
-.ref-item img{max-height:64px;max-width:80%;object-fit:contain;filter:grayscale(1) brightness(1.4);opacity:.75;transition:filter .3s,opacity .3s}
-.ref-item:hover img{filter:none;opacity:1}
-.ref-item span{font-size:.85rem;color:var(--cream-dim);text-align:center}
+.ref-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:24px}
+.ref-item{background:#f7f4ee;border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column;transition:transform .3s,box-shadow .3s}
+.ref-item:hover{transform:translateY(-6px);box-shadow:0 16px 40px rgba(0,0,0,.35)}
+.ref-logo{height:210px;display:flex;align-items:center;justify-content:center;padding:26px}
+.ref-logo img{max-height:150px;max-width:75%;object-fit:contain}
+.ref-body{padding:0 24px 22px}
+.ref-body h3{color:#1c1a17;font-size:1.12rem;margin-bottom:12px}
+.ref-tags{display:flex;flex-wrap:wrap;gap:8px}
+.ref-tags span{background:rgba(165,96,74,.14);color:#8a4a36;font-size:.8rem;font-weight:600;padding:5px 13px;border-radius:8px}
 
 /* Galeri */
 .galeri-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:18px}
@@ -363,9 +366,11 @@ async function applyContent(){
       const sec=document.getElementById('referanslar');sec.style.display='';
       document.getElementById('refGrid').innerHTML=c.referanslar.map(r=>
         '<div class="ref-item reveal">'+
-        (r.logo?'<img src="'+r.logo+'" alt="'+(r.firma||'Referans')+'" loading="lazy">':'')+
-        (r.firma?'<span>'+r.firma+'</span>':'')+
-        '</div>').join('');
+        '<div class="ref-logo">'+(r.logo?'<img src="'+encodeURI(r.logo)+'" alt="'+(r.firma||'Referans')+'" loading="lazy">':'')+'</div>'+
+        '<div class="ref-body">'+
+        (r.firma?'<h3>'+r.firma+'</h3>':'')+
+        (r.etiketler?'<div class="ref-tags">'+r.etiketler.split(',').map(t=>'<span>'+t.trim()+'</span>').join('')+'</div>':'')+
+        '</div></div>').join('');
     }
     // Galeri
     if(Array.isArray(c.galeri)&&c.galeri.length){
