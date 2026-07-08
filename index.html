@@ -184,8 +184,7 @@ footer .copy{color:var(--cream-dim);font-size:.85rem;margin-top:10px}
 /* Açılış intro'su */
 .intro{position:fixed;inset:0;background:var(--bg);z-index:10000;display:flex;align-items:center;justify-content:center;animation:iHide .75s cubic-bezier(.76,0,.24,1) 1.5s forwards}
 .intro-logo{position:relative;text-align:center}
-.intro-logo .i-block{font-family:'Archivo Black',sans-serif;font-size:clamp(3rem,10vw,5rem);letter-spacing:.04em;color:var(--cream);display:block;animation:iLogo .8s cubic-bezier(.22,1,.36,1) .15s both}
-.intro-logo .i-script{font-family:'Mr Dafoe',cursive;font-size:clamp(1.8rem,6vw,3rem);color:var(--copper);position:absolute;left:10%;top:55%;white-space:nowrap;transform:rotate(-4deg);animation:iScript .7s ease .7s both}
+.intro-logo img{width:min(64vw,440px);display:block;animation:iLogo .9s cubic-bezier(.22,1,.36,1) .2s both}
 @keyframes iLogo{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:none}}
 @keyframes iScript{from{opacity:0}to{opacity:1}}
 @keyframes iHide{to{transform:translateY(-100%)}}
@@ -233,8 +232,7 @@ body.introlu .hero-cta{animation-delay:2.19s}
 
 <div class="intro" id="intro" aria-hidden="true">
   <div class="intro-logo">
-    <span class="i-block">MAYA</span>
-    <span class="i-script">Maya Ajans</span>
+    <img src="images/mayaajans_yataylogo_02-4x.png" alt="Maya Ajans">
   </div>
 </div>
 <script>
