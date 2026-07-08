@@ -64,7 +64,12 @@
       "aciklama": "Logo, renk paleti ve marka dili ile işletmenizin her mecrada tutarlı ve akılda kalıcı görünmesini sağlıyoruz."
     }
   ],
-  "referanslar": [],
+  "referanslar": [
+    {
+      "logo": "/images/özikiz-logo.png",
+      "firma": "ÖZİKİZ"
+    }
+  ],
   "hero": {
     "eyebrow": "Tekirdağ / Çorlu — Sosyal Medya Ajansı",
     "baslik": "Markanızı dijitalde",
