@@ -113,7 +113,7 @@ h2{font-family:'Archivo Black',sans-serif;font-size:clamp(1.8rem,4vw,2.8rem);lin
 
 /* Referanslar */
 .ref-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:24px}
-.ref-item{background:#f7f4ee;border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column;transition:transform .3s,box-shadow .3s}
+.ref-item{background:#ffffff;border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column;transition:transform .3s,box-shadow .3s}
 .ref-item:hover{transform:translateY(-6px);box-shadow:0 16px 40px rgba(0,0,0,.35)}
 .ref-logo{height:210px;display:flex;align-items:center;justify-content:center;padding:26px}
 .ref-logo img{max-height:150px;max-width:75%;object-fit:contain}
@@ -157,6 +157,22 @@ footer .logo{margin-bottom:18px}
 .socials svg{width:20px;height:20px;stroke:var(--cream-dim)}
 footer .copy{color:var(--cream-dim);font-size:.85rem;margin-top:10px}
 
+/* Kayan şerit (marquee) */
+.mq-sec{padding:70px 0;overflow:hidden}
+.mq-wrap{transform:rotate(-2deg);margin:0 -40px}
+.mq{display:flex;overflow:hidden;white-space:nowrap}
+.mq-in{display:flex;flex-shrink:0;animation:kaydir 18s linear infinite}
+.mq-in span{font-family:'Archivo Black',sans-serif;font-size:1.6rem;letter-spacing:.02em;padding:14px 0}
+.mq-copper{background:var(--copper)}
+.mq-copper span{color:var(--bg)}
+.mq-dark{border-top:1px solid var(--line);border-bottom:1px solid var(--line);transform:rotate(2.6deg);margin-top:18px}
+.mq-dark .mq-in{animation-direction:reverse;animation-duration:22s}
+.mq-dark span{color:transparent;-webkit-text-stroke:1px var(--cream)}
+.yildiz{padding:14px 18px !important;font-size:1.3rem !important}
+.mq-copper .yildiz{color:var(--bg)}
+.mq-dark .yildiz{color:var(--copper);-webkit-text-stroke:0}
+@keyframes kaydir{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
 /* Showreel */
 .showreel{border-radius:26px;overflow:hidden;border:1px solid var(--line);box-shadow:0 30px 90px rgba(0,0,0,.5)}
 .showreel video{width:100%;display:block}
@@ -164,6 +180,19 @@ footer .copy{color:var(--cream-dim);font-size:.85rem;margin-top:10px}
 /* Reveal animation */
 .reveal{opacity:0;transform:translateY(36px);transition:opacity .9s cubic-bezier(.22,1,.36,1),transform .9s cubic-bezier(.22,1,.36,1)}
 .reveal.visible{opacity:1;transform:none}
+
+/* Açılış intro'su */
+.intro{position:fixed;inset:0;background:var(--bg);z-index:10000;display:flex;align-items:center;justify-content:center;animation:iHide .75s cubic-bezier(.76,0,.24,1) 1.5s forwards}
+.intro-logo{position:relative;text-align:center}
+.intro-logo .i-block{font-family:'Archivo Black',sans-serif;font-size:clamp(3rem,10vw,5rem);letter-spacing:.04em;color:var(--cream);display:block;animation:iLogo .8s cubic-bezier(.22,1,.36,1) .15s both}
+.intro-logo .i-script{font-family:'Mr Dafoe',cursive;font-size:clamp(1.8rem,6vw,3rem);color:var(--copper);position:absolute;left:10%;top:55%;white-space:nowrap;transform:rotate(-4deg);animation:iScript .7s ease .7s both}
+@keyframes iLogo{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:none}}
+@keyframes iScript{from{opacity:0}to{opacity:1}}
+@keyframes iHide{to{transform:translateY(-100%)}}
+body.introlu .hero .eyebrow{animation-delay:1.7s}
+body.introlu .hero h1{animation-delay:1.85s}
+body.introlu .hero p{animation-delay:2.03s}
+body.introlu .hero-cta{animation-delay:2.19s}
 
 /* Hero giriş animasyonu */
 @keyframes riseIn{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:none}}
@@ -188,6 +217,9 @@ footer .copy{color:var(--cream-dim);font-size:.85rem;margin-top:10px}
   .blob{display:none}
   nav.scrolled{backdrop-filter:none;background:rgba(11,10,9,.97)}
   .reveal{transition-duration:.4s}
+  .mq-in span{font-size:1.05rem;padding:10px 0}
+  .yildiz{font-size:.9rem !important;padding:10px 12px !important}
+  .mq-sec{padding:44px 0}
   .nav-links{position:fixed;inset:0;background:rgba(11,10,9,.97);flex-direction:column;justify-content:center;font-size:1.3rem;display:none}
   .nav-links.open{display:flex}
   .nav-links a{font-size:1.2rem}
@@ -198,6 +230,22 @@ footer .copy{color:var(--cream-dim);font-size:.85rem;margin-top:10px}
 </style>
 </head>
 <body>
+
+<div class="intro" id="intro" aria-hidden="true">
+  <div class="intro-logo">
+    <span class="i-block">MAYA</span>
+    <span class="i-script">Maya Ajans</span>
+  </div>
+</div>
+<script>
+(function(){
+  const intro=document.getElementById('intro');
+  if(sessionStorage.getItem('introGoruldu')||matchMedia('(prefers-reduced-motion: reduce)').matches){intro.remove();return}
+  sessionStorage.setItem('introGoruldu','1');
+  document.body.classList.add('introlu');
+  intro.addEventListener('animationend',e=>{if(e.animationName==='iHide')intro.remove()});
+})();
+</script>
 
 <nav id="nav">
   <a href="#" class="logo" aria-label="Maya Ajans">
@@ -234,6 +282,13 @@ footer .copy{color:var(--cream-dim);font-size:.85rem;margin-top:10px}
     </div>
   </div>
 </section>
+
+<div class="mq-sec" aria-hidden="true">
+  <div class="mq-wrap">
+    <div class="mq mq-copper"><div class="mq-in" id="mq1"></div></div>
+    <div class="mq mq-dark"><div class="mq-in" id="mq2"></div></div>
+  </div>
+</div>
 
 <section id="hizmetler" style="padding-top:60px">
   <div class="container">
@@ -374,6 +429,14 @@ footer .copy{color:var(--cream-dim);font-size:.85rem;margin-top:10px}
 </a>
 
 <script>
+// Kayan şerit içeriği
+(function(){
+  const kelimeler=['Sosyal Medya','Video Prodüksiyon','Reklam Yönetimi','Kurumsal Kimlik','Drone Çekimi','İçerik Üretimi'];
+  const blok=kelimeler.map(k=>'<span>'+k+'</span><span class="yildiz">✦</span>').join('');
+  document.getElementById('mq1').innerHTML=blok+blok;
+  document.getElementById('mq2').innerHTML=blok+blok;
+})();
+
 // Nav scroll
 const nav=document.getElementById('nav');
 addEventListener('scroll',()=>nav.classList.toggle('scrolled',scrollY>40));
@@ -394,7 +457,6 @@ async function applyContent(){
     set('heroScript',c.hero?.baslik_el_yazisi);
     set('heroDesc',c.hero?.aciklama);
     set('hakkimizdaDesc',c.hakkimizda);
-    // Hizmet ve süreç kartları
     (c.hizmetler||[]).forEach((h,i)=>{
       const card=document.querySelectorAll('#hizmetGrid .card')[i];
       if(card){card.querySelector('h3').textContent=h.baslik;card.querySelector('p').textContent=h.aciklama}
@@ -403,21 +465,17 @@ async function applyContent(){
       const st=document.querySelectorAll('#surecSteps .step')[i];
       if(st){st.querySelector('h3').textContent=s.baslik;st.querySelector('p').textContent=s.aciklama}
     });
-    // İstatistikler
     (c.istatistikler||[]).forEach((s,i)=>{
       const el=document.querySelectorAll('#statsGrid .stat')[i];
       if(el){el.querySelector('.value').dataset.count=s.deger;el.querySelector('.label').textContent=s.etiket}
     });
-    // İletişim
     const t=c.iletisim||{};
     if(t.telefon){const a=document.getElementById('telLink');a.textContent=t.telefon;a.href='tel:'+(t.telefon_link||t.telefon.replace(/\s/g,''))}
     if(t.eposta){const a=document.getElementById('mailLink');a.textContent=t.eposta;a.href='mailto:'+t.eposta}
     set('adresText',t.adres);
     if(t.instagram){const a=document.getElementById('igLink');a.textContent='@'+t.instagram;a.href='https://www.instagram.com/'+t.instagram+'/'}
     if(t.whatsapp){document.querySelectorAll('a[href*="wa.me"]').forEach(a=>a.href='https://wa.me/'+t.whatsapp)}
-    // Logo görseli
     if(c.logo){document.querySelectorAll('.logo').forEach(l=>{l.innerHTML='<img src="'+encodeURI(c.logo)+'" alt="Maya Ajans" decoding="async">'})}
-    // Referanslar
     if(Array.isArray(c.referanslar)&&c.referanslar.length){
       const sec=document.getElementById('referanslar');sec.style.display='';
       if(c.referanslar.length>6)document.getElementById('refMore').style.display='';
@@ -429,16 +487,15 @@ async function applyContent(){
         (r.etiketler?'<div class="ref-tags">'+r.etiketler.split(',').map(t=>'<span>'+t.trim()+'</span>').join('')+'</div>':'')+
         '</div></div>').join('');
     }
-    // Galeri
     if(Array.isArray(c.galeri)&&c.galeri.length){
       const sec=document.getElementById('calismalar');sec.style.display='';
       document.getElementById('galeriGrid').innerHTML=c.galeri.map(g=>
         '<figure class="reveal">'+
-        '<img src="'+g.gorsel+'" alt="'+(g.baslik||'Çalışma')+'" loading="lazy">'+
+        '<img src="'+encodeURI(g.gorsel)+'" alt="'+(g.baslik||'Çalışma')+'" loading="lazy">'+
         (g.baslik?'<figcaption>'+g.baslik+'</figcaption>':'')+
         '</figure>').join('');
     }
-  }catch(e){/* yerel önizlemede sorun değil */}
+  }catch(e){}
 }
 
 function initAnimations(){
@@ -467,7 +524,6 @@ if(matchMedia('(pointer:fine)').matches){
   addEventListener('mousemove',e=>{
     mx=e.clientX;my=e.clientY;
     dot.style.transform=`translate(${mx}px,${my}px) translate(-50%,-50%)`;
-    // Paralaks: arka plan küreleri fareyle hafifçe kayar
     const px=(mx/innerWidth-.5),py=(my/innerHeight-.5);
     document.querySelectorAll('.blob').forEach((b,i)=>{
       b.style.transform=`translate(${px*(i?-24:24)}px,${py*(i?-18:18)}px)`;
