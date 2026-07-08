@@ -246,6 +246,9 @@ footer .copy{color:var(--cream-dim);font-size:.85rem;margin-top:10px}
     <h2 class="reveal">Referanslarımız</h2>
     <p class="sec-desc reveal">Birlikte çalıştığımız markalar.</p>
     <div class="ref-grid" id="refGrid"></div>
+    <div id="refMore" style="display:none;text-align:center;margin-top:40px">
+      <a href="referanslar.html" class="btn btn-ghost">Tüm Referanslarımız →</a>
+    </div>
   </div>
 </section>
 
@@ -364,7 +367,8 @@ async function applyContent(){
     // Referanslar
     if(Array.isArray(c.referanslar)&&c.referanslar.length){
       const sec=document.getElementById('referanslar');sec.style.display='';
-      document.getElementById('refGrid').innerHTML=c.referanslar.map(r=>
+      if(c.referanslar.length>6)document.getElementById('refMore').style.display='';
+      document.getElementById('refGrid').innerHTML=c.referanslar.slice(0,6).map(r=>
         '<div class="ref-item reveal">'+
         '<div class="ref-logo">'+(r.logo?'<img src="'+encodeURI(r.logo)+'" alt="'+(r.firma||'Referans')+'" loading="lazy">':'')+'</div>'+
         '<div class="ref-body">'+
