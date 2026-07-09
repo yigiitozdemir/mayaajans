@@ -67,6 +67,21 @@
   "referanslar": [
     {
       "logo": "/images/ozikizkasap.png"
+    },
+    {
+      "logo": "/images/arcade_logo-4x.png"
+    },
+    {
+      "logo": "/images/şeffaf-logo.png"
+    },
+    {
+      "logo": "/images/büyüksoy-heb-hebrella.png"
+    },
+    {
+      "logo": "/images/cavusdent_dikey-4x.png"
+    },
+    {
+      "logo": "/images/miradent_beyaz_logo-4x.png"
     }
   ],
   "hero": {
