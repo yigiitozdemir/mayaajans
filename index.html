@@ -10,6 +10,9 @@
 <meta property="og:url" content="https://mayaajans.net">
 <meta property="og:locale" content="tr_TR">
 <link rel="canonical" href="https://mayaajans.net/">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2064%2064'%3E%3Crect%20width='64'%20height='64'%20rx='14'%20fill='%230b0a09'/%3E%3Ctext%20x='32'%20y='46'%20font-family='Arial%20Black,Arial,sans-serif'%20font-size='38'%20font-weight='900'%20text-anchor='middle'%20fill='%23ddd5c7'%3EM%3C/text%3E%3Ccircle%20cx='50'%20cy='16'%20r='6'%20fill='%23a5604a'/%3E%3C/svg%3E">
+<meta property="og:image" content="https://mayaajans.net/images/mayaajans_yataylogo_02-4x.png">
+<meta name="twitter:card" content="summary_large_image">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -79,6 +82,10 @@ nav.scrolled{background:rgba(11,10,9,.9);backdrop-filter:blur(14px);box-shadow:0
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
 h1{font-family:'Archivo Black',sans-serif;font-size:clamp(2.4rem,6vw,4.6rem);line-height:1.08;letter-spacing:-.01em;max-width:900px}
 h1 .script-accent{font-family:'Mr Dafoe',cursive;color:var(--copper);font-weight:400;font-size:1.1em}
+.donen-kutu{display:inline-grid;text-align:center}
+.donen{grid-area:1/1;opacity:0;transform:translateY(60%);transition:opacity .5s ease,transform .5s cubic-bezier(.22,1,.36,1)}
+.donen.aktif{opacity:1;transform:none}
+.donen.cikis{opacity:0;transform:translateY(-60%)}
 .hero p{max-width:620px;margin:26px auto 40px;color:var(--cream-dim);font-size:1.08rem}
 .hero-cta{display:flex;gap:16px;flex-wrap:wrap;justify-content:center}
 
@@ -265,7 +272,7 @@ body.introlu .hero-cta{animation-delay:2.19s}
   <div class="blob blob1"></div>
   <div class="blob blob2"></div>
   <span class="eyebrow"><span class="dot"></span> <span id="heroEyebrow">Tekirdağ / Çorlu — Sosyal Medya Ajansı</span></span>
-  <h1><span id="heroBaslik">Markanızı dijitalde</span><br><span class="script-accent" id="heroScript">büyütüyoruz.</span></h1>
+  <h1><span id="heroBaslik">Markanızı dijitalde</span><br><span class="script-accent donen-kutu" id="donenKutu"><span class="donen aktif" id="heroScript">büyütüyoruz.</span></span></h1>
   <p id="heroDesc">Sosyal medya yönetiminden video prodüksiyona, reklam kampanyalarından kurumsal kimliğe — markanızın dijital yolculuğunu baştan sona tasarlıyor ve yönetiyoruz.</p>
   <div class="hero-cta">
     <a href="#iletisim" class="btn btn-copper">Hemen Teklif Alın</a>
@@ -511,7 +518,27 @@ function initAnimations(){
   }),{threshold:.5});
   document.querySelectorAll('[data-count]').forEach(el=>cio.observe(el));
 }
-applyContent().finally(initAnimations);
+applyContent().finally(()=>{
+  initAnimations();
+  // Hero'da dönen kelime
+  const kutu=document.getElementById('donenKutu');
+  if(kutu){
+    const ilk=document.getElementById('heroScript').textContent.trim();
+    const liste=[ilk,'parlatıyoruz.','konuşturuyoruz.'].filter((k,i,a)=>a.indexOf(k)===i);
+    liste.slice(1).forEach(k=>{
+      const s=document.createElement('span');s.className='donen';s.textContent=k;kutu.appendChild(s);
+    });
+    let idx=0;
+    setInterval(()=>{
+      const spanlar=kutu.querySelectorAll('.donen');
+      if(spanlar.length<2)return;
+      spanlar[idx].classList.remove('aktif');spanlar[idx].classList.add('cikis');
+      const eski=idx;idx=(idx+1)%spanlar.length;
+      spanlar[idx].classList.remove('cikis');spanlar[idx].classList.add('aktif');
+      setTimeout(()=>spanlar[eski].classList.remove('cikis'),500);
+    },2600);
+  }
+});
 
 // Özel imleç + hafif paralaks (yalnızca fareli cihazlarda çalışır, mobili etkilemez)
 if(matchMedia('(pointer:fine)').matches){
