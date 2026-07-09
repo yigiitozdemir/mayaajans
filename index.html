@@ -118,16 +118,15 @@ h2{font-family:'Archivo Black',sans-serif;font-size:clamp(1.8rem,4vw,2.8rem);lin
 .stat .value{font-family:'Archivo Black',sans-serif;font-size:clamp(2.2rem,5vw,3.4rem);color:var(--copper-light)}
 .stat .label{color:var(--cream-dim);font-size:.95rem;margin-top:6px}
 
-/* Referanslar */
-.ref-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:24px}
-.ref-item{background:#ffffff;border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column;transition:transform .3s,box-shadow .3s}
-.ref-item:hover{transform:translateY(-6px);box-shadow:0 16px 40px rgba(0,0,0,.35)}
-.ref-logo{height:210px;display:flex;align-items:center;justify-content:center;padding:26px}
-.ref-logo img{max-height:150px;max-width:75%;object-fit:contain}
-.ref-body{padding:0 24px 22px}
-.ref-body h3{color:#1c1a17;font-size:1.12rem;margin-bottom:12px}
-.ref-tags{display:flex;flex-wrap:wrap;gap:8px}
-.ref-tags span{background:rgba(165,96,74,.14);color:#8a4a36;font-size:.8rem;font-weight:600;padding:5px 13px;border-radius:8px}
+/* Referanslar — logo şeridi */
+.ref-marquee{overflow:hidden;position:relative;padding:10px 0}
+.ref-marquee::before,.ref-marquee::after{content:'';position:absolute;top:0;bottom:0;width:110px;z-index:2;pointer-events:none}
+.ref-marquee::before{left:0;background:linear-gradient(90deg,var(--bg),transparent)}
+.ref-marquee::after{right:0;background:linear-gradient(270deg,var(--bg),transparent)}
+.ref-track{display:flex;gap:26px;width:max-content;animation:kaydir 32s linear infinite}
+.ref-marquee:hover .ref-track{animation-play-state:paused}
+.ref-logo-item{background:#fff;border-radius:16px;height:100px;min-width:190px;display:flex;align-items:center;justify-content:center;padding:20px 38px;flex-shrink:0}
+.ref-logo-item img{max-height:62px;max-width:150px;object-fit:contain}
 
 /* Galeri */
 .galeri-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:18px}
@@ -226,6 +225,8 @@ body.introlu .hero-cta{animation-delay:2.19s}
   .mq-in span{font-size:1.05rem;padding:10px 0}
   .yildiz{font-size:.9rem !important;padding:10px 12px !important}
   .mq-sec{padding:44px 0}
+  .ref-logo-item{height:84px;min-width:150px;padding:16px 26px}
+  .ref-logo-item img{max-height:50px;max-width:120px}
   .nav-links{position:fixed;inset:0;background:rgba(11,10,9,.97);flex-direction:column;justify-content:center;font-size:1.3rem;display:none}
   .nav-links.open{display:flex}
   .nav-links a{font-size:1.2rem}
@@ -358,8 +359,12 @@ body.introlu .hero-cta{animation-delay:2.19s}
     <span class="sec-label reveal">bize güvenenler</span>
     <h2 class="reveal">Referanslarımız</h2>
     <p class="sec-desc reveal">Birlikte çalıştığımız markalar.</p>
-    <div class="ref-grid" id="refGrid"></div>
-    <div id="refMore" style="display:none;text-align:center;margin-top:40px">
+  </div>
+  <div class="ref-marquee reveal">
+    <div class="ref-track" id="refTrack"></div>
+  </div>
+  <div class="container">
+    <div id="refMore" style="text-align:center;margin-top:44px">
       <a href="referanslar.html" class="btn btn-ghost">Tüm Referanslarımız →</a>
     </div>
   </div>
@@ -483,14 +488,13 @@ async function applyContent(){
     if(c.logo){document.querySelectorAll('.logo').forEach(l=>{l.innerHTML='<img src="'+encodeURI(c.logo)+'" alt="Maya Ajans" decoding="async">'})}
     if(Array.isArray(c.referanslar)&&c.referanslar.length){
       const sec=document.getElementById('referanslar');sec.style.display='';
-      if(c.referanslar.length>6)document.getElementById('refMore').style.display='';
-      document.getElementById('refGrid').innerHTML=c.referanslar.slice(0,6).map(r=>
-        '<div class="ref-item reveal">'+
-        '<div class="ref-logo">'+(r.logo?'<img src="'+encodeURI(r.logo)+'" alt="'+(r.firma||'Referans')+'" loading="lazy">':'')+'</div>'+
-        '<div class="ref-body">'+
-        (r.firma?'<h3>'+r.firma+'</h3>':'')+
-        (r.etiketler?'<div class="ref-tags">'+r.etiketler.split(',').map(t=>'<span>'+t.trim()+'</span>').join('')+'</div>':'')+
-        '</div></div>').join('');
+      const logolar=c.referanslar.filter(r=>r.logo);
+      const tekrar=Math.max(2,Math.ceil(10/logolar.length));
+      let dizi=[];
+      for(let i=0;i<tekrar;i++)dizi=dizi.concat(logolar);
+      const blok=dizi.map(r=>
+        '<div class="ref-logo-item"><img src="'+encodeURI(r.logo)+'" alt="'+(r.firma||'Referans')+'" loading="lazy"></div>').join('');
+      document.getElementById('refTrack').innerHTML=blok+blok;
     }
     if(Array.isArray(c.galeri)&&c.galeri.length){
       const sec=document.getElementById('calismalar');sec.style.display='';
