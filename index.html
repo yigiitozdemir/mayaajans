@@ -59,28 +59,23 @@ body{background:var(--bg);color:var(--cream);font-family:'Archivo',sans-serif;li
 .logo{display:inline-block;position:relative;line-height:1;text-decoration:none}
 .logo .block{font-family:'Archivo Black',sans-serif;font-size:1.7rem;letter-spacing:.04em;color:#e7e0d4}
 .logo .script{font-family:'Parisienne',cursive;font-size:1.35rem;color:var(--copper);position:absolute;left:12%;top:52%;white-space:nowrap;transform:rotate(-4deg)}
-nav.scrolled .logo .block{color:var(--cream)}
 .logo img{height:42px;display:block}
 
-/* Nav */
-nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:18px 5%;display:flex;align-items:center;justify-content:space-between;transition:background .3s,box-shadow .3s}
-nav.scrolled{background:rgba(236,229,216,.92);backdrop-filter:blur(14px);box-shadow:0 1px 0 var(--line)}
-nav.scrolled .logo img{background:#0b0a09;padding:7px 11px;border-radius:11px;height:34px}
+/* Nav — her zaman koyu (logo hep uyumlu) */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:18px 5%;display:flex;align-items:center;justify-content:space-between;transition:background .3s,box-shadow .3s,padding .3s}
+nav.scrolled{background:rgba(15,13,11,.92);backdrop-filter:blur(14px);box-shadow:0 6px 24px rgba(0,0,0,.25);padding:12px 5%}
 .nav-links{display:flex;gap:34px;align-items:center;list-style:none}
 .nav-links a{color:#b3aa9b;text-decoration:none;font-size:.92rem;transition:color .2s}
 .nav-links a:hover{color:#fff}
-nav.scrolled .nav-links a{color:var(--cream-dim)}
-nav.scrolled .nav-links a:hover{color:var(--cream)}
 .btn{display:inline-block;padding:13px 28px;border-radius:100px;font-weight:600;font-size:.92rem;text-decoration:none;transition:transform .2s,box-shadow .2s,background .2s;cursor:pointer;border:none}
 .btn-copper{background:var(--copper);color:#fff}
 .btn-copper:hover{background:var(--copper-light);transform:translateY(-2px);box-shadow:0 10px 30px rgba(165,96,74,.35)}
 .btn-ghost{border:1px solid var(--line);color:var(--cream);background:transparent}
 .btn-ghost:hover{border-color:var(--copper);color:var(--copper-light);transform:translateY(-2px)}
 .hamburger{display:none;background:none;border:none;color:#e7e0d4;font-size:1.6rem;cursor:pointer}
-nav.scrolled .hamburger{color:var(--cream)}
 
 /* Hero — koyu bant */
-.hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;position:relative;padding:140px 5% 100px;background:var(--dark);color:#e7e0d4;border-radius:0 0 44px 44px;overflow:hidden}
+.hero{min-height:82vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;position:relative;padding:150px 5% 150px;background:var(--dark);color:#e7e0d4;border-radius:0 0 44px 44px;overflow:hidden}
 .blob{position:absolute;border-radius:50%;filter:blur(120px);opacity:.4;pointer-events:none}
 .blob1{width:520px;height:520px;background:var(--copper);top:-10%;right:-8%}
 .blob2{width:420px;height:420px;background:#4a3a30;bottom:-5%;left:-8%}
@@ -165,8 +160,9 @@ textarea{min-height:130px;resize:vertical}
 
 /* Footer */
 footer{border-top:1px solid var(--line);padding:56px 5% 36px;text-align:center}
-footer .logo{margin-bottom:18px}
+footer .logo{margin-bottom:18px;display:inline-block}
 footer .logo .block{color:var(--cream)}
+footer .logo img{background:#0b0a09;padding:9px 13px;border-radius:12px;height:36px;margin:0 auto}
 .socials{display:flex;gap:14px;justify-content:center;margin:22px 0}
 .socials a{width:44px;height:44px;border:1px solid var(--line);border-radius:50%;display:flex;align-items:center;justify-content:center;transition:border-color .2s,transform .2s}
 .socials a:hover{border-color:var(--copper);transform:translateY(-3px)}
@@ -294,7 +290,7 @@ body.introlu .hero-cta{animation-delay:2.19s}
   </div>
 </header>
 
-<section style="padding-top:0;margin-top:-40px">
+<section style="padding-top:0;margin-top:-120px;position:relative;z-index:2">
   <div class="container">
     <div class="showreel reveal">
       <video src="showreel.mp4" autoplay muted loop playsinline preload="metadata" aria-label="Maya Ajans tanıtım videosu"></video>
