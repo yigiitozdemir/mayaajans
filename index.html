@@ -63,8 +63,10 @@ body{background:var(--bg);color:var(--cream);font-family:'Archivo',sans-serif;li
 nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:18px 5%;display:flex;align-items:center;justify-content:space-between;transition:background .3s,box-shadow .3s,padding .3s}
 nav.scrolled{background:rgba(15,13,11,.92);backdrop-filter:blur(14px);box-shadow:0 6px 24px rgba(0,0,0,.25);padding:12px 5%}
 .nav-links{display:flex;gap:34px;align-items:center;list-style:none}
-.nav-links a{color:#b3aa9b;text-decoration:none;font-size:.92rem;transition:color .2s}
+.nav-links a{color:#b3aa9b;text-decoration:none;font-size:.92rem;transition:color .2s;position:relative}
+.nav-links a::after{content:'';position:absolute;left:0;bottom:-5px;width:0;height:1.5px;background:var(--copper-light);transition:width .28s ease}
 .nav-links a:hover{color:#fff}
+.nav-links a:hover::after{width:100%}
 .btn{display:inline-block;padding:13px 28px;border-radius:100px;font-weight:600;font-size:.92rem;text-decoration:none;transition:transform .2s,box-shadow .2s,background .2s;cursor:pointer;border:none}
 .btn-copper{background:var(--copper);color:#fff}
 .btn-copper:hover{background:var(--copper-light);transform:translateY(-2px);box-shadow:0 10px 30px rgba(165,96,74,.35)}
@@ -90,6 +92,14 @@ h1 .script-accent{font-family:'Dancing Script',cursive;color:var(--copper-light)
 .hero-cta{display:flex;gap:16px;flex-wrap:wrap;justify-content:center}
 .hero .btn-ghost{border-color:rgba(231,224,212,.25);color:#e7e0d4}
 .hero .btn-ghost:hover{border-color:var(--copper-light);color:var(--copper-light)}
+.kelime{display:inline-block;opacity:0;transform:translateY(28px);animation:kelimeGel .6s cubic-bezier(.22,1,.36,1) forwards}
+@keyframes kelimeGel{to{opacity:1;transform:none}}
+.scroll-ind{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);z-index:1;display:flex;flex-direction:column;align-items:center;gap:6px;color:#8a8478;font-size:.7rem;letter-spacing:.1em;transition:opacity .4s}
+.scroll-ind.gizle{opacity:0;pointer-events:none}
+.scroll-ind .mouse{width:22px;height:34px;border:1.5px solid rgba(231,224,212,.35);border-radius:12px;position:relative}
+.scroll-ind .mouse::after{content:'';position:absolute;top:6px;left:50%;width:3px;height:6px;background:var(--copper-light);border-radius:2px;transform:translateX(-50%);animation:sdrop 1.5s ease-in-out infinite}
+@keyframes sdrop{0%{opacity:0;transform:translate(-50%,0)}40%{opacity:1}80%{opacity:0;transform:translate(-50%,11px)}}
+.hero-hglow{position:absolute;width:480px;height:480px;border-radius:50%;background:radial-gradient(circle,rgba(196,127,102,.22),transparent 65%);pointer-events:none;z-index:0;opacity:0;transition:opacity .4s;transform:translate(-50%,-50%)}
 
 section{padding:110px 5%;position:relative}
 .container{max-width:1180px;margin:0 auto}
@@ -188,13 +198,11 @@ footer .copy{color:#7c766b;font-size:.85rem;margin-top:14px}
 @keyframes iLogo{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:none}}
 @keyframes iHide{to{transform:translateY(-100%)}}
 body.introlu .hero .eyebrow{animation-delay:1.7s}
-body.introlu .hero h1{animation-delay:1.85s}
 body.introlu .hero p{animation-delay:2.03s}
 body.introlu .hero-cta{animation-delay:2.19s}
 
 @keyframes riseIn{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:none}}
 .hero .eyebrow{animation:riseIn .8s cubic-bezier(.22,1,.36,1) .15s both}
-.hero h1{animation:riseIn .9s cubic-bezier(.22,1,.36,1) .3s both}
 .hero p{animation:riseIn .9s cubic-bezier(.22,1,.36,1) .48s both}
 .hero-cta{animation:riseIn .9s cubic-bezier(.22,1,.36,1) .64s both}
 
@@ -263,9 +271,10 @@ body.introlu .hero-cta{animation-delay:2.19s}
   <button class="hamburger" id="hamburger" aria-label="Menü">☰</button>
 </nav>
 
-<header class="hero">
+<header class="hero" id="hero">
   <div class="blob blob1"></div>
   <div class="blob blob2"></div>
+  <div class="hero-hglow" id="heroHglow"></div>
   <span class="eyebrow"><span class="dot"></span> <span id="heroEyebrow">Tekirdağ / Çorlu — Sosyal Medya Ajansı</span></span>
   <h1><span id="heroBaslik">Markanızı dijitalde</span><br><span class="script-accent donen-kutu" id="donenKutu"><span class="donen aktif" id="heroScript">büyütüyoruz.</span></span></h1>
   <p id="heroDesc">Sosyal medya yönetiminden video prodüksiyona, reklam kampanyalarından kurumsal kimliğe — markanızın dijital yolculuğunu baştan sona tasarlıyor ve yönetiyoruz.</p>
@@ -273,6 +282,7 @@ body.introlu .hero-cta{animation-delay:2.19s}
     <a href="#iletisim" class="btn btn-copper">Hemen Teklif Alın</a>
     <a href="#hizmetler" class="btn btn-ghost">Hizmetlerimiz</a>
   </div>
+  <a href="#hizmetler" class="scroll-ind" id="scrollInd" aria-label="Aşağı kaydır"><span class="mouse"></span>KAYDIR</a>
 </header>
 
 <section style="padding-top:56px;padding-bottom:0">
@@ -452,7 +462,16 @@ body.introlu .hero-cta{animation-delay:2.19s}
 })();
 
 const nav=document.getElementById('nav');
-addEventListener('scroll',()=>nav.classList.toggle('scrolled',scrollY>40));
+const scrollBar=document.createElement('div');
+scrollBar.style.cssText='position:fixed;top:0;left:0;height:3px;width:0;background:var(--copper);z-index:200;transition:width .1s';
+document.body.appendChild(scrollBar);
+const scrollInd=document.getElementById('scrollInd');
+addEventListener('scroll',()=>{
+  nav.classList.toggle('scrolled',scrollY>40);
+  const h=document.documentElement.scrollHeight-innerHeight;
+  scrollBar.style.width=(h>0?scrollY/h*100:0)+'%';
+  if(scrollInd)scrollInd.classList.toggle('gizle',scrollY>60);
+},{passive:true});
 const links=document.getElementById('navLinks');
 document.getElementById('hamburger').onclick=()=>links.classList.toggle('open');
 links.querySelectorAll('a').forEach(a=>a.onclick=()=>links.classList.remove('open'));
@@ -525,6 +544,16 @@ function initAnimations(){
 }
 applyContent().finally(()=>{
   initAnimations();
+  const hb=document.getElementById('heroBaslik');
+  const acc=document.getElementById('donenKutu');
+  const base=document.body.classList.contains('introlu')?1.75:0.2;
+  let wsayi=0;
+  if(hb){
+    const ws=hb.textContent.trim().split(/\s+/);
+    wsayi=ws.length;
+    hb.innerHTML=ws.map((w,i)=>'<span class="kelime" style="animation-delay:'+(base+i*0.11).toFixed(2)+'s">'+w+'</span>').join(' ');
+  }
+  if(acc){acc.style.opacity='0';acc.style.animation='kelimeGel .7s cubic-bezier(.22,1,.36,1) '+(base+wsayi*0.11).toFixed(2)+'s forwards'}
   const kutu=document.getElementById('donenKutu');
   if(kutu){
     const ilk=document.getElementById('heroScript').textContent.trim();
@@ -564,6 +593,35 @@ if(matchMedia('(pointer:fine)').matches){
   })();
   document.addEventListener('mouseover',e=>{if(e.target.closest('a,button,input,textarea'))ring.classList.add('buyuk')});
   document.addEventListener('mouseout',e=>{if(e.target.closest('a,button,input,textarea'))ring.classList.remove('buyuk')});
+
+  document.querySelectorAll('.btn').forEach(b=>{
+    b.addEventListener('mousemove',e=>{
+      const r=b.getBoundingClientRect();
+      b.style.transform='translate('+((e.clientX-r.left-r.width/2)*0.28)+'px,'+((e.clientY-r.top-r.height/2)*0.4)+'px)';
+    });
+    b.addEventListener('mouseleave',()=>{b.style.transform=''});
+  });
+
+  document.querySelectorAll('.card,.step,.ref-logo-item').forEach(c=>{
+    c.style.transformStyle='preserve-3d';
+    c.addEventListener('mousemove',e=>{
+      const r=c.getBoundingClientRect();
+      const px=(e.clientX-r.left)/r.width-0.5, py=(e.clientY-r.top)/r.height-0.5;
+      c.style.transform='perspective(700px) rotateY('+(px*10)+'deg) rotateX('+(-py*10)+'deg) translateY(-6px)';
+    });
+    c.addEventListener('mouseleave',()=>{c.style.transform=''});
+  });
+
+  const hero=document.getElementById('hero'),hglow=document.getElementById('heroHglow');
+  if(hero&&hglow){
+    hero.addEventListener('mousemove',e=>{
+      const r=hero.getBoundingClientRect();
+      hglow.style.left=(e.clientX-r.left)+'px';
+      hglow.style.top=(e.clientY-r.top)+'px';
+      hglow.style.opacity='1';
+    });
+    hero.addEventListener('mouseleave',()=>{hglow.style.opacity='0'});
+  }
 }
 
 function sendMail(f){
