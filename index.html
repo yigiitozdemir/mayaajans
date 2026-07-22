@@ -100,6 +100,7 @@ h1 .script-accent{font-family:'Dancing Script',cursive;color:var(--copper-light)
 .scroll-ind .mouse::after{content:'';position:absolute;top:6px;left:50%;width:3px;height:6px;background:var(--copper-light);border-radius:2px;transform:translateX(-50%);animation:sdrop 1.5s ease-in-out infinite}
 @keyframes sdrop{0%{opacity:0;transform:translate(-50%,0)}40%{opacity:1}80%{opacity:0;transform:translate(-50%,11px)}}
 .hero-hglow{position:absolute;width:480px;height:480px;border-radius:50%;background:radial-gradient(circle,rgba(196,127,102,.22),transparent 65%);pointer-events:none;z-index:0;opacity:0;transition:opacity .4s;transform:translate(-50%,-50%)}
+.hero-canvas{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
 
 section{padding:110px 5%;position:relative}
 .container{max-width:1180px;margin:0 auto}
@@ -116,6 +117,10 @@ h2{font-family:'Archivo Black',sans-serif;font-size:clamp(1.8rem,4vw,2.8rem);lin
 .card p{color:var(--cream-dim);font-size:.94rem}
 
 .process{background:#f4efe6}
+.surec-timeline{position:relative;height:2px;background:rgba(28,26,23,.12);margin:0 6% 46px;border-radius:2px;display:flex;justify-content:space-between;align-items:center}
+.surec-timeline .stl-fill{position:absolute;left:0;top:0;height:100%;width:0;background:var(--copper);border-radius:2px;transition:width 1.8s ease}
+.surec-timeline.cizildi .stl-fill{width:100%}
+.surec-timeline i{width:13px;height:13px;border-radius:50%;background:var(--bg);border:2px solid var(--copper);position:relative;z-index:1}
 .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:22px;counter-reset:step}
 .step{border:1px solid var(--line);border-radius:var(--radius);padding:34px 28px;background:var(--bg2);position:relative}
 .step .num{font-family:'Archivo Black',sans-serif;font-size:2.6rem;color:transparent;-webkit-text-stroke:1.5px var(--copper);display:block;margin-bottom:14px}
@@ -274,6 +279,7 @@ body.introlu .hero-cta{animation-delay:2.19s}
 <header class="hero" id="hero">
   <div class="blob blob1"></div>
   <div class="blob blob2"></div>
+  <canvas class="hero-canvas" id="heroCanvas"></canvas>
   <div class="hero-hglow" id="heroHglow"></div>
   <span class="eyebrow"><span class="dot"></span> <span id="heroEyebrow">Tekirdağ / Çorlu — Sosyal Medya Ajansı</span></span>
   <h1><span id="heroBaslik">Markanızı dijitalde</span><br><span class="script-accent donen-kutu" id="donenKutu"><span class="donen aktif" id="heroScript">büyütüyoruz.</span></span></h1>
@@ -335,6 +341,7 @@ body.introlu .hero-cta{animation-delay:2.19s}
     <span class="sec-label reveal">nasıl çalışıyoruz?</span>
     <h2 class="reveal">Sürecimiz</h2>
     <p class="sec-desc reveal">Sıradan planlarla değil, markanıza özel akılcı adımlarla ilerliyoruz.</p>
+    <div class="surec-timeline" id="surecTL"><span class="stl-fill"></span><i></i><i></i><i></i><i></i></div>
     <div class="steps" id="surecSteps">
       <div class="step reveal"><span class="num">01</span><h3>Tanışma & Analiz</h3><p>Markanızı, hedef kitlenizi ve rakiplerinizi analiz ederek yol haritası çıkarıyoruz.</p></div>
       <div class="step reveal"><span class="num">02</span><h3>Strateji</h3><p>İçerik ve kampanya stratejinizi hedeflerinize göre planlıyoruz.</p></div>
@@ -462,6 +469,7 @@ body.introlu .hero-cta{animation-delay:2.19s}
 })();
 
 const nav=document.getElementById('nav');
+// Scroll ilerleme çizgisi
 const scrollBar=document.createElement('div');
 scrollBar.style.cssText='position:fixed;top:0;left:0;height:3px;width:0;background:var(--copper);z-index:200;transition:width .1s';
 document.body.appendChild(scrollBar);
@@ -541,9 +549,45 @@ function initAnimations(){
     cio.unobserve(el);
   }),{threshold:.5});
   document.querySelectorAll('[data-count]').forEach(el=>cio.observe(el));
+  // Süreç zaman çizgisi
+  const tl=document.getElementById('surecTL');
+  if(tl){const tio=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){tl.classList.add('cizildi');tio.disconnect()}}),{threshold:.4});tio.observe(tl)}
 }
+
+// Hero parçacık ağı
+(function(){
+  const cv=document.getElementById('heroCanvas'),hero=document.getElementById('hero');
+  if(!cv||!hero||matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  const ctx=cv.getContext('2d');let W,H,ps=[];
+  function boyut(){
+    const r=hero.getBoundingClientRect();W=cv.width=r.width;H=cv.height=r.height;
+    const say=Math.min(60,Math.round(W*H/22000));
+    ps=[];for(let i=0;i<say;i++)ps.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.45,vy:(Math.random()-.5)*.45});
+  }
+  boyut();
+  let mx=-999,my=-999;
+  hero.addEventListener('mousemove',e=>{const r=hero.getBoundingClientRect();mx=e.clientX-r.left;my=e.clientY-r.top},{passive:true});
+  hero.addEventListener('mouseleave',()=>{mx=-999;my=-999});
+  const MESAFE=140;
+  function ciz(){
+    ctx.clearRect(0,0,W,H);
+    for(const p of ps){p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>W)p.vx*=-1;if(p.y<0||p.y>H)p.vy*=-1;
+      const dx=p.x-mx,dy=p.y-my,d=Math.hypot(dx,dy);if(d<130&&d>0){p.x+=dx/d*1.2;p.y+=dy/d*1.2}}
+    for(let i=0;i<ps.length;i++)for(let j=i+1;j<ps.length;j++){
+      const a=ps[i],b=ps[j],d=Math.hypot(a.x-b.x,a.y-b.y);
+      if(d<MESAFE){ctx.strokeStyle='rgba(196,127,102,'+(1-d/MESAFE)*.35+')';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke()}
+    }
+    ctx.fillStyle='rgba(196,127,102,.7)';
+    for(const p of ps){ctx.beginPath();ctx.arc(p.x,p.y,1.8,0,7);ctx.fill()}
+    requestAnimationFrame(ciz);
+  }
+  ciz();
+  let rt;addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(boyut,200)});
+})();
+
 applyContent().finally(()=>{
   initAnimations();
+  // Başlık kelime kelime beliriş
   const hb=document.getElementById('heroBaslik');
   const acc=document.getElementById('donenKutu');
   const base=document.body.classList.contains('introlu')?1.75:0.2;
@@ -594,6 +638,7 @@ if(matchMedia('(pointer:fine)').matches){
   document.addEventListener('mouseover',e=>{if(e.target.closest('a,button,input,textarea'))ring.classList.add('buyuk')});
   document.addEventListener('mouseout',e=>{if(e.target.closest('a,button,input,textarea'))ring.classList.remove('buyuk')});
 
+  // Manyetik butonlar
   document.querySelectorAll('.btn').forEach(b=>{
     b.addEventListener('mousemove',e=>{
       const r=b.getBoundingClientRect();
@@ -602,6 +647,7 @@ if(matchMedia('(pointer:fine)').matches){
     b.addEventListener('mouseleave',()=>{b.style.transform=''});
   });
 
+  // 3B kart eğilme
   document.querySelectorAll('.card,.step,.ref-logo-item').forEach(c=>{
     c.style.transformStyle='preserve-3d';
     c.addEventListener('mousemove',e=>{
@@ -612,6 +658,7 @@ if(matchMedia('(pointer:fine)').matches){
     c.addEventListener('mouseleave',()=>{c.style.transform=''});
   });
 
+  // Hero'da imleci takip eden ışık
   const hero=document.getElementById('hero'),hglow=document.getElementById('heroHglow');
   if(hero&&hglow){
     hero.addEventListener('mousemove',e=>{
