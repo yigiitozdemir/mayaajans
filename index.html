@@ -165,6 +165,26 @@ h2{font-family:'Archivo Black',sans-serif;font-size:clamp(1.8rem,4vw,2.8rem);lin
 .galeri-grid figure:hover img{transform:scale(1.05)}
 .galeri-grid figcaption{padding:12px 16px;font-size:.88rem;color:var(--cream-dim)}
 
+.pf-tabs{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:32px}
+.pf-tab{border:1px solid var(--line);background:var(--bg2);color:var(--cream-dim);padding:9px 20px;border-radius:100px;font-size:.9rem;font-weight:600;cursor:pointer;transition:background .2s,color .2s,border-color .2s;font-family:inherit}
+.pf-tab.on,.pf-tab:hover{background:var(--copper);color:#fff;border-color:var(--copper)}
+.pf-masonry{columns:4 240px;column-gap:18px}
+.pf-item{position:relative;border-radius:var(--radius);overflow:hidden;break-inside:avoid;margin-bottom:18px;cursor:pointer;border:1px solid var(--line);background:var(--dark);display:block;text-decoration:none}
+.pf-item img{width:100%;display:block;transition:transform .5s}
+.pf-item:hover img{transform:scale(1.05)}
+.pf-item .pf-badge{position:absolute;top:12px;left:12px;background:rgba(11,10,9,.72);color:#fff;font-size:.66rem;letter-spacing:.06em;padding:4px 10px;border-radius:100px;z-index:2;font-weight:600}
+.pf-item .pf-play{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,.92);display:flex;align-items:center;justify-content:center;z-index:2;transition:transform .25s}
+.pf-item:hover .pf-play{transform:translate(-50%,-50%) scale(1.12)}
+.pf-item .pf-play::after{content:'';border-left:18px solid var(--copper);border-top:11px solid transparent;border-bottom:11px solid transparent;margin-left:4px}
+.pf-item .pf-cap{position:absolute;left:0;right:0;bottom:0;padding:28px 14px 12px;background:linear-gradient(transparent,rgba(11,10,9,.82));color:#fff;font-size:.86rem;font-weight:600;z-index:2;opacity:0;transition:opacity .3s}
+.pf-item:hover .pf-cap{opacity:1}
+.pf-lb{position:fixed;inset:0;background:rgba(8,7,6,.9);z-index:9000;display:none;align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(6px)}
+.pf-lb.acik{display:flex}
+.pf-lb-inner{position:relative;max-width:min(92vw,900px)}
+.pf-lb-inner img,.pf-lb-inner video{max-width:100%;max-height:86vh;border-radius:14px;display:block}
+.pf-lb-close{position:absolute;top:-16px;right:-16px;width:42px;height:42px;border-radius:50%;background:var(--copper);color:#fff;border:none;font-size:1.4rem;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2}
+@media(max-width:640px){.pf-masonry{columns:2 150px;column-gap:12px}.pf-item{margin-bottom:12px}.pf-item .pf-play{width:44px;height:44px}}
+
 .ig-band{background:linear-gradient(135deg,rgba(165,96,74,.16),rgba(165,96,74,.05));border:1px solid rgba(165,96,74,.3);border-radius:28px;padding:64px 8%;text-align:center}
 .ig-band h2{margin-bottom:14px}
 .ig-band p{color:var(--cream-dim);margin-bottom:32px}
@@ -289,6 +309,7 @@ body.introlu .hero-cta{animation-delay:2.19s}
     <li><a href="#surec">Sürecimiz</a></li>
     <li><a href="#hakkimizda">Hakkımızda</a></li>
     <li><a href="referanslar.html">Referanslar</a></li>
+    <li><a href="#portfolyo">Çalışmalar</a></li>
     <li><a href="#iletisim">İletişim</a></li>
   </ul>
   <a href="#iletisim" class="btn btn-copper nav-cta">Teklif Al</a>
@@ -400,14 +421,21 @@ body.introlu .hero-cta{animation-delay:2.19s}
   </div>
 </section>
 
-<section id="calismalar" style="display:none">
+<section id="portfolyo" style="display:none">
   <div class="container">
     <span class="sec-label reveal">portfolyo</span>
     <h2 class="reveal">Çalışmalarımız</h2>
-    <p class="sec-desc reveal">Ürettiğimiz içerik ve tasarımlardan seçkiler.</p>
-    <div class="galeri-grid" id="galeriGrid"></div>
+    <p class="sec-desc reveal">Ürettiğimiz reels, video ve tasarımlardan seçkiler.</p>
+    <div class="pf-tabs reveal" id="pfTabs">
+      <button class="pf-tab on" data-f="all">Tümü</button>
+      <button class="pf-tab" data-f="reels">Reels</button>
+      <button class="pf-tab" data-f="post">Postlar</button>
+      <button class="pf-tab" data-f="video">Videolar</button>
+    </div>
+    <div class="pf-masonry" id="pfMasonry"></div>
   </div>
 </section>
+<div class="pf-lb" id="pfLb"><div class="pf-lb-inner"><button class="pf-lb-close" id="pfClose" aria-label="Kapat">×</button><div id="pfLbContent"></div></div></div>
 
 <section>
   <div class="container">
@@ -549,13 +577,9 @@ async function applyContent(){
         '<div class="ref-logo-item"><img src="'+encodeURI(r.logo)+'" alt="'+(r.firma||'Referans')+'" loading="lazy"></div>').join('');
       document.getElementById('refTrack').innerHTML=blok+blok;
     }
-    if(Array.isArray(c.galeri)&&c.galeri.length){
-      const sec=document.getElementById('calismalar');sec.style.display='';
-      document.getElementById('galeriGrid').innerHTML=c.galeri.map(g=>
-        '<figure class="reveal">'+
-        '<img src="'+encodeURI(g.gorsel)+'" alt="'+(g.baslik||'Çalışma')+'" loading="lazy">'+
-        (g.baslik?'<figcaption>'+g.baslik+'</figcaption>':'')+
-        '</figure>').join('');
+    if(Array.isArray(c.portfolyo)&&c.portfolyo.length){
+      window.__pf=c.portfolyo.filter(p=>p.kapak);
+      if(window.__pf.length){document.getElementById('portfolyo').style.display='';renderPF('all');}
     }
   }catch(e){}
 }
@@ -578,6 +602,42 @@ function initAnimations(){
   const tl=document.getElementById('surecTL');
   if(tl){const tio=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){tl.classList.add('cizildi');tio.disconnect()}}),{threshold:.4});tio.observe(tl)}
 }
+
+// Portfolyo (reels / post / video)
+const PF_ETIKET={reels:'REELS',post:'POST',video:'VIDEO'};
+function renderPF(f){
+  const box=document.getElementById('pfMasonry');if(!box||!window.__pf)return;
+  const list=window.__pf.filter(p=>f==='all'||p.tur===f);
+  box.innerHTML=list.map(p=>{
+    const oyn=(p.tur!=='post');
+    return '<a class="pf-item" href="javascript:void 0" data-i="'+window.__pf.indexOf(p)+'">'+
+      '<span class="pf-badge">'+(PF_ETIKET[p.tur]||'')+'</span>'+
+      (oyn?'<span class="pf-play"></span>':'')+
+      '<img src="'+encodeURI(p.kapak)+'" alt="'+(p.baslik||'Çalışma')+'" loading="lazy">'+
+      (p.baslik?'<span class="pf-cap">'+p.baslik+'</span>':'')+
+      '</a>';
+  }).join('');
+  box.querySelectorAll('.pf-item').forEach(el=>el.addEventListener('click',e=>{e.preventDefault();pfAc(+el.dataset.i)}));
+}
+function pfAc(i){
+  const p=window.__pf&&window.__pf[i];if(!p)return;
+  const c=document.getElementById('pfLbContent');
+  if(p.tur!=='post'&&p.video){
+    c.innerHTML='<video src="'+encodeURI(p.video)+'" controls autoplay playsinline></video>';
+  }else{
+    c.innerHTML='<img src="'+encodeURI(p.kapak)+'" alt="'+(p.baslik||'')+'">';
+  }
+  document.getElementById('pfLb').classList.add('acik');
+}
+function pfKapat(){const lb=document.getElementById('pfLb');if(!lb)return;lb.classList.remove('acik');document.getElementById('pfLbContent').innerHTML='';}
+(function(){
+  const tabs=document.getElementById('pfTabs');
+  if(tabs)tabs.querySelectorAll('.pf-tab').forEach(t=>t.addEventListener('click',()=>{tabs.querySelectorAll('.pf-tab').forEach(x=>x.classList.remove('on'));t.classList.add('on');renderPF(t.dataset.f)}));
+  const close=document.getElementById('pfClose'),lb=document.getElementById('pfLb');
+  if(close)close.addEventListener('click',pfKapat);
+  if(lb)lb.addEventListener('click',e=>{if(e.target===lb)pfKapat()});
+  addEventListener('keydown',e=>{if(e.key==='Escape')pfKapat()});
+})();
 
 // Hero parçacık ağı
 (function(){
