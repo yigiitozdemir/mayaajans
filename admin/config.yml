@@ -1,6 +1,4 @@
 # Maya Ajans — Decap CMS ayarları
-# NOT: "repo" satırındaki KULLANICIADI kısmını GitHub kullanıcı adınızla değiştirin.
-# "base_url" satırını OAuth kurulumundan sonra dolduracağız (birlikte yapacağız).
 
 backend:
   name: github
@@ -65,14 +63,30 @@ collections:
             fields:
               - { label: "Firma logosu", name: "logo", widget: "image" }
               - { label: "Firma adı", name: "firma", widget: "string", required: false }
-          - label: "Çalışmalarımız (Galeri)"
-            name: "galeri"
+          - label: "Portfolyo (Reels / Post / Video)"
+            name: "portfolyo"
             widget: "list"
             required: false
-            summary: "{{fields.baslik}}"
-            hint: "Fotoğraf ekledikçe sitede 'Çalışmalarımız' bölümü otomatik görünür"
+            summary: "{{fields.tur}} — {{fields.baslik}}"
+            hint: "Ekledikçe sitede 'Çalışmalarımız' bölümü otomatik görünür. Video/Reels için kapak görseli + MP4 yükleyin; Post için sadece JPEG kapak yeterli."
             fields:
-              - { label: "Fotoğraf", name: "gorsel", widget: "image" }
+              - label: "Tür"
+                name: "tur"
+                widget: "select"
+                default: "reels"
+                options:
+                  - { label: "Reels (dikey video)", value: "reels" }
+                  - { label: "Post (kare görsel)", value: "post" }
+                  - { label: "Video (yatay video)", value: "video" }
+              - label: "Kapak görseli (JPEG)"
+                name: "kapak"
+                widget: "image"
+                hint: "Post için bu görselin kendisi gösterilir. Video/Reels için önizleme (kapak) karesi."
+              - label: "Video dosyası (MP4)"
+                name: "video"
+                widget: "file"
+                required: false
+                hint: "Sadece Reels ve Video için MP4 yükleyin. Post seçtiyseniz burayı boş bırakın."
               - { label: "Başlık (isteğe bağlı)", name: "baslik", widget: "string", required: false }
           - label: "İletişim Bilgileri"
             name: "iletisim"
