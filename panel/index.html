@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Müşteri Paneli | Maya Ajans</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2064%2064'%3E%3Crect%20width='64'%20height='64'%20rx='14'%20fill='%230b0a09'/%3E%3Ctext%20x='32'%20y='46'%20font-family='Arial%20Black,Arial,sans-serif'%20font-size='38'%20font-weight='900'%20text-anchor='middle'%20fill='%23ddd5c7'%3EM%3C/text%3E%3Ccircle%20cx='50'%20cy='16'%20r='6'%20fill='%23a5604a'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600&family=Archivo+Black&family=Dancing+Script:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ece5d8; --bg2:#ffffff; --cream:#1c1a17; --cream-dim:#6b655c;
+  --copper:#a5604a; --copper-light:#8a4a36; --line:rgba(28,26,23,.14); --dark:#0f0d0b; --radius:20px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--cream);font-family:'Archivo',sans-serif;line-height:1.6;min-height:100vh}
+::selection{background:var(--copper);color:#fff}
+
+.topbar{background:var(--dark);color:#e7e0d4;padding:16px 5%;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
+.topbar .brand{display:flex;align-items:center;gap:12px}
+.topbar .brand img{height:34px;display:block}
+.topbar .brand .pt{font-family:'Dancing Script',cursive;color:var(--copper);font-size:1.25rem;line-height:1}
+.topbar .brand .pt small{display:block;font-family:'Archivo',sans-serif;color:#8a8478;font-size:.62rem;letter-spacing:.08em;text-transform:uppercase}
+.logout{color:#b3aa9b;text-decoration:none;font-size:.82rem;border:1px solid rgba(231,224,212,.2);border-radius:100px;padding:7px 16px;transition:border-color .2s,color .2s}
+.logout:hover{border-color:var(--copper-light);color:#fff}
+
+.wrap{max-width:1080px;margin:0 auto;padding:40px 5% 80px}
+.hello{margin-bottom:34px}
+.hello .lbl{font-family:'Dancing Script',cursive;color:var(--copper);font-size:1.6rem}
+.hello h1{font-family:'Archivo Black',sans-serif;font-size:clamp(1.6rem,4vw,2.4rem);line-height:1.15;margin-top:2px}
+.hello p{color:var(--cream-dim);margin-top:8px;max-width:560px}
+.hello .mail{color:var(--copper-light);font-weight:600}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px}
+.tile{background:var(--bg2);border:1px solid var(--line);border-radius:var(--radius);padding:28px 26px;position:relative;overflow:hidden}
+.tile .ic{width:50px;height:50px;border-radius:14px;background:rgba(165,96,74,.14);display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin-bottom:18px}
+.tile h3{font-size:1.12rem;margin-bottom:8px}
+.tile p{color:var(--cream-dim);font-size:.92rem;margin-bottom:16px}
+.tile .soon{display:inline-block;font-size:.68rem;font-weight:700;letter-spacing:.05em;color:var(--copper);background:rgba(165,96,74,.12);border-radius:100px;padding:5px 12px}
+
+.note{margin-top:34px;background:rgba(165,96,74,.08);border:1px solid rgba(165,96,74,.25);border-radius:14px;padding:16px 20px;color:var(--cream-dim);font-size:.9rem}
+.note b{color:var(--copper-light)}
+.foot{text-align:center;color:#9a9184;font-size:.8rem;margin-top:40px}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">
+    <img src="/images/mayaajans_yataylogo_02-4x.png" alt="Maya Ajans">
+    <span class="pt">Müşteri Paneli<small>Maya Ajans</small></span>
+  </div>
+  <a class="logout" href="/cdn-cgi/access/logout">Çıkış</a>
+</div>
+
+<div class="wrap">
+  <div class="hello">
+    <span class="lbl">hoş geldiniz</span>
+    <h1 id="hello">Paneliniz hazırlanıyor</h1>
+    <p>Bu alandan içeriklerinizi onaylayacak, performansınızı izleyecek ve dosyalarınıza ulaşacaksınız. <span class="mail" id="mail"></span></p>
+  </div>
+
+  <div class="grid">
+    <div class="tile">
+      <div class="ic">✅</div>
+      <h3>İçerik Onayı</h3>
+      <p>Planlanan gönderilerinizi görselleriyle görün, tek tıkla onaylayın veya revize isteyin.</p>
+      <span class="soon">Çok yakında</span>
+    </div>
+    <div class="tile">
+      <div class="ic">📊</div>
+      <h3>Performans</h3>
+      <p>Takipçi, erişim ve etkileşim rakamlarınız — otomatik güncellenen raporunuz.</p>
+      <span class="soon">Çok yakında</span>
+    </div>
+    <div class="tile">
+      <div class="ic">📁</div>
+      <h3>Dosyalar</h3>
+      <p>Marka kitiniz, içerik görselleriniz ve aylık raporlarınız indirmeye hazır.</p>
+      <span class="soon">Çok yakında</span>
+    </div>
+  </div>
+
+  <div class="note">
+    <b>Merhaba!</b> Panelinizi adım adım kuruyoruz. Bölümler hazır oldukça burada görünecek. Bir sorunuz olursa
+    <a href="https://wa.me/905447631406" style="color:var(--copper-light);font-weight:600">WhatsApp</a> veya
+    <a href="mailto:yigit@mayaajans.net" style="color:var(--copper-light);font-weight:600">e-posta</a> ile bize ulaşın.
+  </div>
+
+  <div class="foot">© 2026 Maya Ajans · mayaajans.net</div>
+</div>
+
+<script>
+// Cloudflare Access kimliğinden müşteriyi selamla
+(async function(){
+  try{
+    const r=await fetch('/cdn-cgi/access/get-identity',{cache:'no-store'});
+    if(!r.ok)return;
+    const d=await r.json();
+    const isim=(d.name&&d.name.trim())||(d.email?d.email.split('@')[0]:'');
+    if(isim){document.getElementById('hello').textContent='Hoş geldiniz, '+isim+' 👋';}
+    if(d.email){document.getElementById('mail').textContent='Giriş: '+d.email;}
+  }catch(e){}
+})();
+</script>
+</body>
+</html>
