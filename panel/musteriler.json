@@ -1,0 +1,15 @@
+{
+  "yigit@mayaajans.net": {
+    "firma": "Demo Müşteri (Örnek)",
+    "rapor_url": "",
+    "onaylar": [
+      { "tur": "reels", "kapak": "", "video": "", "baslik": "Kıyma kampanyası reels", "tarih": "12 Ağustos" },
+      { "tur": "post", "kapak": "", "video": "", "baslik": "Hafta sonu mangal postu", "tarih": "14 Ağustos" },
+      { "tur": "video", "kapak": "", "video": "", "baslik": "Tanıtım filmi", "tarih": "9 Ağustos", "durum": "onaylandi" }
+    ],
+    "dosyalar": [
+      { "ad": "Marka Kiti (logo + renkler)", "url": "https://drive.google.com/" },
+      { "ad": "Ağustos içerik görselleri", "url": "https://drive.google.com/" }
+    ]
+  }
+}
