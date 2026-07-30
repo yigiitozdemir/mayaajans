@@ -82,6 +82,27 @@ h2{font-family:'Archivo Black',sans-serif;font-size:1.15rem;margin-bottom:12px}
 .hata{background:#fbe6e0;border:1px solid #e0a99a;color:#8a3320;padding:10px 14px;border-radius:10px;font-size:.86rem;margin-top:10px}
 .yukle{position:fixed;inset:0;background:rgba(236,229,216,.7);z-index:9500;display:none;align-items:center;justify-content:center;font-weight:600;color:var(--copper-d)}
 .yukle.on{display:flex}
+/* yorumlar */
+.yorumlar{margin-top:9px;border-top:1px solid var(--line);padding-top:9px}
+.ybubble{background:var(--bg);border-radius:10px;padding:6px 10px;margin-bottom:5px;font-size:.82rem}
+.ybubble.me{background:#f0e6df}
+.ybubble .who{font-size:.62rem;color:var(--dim);font-weight:700;margin-bottom:1px}
+.yinput{display:flex;gap:6px;margin-top:6px}
+.yinput input{font-size:.82rem;padding:8px 10px}
+.yinput button{flex:0;min-width:auto;padding:8px 14px}
+.ytoggle{background:none;border:none;color:var(--copper-d);font-size:.76rem;font-weight:600;cursor:pointer;padding:6px 0 0}
+/* talepler */
+.talep{background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:11px 14px;margin-bottom:9px;font-size:.9rem}
+.talep .meta{font-size:.7rem;color:var(--dim);margin-bottom:4px}
+.durum-sel{font-size:.74rem;padding:4px 8px;border-radius:8px;width:auto}
+/* özel günler */
+.og-grp{margin-bottom:18px}
+.og-grp h3{font-size:.72rem;color:var(--copper-d);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
+.og-item{display:flex;align-items:center;gap:11px;padding:10px 13px;border:1px solid var(--line);border-radius:11px;margin-bottom:7px;background:var(--bg2);cursor:pointer;transition:border-color .15s,background .15s}
+.og-item.sel{border-color:var(--copper);background:#faf3ee}
+.og-item input{width:auto;margin:0;pointer-events:none}
+.og-item .tar{margin-left:auto;font-size:.74rem;color:var(--dim);white-space:nowrap}
+.chip{display:inline-block;background:#f0e6df;color:var(--copper-d);border-radius:100px;padding:3px 10px;font-size:.72rem;font-weight:600;margin:0 5px 5px 0}
 /* login */
 .giris{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
 .giris .box{width:100%;max-width:380px;background:var(--bg2);border:1px solid var(--line);border-radius:22px;padding:34px 30px;text-align:center}
@@ -179,6 +200,31 @@ async function uploadFile(file){
   return sb.storage.from("dosyalar").getPublicUrl(ad).data.publicUrl;
 }
 
+/* ---------- ORTAK: tarih, yorum, talep ---------- */
+const AYLAR=["Ocak","Şubat","Mart","Nisan","Mayıs","Haziran","Temmuz","Ağustos","Eylül","Ekim","Kasım","Aralık"];
+function tarihStr(d){ if(!d) return ""; const p=(""+d).split("-"); if(p.length<3) return d; return parseInt(p[2],10)+" "+(AYLAR[parseInt(p[1],10)-1]||""); }
+function tarihSaat(x){ try{ return new Date(x).toLocaleString("tr-TR",{day:"numeric",month:"long",hour:"2-digit",minute:"2-digit"}); }catch(_){ return ""; } }
+
+async function yorumKutusu(container, onay_id, rol){
+  const { data } = await sb.from("yorumlar").select("*").eq("onay_id", onay_id).order("created_at");
+  const list = data || [];
+  container.innerHTML =
+    (list.length ? list.map(y=>'<div class="ybubble'+(y.yazan_rol===rol?" me":"")+'"><div class="who">'+(y.yazan_rol==="yonetici"?"Maya Ajans":"Müşteri")+' · '+tarihSaat(y.created_at)+'</div>'+esc(y.mesaj)+'</div>').join('') : '<div class="mut" style="font-size:.78rem;margin-bottom:5px">Henüz yorum yok.</div>')+
+    '<div class="yinput"><input placeholder="Yorum yaz..." data-yi><button class="btn btn-c" data-yg>Gönder</button></div>';
+  const inp = container.querySelector("[data-yi]"), btn = container.querySelector("[data-yg]");
+  const gonder = async()=>{ const mesaj=inp.value.trim(); if(!mesaj) return; const { data:{ user } } = await sb.auth.getUser(); const { error } = await sb.from("yorumlar").insert({ onay_id, mesaj, yazan_rol:rol, yazan_email:user?.email }); if(error){ alert("Gönderilemedi: "+error.message); return; } inp.value=""; yorumKutusu(container, onay_id, rol); };
+  btn.onclick = gonder; inp.onkeydown = e=>{ if(e.key==="Enter") gonder(); };
+}
+
+function renderTalepler(box, list, admin){
+  const et={ yeni:"🆕 Yeni", goruldu:"👀 Görüldü", tamamlandi:"✅ Tamamlandı" };
+  if(!list.length){ box.innerHTML='<div class="bos">Henüz istek yok.</div>'; return; }
+  box.innerHTML = list.map(t=>'<div class="talep"><div class="meta">'+tarihSaat(t.created_at)+' · '+(et[t.durum]||t.durum)+'</div>'+esc(t.mesaj)+
+    (admin?'<div style="margin-top:7px"><select class="durum-sel" data-td="'+t.id+'"><option value="yeni"'+(t.durum==="yeni"?" selected":"")+'>Yeni</option><option value="goruldu"'+(t.durum==="goruldu"?" selected":"")+'>Görüldü</option><option value="tamamlandi"'+(t.durum==="tamamlandi"?" selected":"")+'>Tamamlandı</option></select></div>':'')+
+    '</div>').join('');
+  if(admin) box.querySelectorAll("[data-td]").forEach(s=>s.onchange=async()=>{ await sb.from("talepler").update({ durum:s.value }).eq("id", s.dataset.td); });
+}
+
 /* ---------- GİRİŞ ---------- */
 // "Beni hatırla" — kayıtlı e-posta/şifreyi forma doldur
 (function(){
@@ -202,7 +248,7 @@ $("#girisForm").addEventListener("submit", async e=>{
   yukle(false);
   if(error){ $("#gHata").textContent = "Giriş başarısız: e-posta veya şifre hatalı."; $("#gHata").classList.remove("hide"); }
 });
-$("#cikis").onclick = async()=>{ await sb.auth.signOut(); localStorage.removeItem("maya-hatirla"); location.reload(); };
+$("#cikis").onclick = async()=>{ await sb.auth.signOut(); location.reload(); };
 
 let _basladi = false;
 function _basla(){ if(_basladi) return; _basladi = true; basla(); }
@@ -212,7 +258,6 @@ sb.auth.onAuthStateChange((_e, session)=>{ if(session) _basla(); });
 (async function(){
   let { data:{ session } } = await sb.auth.getSession();
   if(!session){
-    // Erişim bileti dolmuş olabilir; saklı yenileme biletiyle oturumu geri getirmeyi dene
     try { const r = await sb.auth.refreshSession(); session = r.data && r.data.session; } catch(_){}
   }
   if(session) _basla();
@@ -238,10 +283,12 @@ async function adminYukle(){
   const av = $("#adminView");
   if(error){ av.innerHTML='<div class="hata">Veri alınamadı: '+esc(error.message)+'</div>'; return; }
   av.innerHTML =
-    '<span class="lbl">yönetim</span><h1 style="margin-bottom:18px">Müşteriler</h1>'+
+    '<span class="lbl">yönetim</span><h1 style="margin-bottom:12px">Müşteriler</h1>'+
+    '<button class="btn btn-g" id="ogOzet" style="margin-bottom:18px">📅 Özel Gün Seçimleri</button><div id="ogOzetBox" class="hide" style="margin-bottom:18px"></div>'+
     '<div class="grid" id="mliste">'+
       (list||[]).map((m,i)=>'<div class="mc" data-id="'+m.id+'"><div class="f">'+esc(m.firma)+'</div><div class="e">'+esc(m.email)+'</div>'+
-        '<div class="k">'+(m.onaylar?.length||0)+' onay · '+(m.dosyalar?.length||0)+' dosya</div></div>').join('')+
+        '<div class="k">'+(m.onaylar?.length||0)+' onay · '+(m.dosyalar?.length||0)+' dosya</div>'+
+        '<button class="btn btn-g" data-hat="'+m.id+'" style="margin-top:9px;padding:5px 12px;font-size:.74rem">🔔 Hatırlat</button></div>').join('')+
     '</div>'+
     '<div class="card" style="margin-top:20px"><h2>+ Yeni müşteri ekle</h2>'+
       '<div class="row"><div><label>Firma adı</label><input id="yFirma" placeholder="Örn: Özikiz Kasap"></div>'+
@@ -253,6 +300,8 @@ async function adminYukle(){
 
   window.__list = list||[];
   document.querySelectorAll("#mliste .mc").forEach(el=>el.onclick=()=>detayAc(el.dataset.id));
+  document.querySelectorAll("[data-hat]").forEach(b=>b.onclick=async(e)=>{ e.stopPropagation(); if(!confirm("Bu müşteriye hatırlatma bildirimi gönderilsin mi?")) return; b.disabled=true; const { error } = await sb.functions.invoke("bildirim-gonder",{ body:{ musteri_id:b.dataset.hat, title:"Maya Ajans hatırlatma", govde:"Onayınızı bekleyen içerikler var. Panelinizden onaylayabilirsiniz 🙏" } }); b.disabled=false; alert(error ? ("Gönderilemedi: "+error.message) : "Hatırlatma gönderildi ✅"); });
+  $("#ogOzet").onclick=()=>{ const b=$("#ogOzetBox"); if(b.classList.contains("hide")){ b.classList.remove("hide"); ozelGunOzet(b); } else { b.classList.add("hide"); } };
   $("#yEkle").onclick = async()=>{
     const firma=$("#yFirma").value.trim(), email=$("#yEmail").value.trim().toLowerCase();
     if(!firma||!email){alert("Firma ve e-posta gerekli.");return;}
@@ -262,6 +311,24 @@ async function adminYukle(){
     if(error){alert("Eklenemedi: "+error.message);return;}
     adminYukle();
   };
+}
+
+async function ozelGunOzet(container){
+  container.innerHTML='<div class="mut" style="padding:8px">Yükleniyor…</div>';
+  const [{ data:secimler }, { data:gunler }, { data:musteriler }] = await Promise.all([
+    sb.from("musteri_ozel_gun").select("*"),
+    sb.from("ozel_gunler").select("*").order("tarih"),
+    sb.from("musteriler").select("id,firma").order("firma")
+  ]);
+  const gunMap={}; (gunler||[]).forEach(g=>gunMap[g.id]=g);
+  const byM={}; (secimler||[]).forEach(s=>{ (byM[s.musteri_id]=byM[s.musteri_id]||[]).push(s.ozel_gun_id); });
+  container.innerHTML='<div class="card"><h2>📅 Özel gün seçimleri</h2>'+
+    ((musteriler||[]).length? (musteriler||[]).map(m=>{
+      const ids=(byM[m.id]||[]).map(id=>gunMap[id]).filter(Boolean).sort((a,b)=>(a.tarih>b.tarih?1:-1));
+      const chips = ids.length ? ids.map(g=>'<span class="chip">'+esc(g.ad)+' · '+tarihStr(g.tarih)+'</span>').join('') : '<span class="mut" style="font-size:.8rem">seçim yok</span>';
+      return '<div style="padding:11px 0;border-top:1px solid var(--line)"><b>'+esc(m.firma)+'</b><div style="margin-top:6px">'+chips+'</div></div>';
+    }).join('') : '<div class="mut" style="margin-top:8px">Müşteri yok.</div>')+
+  '</div>';
 }
 
 function detayAc(id){
@@ -288,10 +355,23 @@ function detayAc(id){
       '<div class="row" style="margin-top:8px"><div><label>Dosya adı</label><input id="fAd" placeholder="Marka Kiti"></div></div>'+
       '<div class="row"><div><label>Dosya yükle</label><input type="file" id="fDosya"></div><div><label>...veya link yapıştır</label><input id="fLink" placeholder="https://drive.google.com/..."></div></div>'+
       '<button class="btn btn-c" id="fEkle" style="margin-top:6px">Dosya Ekle</button></div>'+
-    '</div>';
+    '</div>'+
+    '<div class="card" style="margin-top:16px"><h2>💬 Talepler / istekler</h2><div id="dTalep"></div></div>'+
+    '<div class="card" style="margin-top:16px"><h2>📅 Seçtiği özel günler</h2><div id="dOzel"></div></div>';
 
   renderAdminOnay(m);
   renderAdminDosya(m);
+  (async()=>{
+    const { data:tl } = await sb.from("talepler").select("*").eq("musteri_id", m.id).order("created_at",{ ascending:false });
+    renderTalepler($("#dTalep"), tl||[], true);
+    const [{ data:og }, { data:sel }] = await Promise.all([
+      sb.from("ozel_gunler").select("*").order("tarih"),
+      sb.from("musteri_ozel_gun").select("ozel_gun_id").eq("musteri_id", m.id)
+    ]);
+    const s=new Set((sel||[]).map(x=>x.ozel_gun_id));
+    const chosen=(og||[]).filter(g=>s.has(g.id));
+    $("#dOzel").innerHTML = chosen.length ? chosen.map(g=>'<span class="chip">'+esc(g.ad)+' · '+tarihStr(g.tarih)+'</span>').join('') : '<span class="mut" style="font-size:.82rem">Bu müşteri henüz özel gün seçmemiş.</span>';
+  })();
 
   $("#dKaydet").onclick = async()=>{
     yukle(true);
@@ -341,9 +421,11 @@ function renderAdminOnay(m){
     const durum = it.durum==="onaylandi"?'<div class="st ok">✓ Onaylandı</div>':it.durum==="revize"?'<div class="st" style="color:#b3702a">✏️ Revize: '+esc(it.revize_notu||"")+'</div>':'<div class="st mut">⏳ Onay bekliyor</div>';
     return '<div class="it"><button class="sil" data-so="'+it.id+'">×</button><div class="m">'+
       '<span class="badge pill">'+(ETIKET[it.tur]||"")+'</span>'+media+'</div>'+
-      '<div class="bd"><div class="t">'+esc(it.baslik)+'</div><div class="d">📅 '+esc(it.tarih||"")+'</div>'+durum+'</div></div>';
+      '<div class="bd"><div class="t">'+esc(it.baslik)+'</div><div class="d">📅 '+esc(it.tarih||"")+'</div>'+durum+
+      '<button class="ytoggle" data-yt="'+it.id+'">💬 Yorumlar</button><div class="yorumlar hide" id="ay-'+it.id+'"></div></div></div>';
   }).join('');
   box.querySelectorAll("[data-so]").forEach(b=>b.onclick=async()=>{ if(!confirm("Silinsin mi?"))return; yukle(true); await sb.from("onaylar").delete().eq("id",b.dataset.so); yukle(false); await adminYukle(); detayAc(m.id); });
+  box.querySelectorAll("[data-yt]").forEach(b=>b.onclick=()=>{ const c=$("#ay-"+b.dataset.yt); if(c.classList.contains("hide")){ c.classList.remove("hide"); yorumKutusu(c,b.dataset.yt,"yonetici"); } else { c.classList.add("hide"); } });
 }
 function renderAdminDosya(m){
   const box=$("#dDosya");
@@ -365,11 +447,48 @@ async function musteriYukle(email){
   cv.innerHTML =
     '<span class="lbl">hoş geldiniz</span><h1 style="margin-bottom:4px">'+esc(m.firma)+'</h1><p class="mut" style="margin-bottom:16px">İçeriklerinizi onaylayın, performansınızı ve dosyalarınızı görün.</p>'+
     '<button class="btn btn-c" id="bildirimBtn" style="margin-bottom:22px">🔔 Bildirimleri Aç</button>'+
-    '<div class="tabs"><button class="tab on" data-t="onay">İçerik Onayı</button><button class="tab" data-t="perf">Performans</button><button class="tab" data-t="dosya">Dosyalar</button></div>'+
-    '<div class="pane on" id="c-onay"></div><div class="pane" id="c-perf"></div><div class="pane" id="c-dosya"></div>';
+    '<div class="tabs"><button class="tab on" data-t="onay">İçerik Onayı</button><button class="tab" data-t="ozel">Özel Günler</button><button class="tab" data-t="talep">Talepler</button><button class="tab" data-t="perf">Performans</button><button class="tab" data-t="dosya">Dosyalar</button></div>'+
+    '<div class="pane on" id="c-onay"></div><div class="pane" id="c-ozel"></div><div class="pane" id="c-talep"></div><div class="pane" id="c-perf"></div><div class="pane" id="c-dosya"></div>';
   cv.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{cv.querySelectorAll(".tab").forEach(x=>x.classList.remove("on"));t.classList.add("on");cv.querySelectorAll(".pane").forEach(p=>p.classList.remove("on"));$("#c-"+t.dataset.t).classList.add("on");});
   const bb=$("#bildirimBtn"); if(bb){ if(("Notification" in window)&&Notification.permission==="granted") bb.textContent="🔔 Bildirimler açık"; bb.onclick=()=>bildirimAc(m.id); }
-  cOnay(m); cPerf(m); cDosya(m);
+  cOnay(m); cPerf(m); cDosya(m); cOzelGun(m); cTalep(m);
+}
+async function cOzelGun(m){
+  const box=$("#c-ozel");
+  const [{ data:gunler }, { data:secili }] = await Promise.all([
+    sb.from("ozel_gunler").select("*").order("tarih"),
+    sb.from("musteri_ozel_gun").select("ozel_gun_id").eq("musteri_id", m.id)
+  ]);
+  const sec=new Set((secili||[]).map(x=>x.ozel_gun_id));
+  const gr={}; (gunler||[]).forEach(g=>{ (gr[g.kategori]=gr[g.kategori]||[]).push(g); });
+  box.innerHTML='<p class="mut" style="margin-bottom:16px">İçerik istediğiniz özel günleri işaretleyin. Ekibimiz planlamayı bunlara göre yapar. (Seçiminiz anında kaydedilir.)</p>'+
+    Object.entries(gr).map(([k,arr])=>'<div class="og-grp"><h3>'+esc(k)+'</h3>'+
+      arr.map(g=>'<div class="og-item'+(sec.has(g.id)?' sel':'')+'" data-g="'+g.id+'"><input type="checkbox"'+(sec.has(g.id)?' checked':'')+'><span>'+esc(g.ad)+'</span><span class="tar">'+tarihStr(g.tarih)+'</span></div>').join('')+
+    '</div>').join('');
+  box.querySelectorAll(".og-item").forEach(el=>el.onclick=async()=>{
+    const id=el.dataset.g, cb=el.querySelector("input"), willSel=!el.classList.contains("sel");
+    el.classList.toggle("sel", willSel); cb.checked=willSel;
+    if(willSel){ const { error } = await sb.from("musteri_ozel_gun").insert({ musteri_id:m.id, ozel_gun_id:id }); if(error){ el.classList.remove("sel"); cb.checked=false; alert("Kaydedilemedi: "+error.message); } }
+    else { await sb.from("musteri_ozel_gun").delete().eq("musteri_id", m.id).eq("ozel_gun_id", id); }
+  });
+}
+async function cTalep(m){
+  const box=$("#c-talep");
+  const { data:list } = await sb.from("talepler").select("*").eq("musteri_id", m.id).order("created_at",{ ascending:false });
+  box.innerHTML='<div class="card" style="background:var(--bg);margin-bottom:14px"><label>Yeni istek / iş talebi</label>'+
+    '<textarea id="tMesaj" rows="3" placeholder="Örn: Bu ay bir tanıtım videosu da isteriz; şu ürünü öne çıkaralım..."></textarea>'+
+    '<button class="btn btn-c" id="tGonder" style="margin-top:8px">Gönder</button></div><div id="tListe"></div>';
+  renderTalepler($("#tListe"), list||[], false);
+  $("#tGonder").onclick=async()=>{
+    const mesaj=$("#tMesaj").value.trim(); if(!mesaj){ alert("Lütfen bir şeyler yazın."); return; }
+    yukle(true);
+    const { data:{ user } } = await sb.auth.getUser();
+    const { error } = await sb.from("talepler").insert({ musteri_id:m.id, mesaj, yazan_email:user?.email });
+    if(!error) slackBildir('🆕 '+m.firma+' yeni istek gönderdi: '+mesaj);
+    yukle(false);
+    if(error){ alert("Gönderilemedi: "+error.message); return; }
+    cTalep(m);
+  };
 }
 function cOnay(m){
   const box=$("#c-onay"); const liste=m.onaylar||[];
@@ -382,11 +501,13 @@ function cOnay(m){
     return '<div class="it"><div class="m" data-o="'+it.id+'"><span class="badge pill">'+(ETIKET[it.tur]||"")+'</span>'+(oyn?'<span class="play"></span>':'')+media+'</div>'+
       '<div class="bd"><div class="t">'+esc(it.baslik)+'</div><div class="d">📅 '+esc(it.tarih||"")+'</div>'+
       (ok?'<div class="st ok">✓ Onayladınız</div>':'<div class="mini"><button class="b-ok" data-ok="'+it.id+'">✓ Onayla</button><button class="b-rev" data-rev="'+it.id+'">Revize</button></div>')+
+      '<button class="ytoggle" data-yt="'+it.id+'">💬 Yorumlar</button><div class="yorumlar hide" id="cy-'+it.id+'"></div>'+
       '</div></div>';
   }).join('')+'</div>';
   box.querySelectorAll("[data-o]").forEach(el=>el.onclick=()=>{const it=liste.find(x=>x.id===el.dataset.o);if(it.tur!=="post"&&it.video_url)lbAc('<iframe src="'+esc(driveEmbed(it.video_url))+'" allow="autoplay" allowfullscreen></iframe>');else if(it.kapak_url)lbAc('<img src="'+esc(it.kapak_url)+'">');});
   box.querySelectorAll("[data-ok]").forEach(b=>b.onclick=async()=>{const it=liste.find(x=>x.id===b.dataset.ok);yukle(true);await sb.from("onaylar").update({durum:"onaylandi"}).eq("id",it.id);slackBildir('✅ '+m.firma+' onayladı — "'+it.baslik+'" ('+(it.tarih||"")+')');yukle(false);b.closest(".mini").outerHTML='<div class="st ok">✓ Onayladınız</div>';});
   box.querySelectorAll("[data-rev]").forEach(b=>b.onclick=async()=>{const it=liste.find(x=>x.id===b.dataset.rev);const not=prompt("Revize notunuz:","");if(not===null)return;yukle(true);await sb.from("onaylar").update({durum:"revize",revize_notu:not}).eq("id",it.id);slackBildir('✏️ '+m.firma+' revize istedi — "'+it.baslik+'" ('+(it.tarih||"")+'): '+not);yukle(false);b.closest(".mini").outerHTML='<div class="st" style="color:#b3702a">✏️ Revize iletildi</div>';});
+  box.querySelectorAll("[data-yt]").forEach(b=>b.onclick=()=>{ const c=$("#cy-"+b.dataset.yt); if(c.classList.contains("hide")){ c.classList.remove("hide"); yorumKutusu(c,b.dataset.yt,"musteri"); } else { c.classList.add("hide"); } });
 }
 function cPerf(m){const box=$("#c-perf");if(!m.rapor_url){box.innerHTML='<div class="bos">Performans raporunuz çok yakında burada olacak.</div>';return;}box.innerHTML='<div class="rapor"><iframe src="'+esc(m.rapor_url)+'" allowfullscreen></iframe></div><a class="btn btn-c" style="margin-top:12px" href="'+esc(m.rapor_url)+'" target="_blank" rel="noopener">Raporu tam ekran aç →</a>';}
 function cDosya(m){const box=$("#c-dosya");const l=m.dosyalar||[];if(!l.length){box.innerHTML='<div class="bos">Dosyalarınız çok yakında burada olacak.</div>';return;}box.innerHTML=l.map(d=>'<a class="dosya" href="'+esc(d.url)+'" target="_blank" rel="noopener"><span class="ad">'+esc(d.ad)+'</span><span style="color:var(--copper);font-weight:600">Aç ↗</span></a>').join('');}
