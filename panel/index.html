@@ -8,41 +8,64 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2064%2064'%3E%3Crect%20width='64'%20height='64'%20rx='14'%20fill='%230b0a09'/%3E%3Ctext%20x='32'%20y='46'%20font-family='Arial%20Black,Arial,sans-serif'%20font-size='38'%20font-weight='900'%20text-anchor='middle'%20fill='%23ddd5c7'%3EM%3C/text%3E%3Ccircle%20cx='50'%20cy='16'%20r='6'%20fill='%23a5604a'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600&family=Archivo+Black&family=Dancing+Script:wght@600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Archivo+Black&family=Dancing+Script:wght@600;700&display=swap" rel="stylesheet">
 <style>
-:root{
-  --bg:#ece5d8; --bg2:#ffffff; --cream:#1c1a17; --cream-dim:#6b655c;
-  --copper:#a5604a; --copper-light:#8a4a36; --line:rgba(28,26,23,.14); --dark:#0f0d0b; --radius:20px;
-}
+:root{--bg:#ece5d8;--bg2:#ffffff;--cream:#1c1a17;--cream-dim:#6b655c;--copper:#a5604a;--copper-light:#8a4a36;--line:rgba(28,26,23,.14);--dark:#0f0d0b;--radius:20px}
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:var(--bg);color:var(--cream);font-family:'Archivo',sans-serif;line-height:1.6;min-height:100vh}
 ::selection{background:var(--copper);color:#fff}
-
-.topbar{background:var(--dark);color:#e7e0d4;padding:16px 5%;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
+.topbar{background:var(--dark);color:#e7e0d4;padding:14px 5%;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
 .topbar .brand{display:flex;align-items:center;gap:12px}
-.topbar .brand img{height:34px;display:block}
-.topbar .brand .pt{font-family:'Dancing Script',cursive;color:var(--copper);font-size:1.25rem;line-height:1}
-.topbar .brand .pt small{display:block;font-family:'Archivo',sans-serif;color:#8a8478;font-size:.62rem;letter-spacing:.08em;text-transform:uppercase}
-.logout{color:#b3aa9b;text-decoration:none;font-size:.82rem;border:1px solid rgba(231,224,212,.2);border-radius:100px;padding:7px 16px;transition:border-color .2s,color .2s}
+.topbar .brand img{height:32px;display:block}
+.topbar .brand .pt{font-family:'Dancing Script',cursive;color:var(--copper);font-size:1.2rem;line-height:1}
+.topbar .brand .pt small{display:block;font-family:'Archivo',sans-serif;color:#8a8478;font-size:.6rem;letter-spacing:.08em;text-transform:uppercase}
+.logout{color:#b3aa9b;text-decoration:none;font-size:.8rem;border:1px solid rgba(231,224,212,.2);border-radius:100px;padding:6px 15px;transition:border-color .2s,color .2s}
 .logout:hover{border-color:var(--copper-light);color:#fff}
-
-.wrap{max-width:1080px;margin:0 auto;padding:40px 5% 80px}
-.hello{margin-bottom:34px}
-.hello .lbl{font-family:'Dancing Script',cursive;color:var(--copper);font-size:1.6rem}
-.hello h1{font-family:'Archivo Black',sans-serif;font-size:clamp(1.6rem,4vw,2.4rem);line-height:1.15;margin-top:2px}
-.hello p{color:var(--cream-dim);margin-top:8px;max-width:560px}
-.hello .mail{color:var(--copper-light);font-weight:600}
-
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px}
-.tile{background:var(--bg2);border:1px solid var(--line);border-radius:var(--radius);padding:28px 26px;position:relative;overflow:hidden}
-.tile .ic{width:50px;height:50px;border-radius:14px;background:rgba(165,96,74,.14);display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin-bottom:18px}
-.tile h3{font-size:1.12rem;margin-bottom:8px}
-.tile p{color:var(--cream-dim);font-size:.92rem;margin-bottom:16px}
-.tile .soon{display:inline-block;font-size:.68rem;font-weight:700;letter-spacing:.05em;color:var(--copper);background:rgba(165,96,74,.12);border-radius:100px;padding:5px 12px}
-
-.note{margin-top:34px;background:rgba(165,96,74,.08);border:1px solid rgba(165,96,74,.25);border-radius:14px;padding:16px 20px;color:var(--cream-dim);font-size:.9rem}
-.note b{color:var(--copper-light)}
+.wrap{max-width:1080px;margin:0 auto;padding:34px 5% 80px}
+.hello{margin-bottom:26px}
+.hello .lbl{font-family:'Dancing Script',cursive;color:var(--copper);font-size:1.5rem}
+.hello h1{font-family:'Archivo Black',sans-serif;font-size:clamp(1.5rem,4vw,2.2rem);line-height:1.15;margin-top:2px}
+.hello p{color:var(--cream-dim);margin-top:6px;font-size:.95rem}
+.tabs{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:26px;border-bottom:1px solid var(--line)}
+.tab{background:none;border:none;border-bottom:2px solid transparent;color:var(--cream-dim);padding:11px 4px;margin-bottom:-1px;font-size:.95rem;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:7px}
+.tab .say{background:var(--copper);color:#fff;font-size:.66rem;border-radius:100px;padding:1px 7px;font-weight:700}
+.tab.on{color:var(--copper);border-bottom-color:var(--copper)}
+.pane{display:none}.pane.on{display:block}
+.bos{background:var(--bg2);border:1px dashed var(--line);border-radius:var(--radius);padding:44px 24px;text-align:center;color:var(--cream-dim)}
+.bos .ic{font-size:2rem;margin-bottom:10px}
+.pf-masonry{columns:3 220px;column-gap:16px}
+.pf-item{position:relative;border-radius:16px;overflow:hidden;break-inside:avoid;margin-bottom:16px;border:1px solid var(--line);background:var(--bg2)}
+.pf-media{position:relative;cursor:pointer}
+.pf-media img{width:100%;display:block}
+.pf-media .ph{width:100%;min-height:150px}
+.pf-badge{position:absolute;top:10px;left:10px;background:rgba(11,10,9,.72);color:#fff;font-size:.62rem;letter-spacing:.05em;padding:3px 9px;border-radius:100px;font-weight:700;z-index:2}
+.pf-play{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.92);display:flex;align-items:center;justify-content:center;z-index:2}
+.pf-play::after{content:'';border-left:16px solid var(--copper);border-top:10px solid transparent;border-bottom:10px solid transparent;margin-left:3px}
+.pf-body{padding:12px 13px 13px}
+.pf-body .bl{font-weight:600;font-size:.9rem;margin-bottom:3px}
+.pf-body .dt{color:#9a9184;font-size:.72rem;margin-bottom:10px}
+.pf-durum{font-size:.78rem;font-weight:600}
+.pf-durum.ok{color:#2f6a49}
+.pf-btns{display:flex;gap:7px}
+.pf-btns button{flex:1;border:none;border-radius:100px;padding:8px 0;font-size:.76rem;font-weight:600;cursor:pointer;font-family:inherit}
+.b-ok{background:var(--copper);color:#fff}
+.b-rev{background:var(--bg);border:1px solid var(--line)!important;color:var(--cream-dim)}
+.rapor-embed{width:100%;aspect-ratio:16/10;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:var(--bg2)}
+.rapor-embed iframe{width:100%;height:100%;border:0}
+.rapor-ac{display:inline-block;margin-top:14px;background:var(--copper);color:#fff;text-decoration:none;padding:11px 22px;border-radius:100px;font-weight:600;font-size:.9rem}
+.dosya{display:flex;align-items:center;gap:14px;background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:13px 16px;margin-bottom:11px;text-decoration:none;color:var(--cream)}
+.dosya:hover{border-color:var(--copper)}
+.dosya .ic{width:38px;height:38px;border-radius:10px;background:rgba(165,96,74,.14);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex:none}
+.dosya .ad{flex:1;font-weight:600;font-size:.9rem}
+.dosya .git{color:var(--copper);font-weight:600;font-size:.82rem}
+.lb{position:fixed;inset:0;background:rgba(8,7,6,.9);z-index:9000;display:none;align-items:center;justify-content:center;padding:24px}
+.lb.acik{display:flex}
+.lb-in{position:relative;max-width:min(92vw,900px)}
+.lb-in img,.lb-in iframe,.lb-in video{max-width:100%;max-height:86vh;border-radius:14px;display:block;background:#000}
+.lb-in iframe{width:min(90vw,420px);aspect-ratio:9/16;border:0}
+.lb-close{position:absolute;top:-16px;right:-16px;width:40px;height:40px;border-radius:50%;background:var(--copper);color:#fff;border:none;font-size:1.3rem;cursor:pointer}
 .foot{text-align:center;color:#9a9184;font-size:.8rem;margin-top:40px}
+@media(max-width:600px){.pf-masonry{columns:2 150px;column-gap:12px}}
 </style>
 </head>
 <body>
@@ -50,7 +73,7 @@ body{background:var(--bg);color:var(--cream);font-family:'Archivo',sans-serif;li
 <div class="topbar">
   <div class="brand">
     <img src="/images/mayaajans_yataylogo_02-4x.png" alt="Maya Ajans">
-    <span class="pt">Müşteri Paneli<small>Maya Ajans</small></span>
+    <span class="pt">Müşteri Paneli<small id="firmaUst">Maya Ajans</small></span>
   </div>
   <a class="logout" href="/cdn-cgi/access/logout">Çıkış</a>
 </div>
@@ -58,51 +81,143 @@ body{background:var(--bg);color:var(--cream);font-family:'Archivo',sans-serif;li
 <div class="wrap">
   <div class="hello">
     <span class="lbl">hoş geldiniz</span>
-    <h1 id="hello">Paneliniz hazırlanıyor</h1>
-    <p>Bu alandan içeriklerinizi onaylayacak, performansınızı izleyecek ve dosyalarınıza ulaşacaksınız. <span class="mail" id="mail"></span></p>
+    <h1 id="hello">Paneliniz yükleniyor…</h1>
+    <p id="mail"></p>
   </div>
 
-  <div class="grid">
-    <div class="tile">
-      <div class="ic">✅</div>
-      <h3>İçerik Onayı</h3>
-      <p>Planlanan gönderilerinizi görselleriyle görün, tek tıkla onaylayın veya revize isteyin.</p>
-      <span class="soon">Çok yakında</span>
+  <div id="icerik" style="display:none">
+    <div class="tabs">
+      <button class="tab on" data-t="onay">İçerik Onayı <span class="say" id="sayOnay" style="display:none">0</span></button>
+      <button class="tab" data-t="perf">Performans</button>
+      <button class="tab" data-t="dosya">Dosyalar</button>
     </div>
-    <div class="tile">
-      <div class="ic">📊</div>
-      <h3>Performans</h3>
-      <p>Takipçi, erişim ve etkileşim rakamlarınız — otomatik güncellenen raporunuz.</p>
-      <span class="soon">Çok yakında</span>
-    </div>
-    <div class="tile">
-      <div class="ic">📁</div>
-      <h3>Dosyalar</h3>
-      <p>Marka kitiniz, içerik görselleriniz ve aylık raporlarınız indirmeye hazır.</p>
-      <span class="soon">Çok yakında</span>
-    </div>
+
+    <div class="pane on" id="p-onay"></div>
+    <div class="pane" id="p-perf"></div>
+    <div class="pane" id="p-dosya"></div>
   </div>
 
-  <div class="note">
-    <b>Merhaba!</b> Panelinizi adım adım kuruyoruz. Bölümler hazır oldukça burada görünecek. Bir sorunuz olursa
-    <a href="https://wa.me/905447631406" style="color:var(--copper-light);font-weight:600">WhatsApp</a> veya
-    <a href="mailto:yigit@mayaajans.net" style="color:var(--copper-light);font-weight:600">e-posta</a> ile bize ulaşın.
+  <div id="hazir" class="bos" style="display:none">
+    <div class="ic">👋</div>
+    <b>Paneliniz hazırlanıyor.</b>
+    <p style="margin-top:6px">İçerikleriniz eklenince burada görünecek. Sorularınız için
+      <a href="https://wa.me/905447631406" style="color:var(--copper-light);font-weight:600">WhatsApp</a>.</p>
   </div>
 
   <div class="foot">© 2026 Maya Ajans · mayaajans.net</div>
 </div>
 
+<div class="lb" id="lb"><div class="lb-in"><button class="lb-close" id="lbClose" aria-label="Kapat">×</button><div id="lbIcerik"></div></div></div>
+
 <script>
-// Cloudflare Access kimliğinden müşteriyi selamla
+const WA = "905447631406"; // Maya Ajans WhatsApp (onay bildirimleri buraya gider)
+const GRAD = ["#4a7c6a,#2f5245","#7c5a4a,#4a332a","#5a6a8c,#37425a","#8c6a4a,#5a4230","#6a5a7c,#42364f","#a5604a,#6b3a2a"];
+const ETIKET = {reels:"REELS", post:"POST", video:"VIDEO"};
+
+function esc(s){return (s||"").replace(/[<>&"]/g,c=>({"<":"&lt;",">":"&gt;","&":"&amp;",'"':"&quot;"}[c]));}
+
+function driveEmbed(url){
+  const m = (url||"").match(/\/d\/([^/]+)/) || (url||"").match(/[?&]id=([^&]+)/);
+  return m ? "https://drive.google.com/file/d/"+m[1]+"/preview" : url;
+}
+
+function lbAc(html){document.getElementById("lbIcerik").innerHTML=html;document.getElementById("lb").classList.add("acik");}
+function lbKapat(){document.getElementById("lb").classList.remove("acik");document.getElementById("lbIcerik").innerHTML="";}
+
+function waLink(mesaj){return "https://wa.me/"+WA+"?text="+encodeURIComponent(mesaj);}
+
+function renderOnay(firma, liste){
+  const box=document.getElementById("p-onay");
+  const bekleyen=(liste||[]).filter(x=>x.durum!=="onaylandi");
+  const say=document.getElementById("sayOnay");
+  if(bekleyen.length){say.style.display="";say.textContent=bekleyen.length;}
+  if(!liste || !liste.length){box.innerHTML='<div class="bos"><div class="ic">✅</div>Şu an onay bekleyen içerik yok.</div>';return;}
+  box.innerHTML='<div class="pf-masonry">'+liste.map((it,i)=>{
+    const g="linear-gradient(150deg,"+GRAD[i%GRAD.length]+")";
+    const oyn=it.tur!=="post";
+    const media = it.kapak
+      ? '<img src="'+esc(it.kapak)+'" alt="'+esc(it.baslik)+'">'
+      : '<div class="ph" style="background:'+g+'"></div>';
+    const durumOk = it.durum==="onaylandi";
+    return '<div class="pf-item" data-i="'+i+'">'+
+      '<div class="pf-media" data-open="'+i+'"><span class="pf-badge">'+(ETIKET[it.tur]||"")+'</span>'+
+        (oyn?'<span class="pf-play"></span>':'')+media+'</div>'+
+      '<div class="pf-body"><div class="bl">'+esc(it.baslik)+'</div>'+
+        '<div class="dt">📅 '+esc(it.tarih||"")+'</div>'+
+        (durumOk
+          ? '<div class="pf-durum ok">✓ Onaylandı</div>'
+          : '<div class="pf-btns"><button class="b-ok" data-ok="'+i+'">✓ Onayla</button><button class="b-rev" data-rev="'+i+'">Revize İste</button></div>')+
+      '</div></div>';
+  }).join('')+'</div>';
+
+  box.querySelectorAll('[data-open]').forEach(el=>el.onclick=()=>{
+    const it=liste[+el.dataset.open];
+    if(it.tur!=="post" && it.video){lbAc('<iframe src="'+esc(driveEmbed(it.video))+'" allow="autoplay" allowfullscreen></iframe>');}
+    else if(it.kapak){lbAc('<img src="'+esc(it.kapak)+'" alt="">');}
+  });
+  box.querySelectorAll('[data-ok]').forEach(b=>b.onclick=()=>{
+    const it=liste[+b.dataset.ok];
+    window.open(waLink('Merhaba, '+firma+' panelinden "'+it.baslik+'" ('+it.tarih+') içeriğini ONAYLADIM. ✅'),'_blank');
+    b.closest('.pf-btns').outerHTML='<div class="pf-durum ok">✓ Onayladınız — ekibe iletiliyor</div>';
+  });
+  box.querySelectorAll('[data-rev]').forEach(b=>b.onclick=()=>{
+    const it=liste[+b.dataset.rev];
+    const not=prompt('Revize notunuz (nasıl düzeltelim?):','');
+    if(not===null)return;
+    window.open(waLink('Merhaba, '+firma+' panelinden "'+it.baslik+'" ('+it.tarih+') için REVİZE istiyorum: '+not),'_blank');
+    b.closest('.pf-btns').outerHTML='<div class="pf-durum">✏️ Revize notunuz ekibe iletiliyor</div>';
+  });
+}
+
+function renderPerf(rapor){
+  const box=document.getElementById("p-perf");
+  if(!rapor){box.innerHTML='<div class="bos"><div class="ic">📊</div>Performans raporunuz çok yakında burada olacak.</div>';return;}
+  box.innerHTML='<div class="rapor-embed"><iframe src="'+esc(rapor)+'" allowfullscreen></iframe></div>'+
+    '<a class="rapor-ac" href="'+esc(rapor)+'" target="_blank" rel="noopener">Raporu tam ekran aç →</a>';
+}
+
+function renderDosya(liste){
+  const box=document.getElementById("p-dosya");
+  if(!liste || !liste.length){box.innerHTML='<div class="bos"><div class="ic">📁</div>Dosyalarınız çok yakında burada olacak.</div>';return;}
+  const ikon=ad=>/rapor|pdf/i.test(ad)?'📄':/marka|logo|kit/i.test(ad)?'🎨':/görsel|foto|resim/i.test(ad)?'🖼️':'📎';
+  box.innerHTML=liste.map(d=>'<a class="dosya" href="'+esc(d.url)+'" target="_blank" rel="noopener"><span class="ic">'+ikon(d.ad)+'</span><span class="ad">'+esc(d.ad)+'</span><span class="git">Aç ↗</span></a>').join('');
+}
+
+(function(){
+  document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));t.classList.add('on');
+    document.querySelectorAll('.pane').forEach(p=>p.classList.remove('on'));
+    document.getElementById('p-'+t.dataset.t).classList.add('on');
+  });
+  document.getElementById('lbClose').onclick=lbKapat;
+  document.getElementById('lb').onclick=e=>{if(e.target.id==='lb')lbKapat();};
+  addEventListener('keydown',e=>{if(e.key==='Escape')lbKapat();});
+})();
+
 (async function(){
+  let email="";
   try{
     const r=await fetch('/cdn-cgi/access/get-identity',{cache:'no-store'});
-    if(!r.ok)return;
-    const d=await r.json();
-    const isim=(d.name&&d.name.trim())||(d.email?d.email.split('@')[0]:'');
-    if(isim){document.getElementById('hello').textContent='Hoş geldiniz, '+isim+' 👋';}
-    if(d.email){document.getElementById('mail').textContent='Giriş: '+d.email;}
+    if(r.ok){const d=await r.json();email=(d.email||'').toLowerCase();
+      const isim=(d.name&&d.name.trim())||(email?email.split('@')[0]:'');
+      if(isim)document.getElementById('hello').textContent='Hoş geldiniz, '+isim+' 👋';
+      if(email)document.getElementById('mail').textContent='Giriş: '+email;
+    }
   }catch(e){}
+
+  let musteriler={};
+  try{const r=await fetch('musteriler.json',{cache:'no-store'});if(r.ok)musteriler=await r.json();}catch(e){}
+
+  let m=null;
+  for(const k in musteriler){if(k.toLowerCase()===email){m=musteriler[k];break;}}
+
+  if(!m){document.getElementById('hazir').style.display='';return;}
+
+  if(m.firma){document.getElementById('firmaUst').textContent=m.firma;}
+  document.getElementById('icerik').style.display='';
+  renderOnay(m.firma||'Müşteri', m.onaylar);
+  renderPerf(m.rapor_url);
+  renderDosya(m.dosyalar);
 })();
 </script>
 </body>
