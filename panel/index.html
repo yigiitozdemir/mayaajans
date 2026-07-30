@@ -75,6 +75,7 @@ h2{font-family:'Archivo Black',sans-serif;font-size:1.15rem;margin-bottom:12px}
 .hata{background:#fbe6e0;border:1px solid #e0a99a;color:#8a3320;padding:10px 14px;border-radius:10px;font-size:.86rem;margin-top:10px}
 .yukle{position:fixed;inset:0;background:rgba(236,229,216,.7);z-index:9500;display:none;align-items:center;justify-content:center;font-weight:600;color:var(--copper-d)}
 .yukle.on{display:flex}
+/* login */
 .giris{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
 .giris .box{width:100%;max-width:380px;background:var(--bg2);border:1px solid var(--line);border-radius:22px;padding:34px 30px;text-align:center}
 .giris img{height:44px;margin-bottom:6px}
@@ -86,9 +87,10 @@ h2{font-family:'Archivo Black',sans-serif;font-size:1.15rem;margin-bottom:12px}
 
 <div class="yukle" id="yukle">Yükleniyor…</div>
 
+<!-- GİRİŞ -->
 <div class="giris" id="giris">
   <div class="box">
-    <img src="/images/mayaajans_yataylogo_02-4x.png" alt="Maya Ajans">
+    <img src="/images/mayaajans_yataylogo_02-4x.png" alt="Maya Ajans" style="filter:invert(0)">
     <h1>Müşteri Paneli</h1>
     <p class="mut">Devam etmek için giriş yapın</p>
     <form id="girisForm">
@@ -100,6 +102,7 @@ h2{font-family:'Archivo Black',sans-serif;font-size:1.15rem;margin-bottom:12px}
   </div>
 </div>
 
+<!-- UYGULAMA -->
 <div id="app" class="hide">
   <div class="top">
     <div class="b"><img src="/images/mayaajans_yataylogo_02-4x.png" alt="Maya Ajans"><span class="pt">Müşteri Paneli<small id="rolEt">Maya Ajans</small></span></div>
@@ -131,7 +134,9 @@ function lbAc(h){$("#lbc").innerHTML=h;$("#lb").classList.add("on");}
 $("#lbx").onclick=()=>{$("#lb").classList.remove("on");$("#lbc").innerHTML="";};
 $("#lb").onclick=e=>{if(e.target.id==="lb"){$("#lb").classList.remove("on");$("#lbc").innerHTML="";}};
 const wa = m => window.open("https://wa.me/"+WA+"?text="+encodeURIComponent(m),"_blank");
+async function slackBildir(mesaj){ try{ await sb.functions.invoke("slack-bildir",{ body:{ mesaj } }); }catch(e){} }
 
+// dosya yükle → public URL
 async function uploadFile(file){
   const ad = crypto.randomUUID()+"-"+file.name.replace(/[^\w.\-]/g,"_");
   const { error } = await sb.storage.from("dosyalar").upload(ad, file, {upsert:false});
@@ -139,6 +144,7 @@ async function uploadFile(file){
   return sb.storage.from("dosyalar").getPublicUrl(ad).data.publicUrl;
 }
 
+/* ---------- GİRİŞ ---------- */
 $("#girisForm").addEventListener("submit", async e=>{
   e.preventDefault();
   $("#gHata").classList.add("hide");
@@ -168,6 +174,7 @@ async function basla(){
   else { $("#rolEt").textContent="Müşteri"; $("#clientView").classList.remove("hide"); $("#adminView").classList.add("hide"); musteriYukle(user.email); }
 }
 
+/* ==================== YÖNETİCİ ==================== */
 async function adminYukle(){
   yukle(true);
   const { data:list, error } = await sb.from("musteriler").select("*, onaylar(*), dosyalar(*)").order("firma");
@@ -288,6 +295,7 @@ function renderAdminDosya(m){
   box.querySelectorAll("[data-sd]").forEach(b=>b.onclick=async()=>{ if(!confirm("Silinsin mi?"))return; yukle(true); await sb.from("dosyalar").delete().eq("id",b.dataset.sd); yukle(false); await adminYukle(); detayAc(m.id); });
 }
 
+/* ==================== MÜŞTERİ ==================== */
 async function musteriYukle(email){
   yukle(true);
   const { data:rows, error } = await sb.from("musteriler").select("*, onaylar(*), dosyalar(*)").limit(1);
@@ -318,8 +326,8 @@ function cOnay(m){
       '</div></div>';
   }).join('')+'</div>';
   box.querySelectorAll("[data-o]").forEach(el=>el.onclick=()=>{const it=liste.find(x=>x.id===el.dataset.o);if(it.tur!=="post"&&it.video_url)lbAc('<iframe src="'+esc(driveEmbed(it.video_url))+'" allow="autoplay" allowfullscreen></iframe>');else if(it.kapak_url)lbAc('<img src="'+esc(it.kapak_url)+'">');});
-  box.querySelectorAll("[data-ok]").forEach(b=>b.onclick=async()=>{const it=liste.find(x=>x.id===b.dataset.ok);yukle(true);await sb.from("onaylar").update({durum:"onaylandi"}).eq("id",it.id);yukle(false);wa('Merhaba, "'+it.baslik+'" ('+it.tarih+') içeriğini ONAYLADIM. ✅');b.closest(".mini").outerHTML='<div class="st ok">✓ Onayladınız</div>';});
-  box.querySelectorAll("[data-rev]").forEach(b=>b.onclick=async()=>{const it=liste.find(x=>x.id===b.dataset.rev);const not=prompt("Revize notunuz:","");if(not===null)return;yukle(true);await sb.from("onaylar").update({durum:"revize",revize_notu:not}).eq("id",it.id);yukle(false);wa('Merhaba, "'+it.baslik+'" ('+it.tarih+') için REVİZE istiyorum: '+not);b.closest(".mini").outerHTML='<div class="st" style="color:#b3702a">✏️ Revize iletildi</div>';});
+  box.querySelectorAll("[data-ok]").forEach(b=>b.onclick=async()=>{const it=liste.find(x=>x.id===b.dataset.ok);yukle(true);await sb.from("onaylar").update({durum:"onaylandi"}).eq("id",it.id);slackBildir('✅ '+m.firma+' onayladı — "'+it.baslik+'" ('+(it.tarih||"")+')');yukle(false);b.closest(".mini").outerHTML='<div class="st ok">✓ Onayladınız</div>';});
+  box.querySelectorAll("[data-rev]").forEach(b=>b.onclick=async()=>{const it=liste.find(x=>x.id===b.dataset.rev);const not=prompt("Revize notunuz:","");if(not===null)return;yukle(true);await sb.from("onaylar").update({durum:"revize",revize_notu:not}).eq("id",it.id);slackBildir('✏️ '+m.firma+' revize istedi — "'+it.baslik+'" ('+(it.tarih||"")+'): '+not);yukle(false);b.closest(".mini").outerHTML='<div class="st" style="color:#b3702a">✏️ Revize iletildi</div>';});
 }
 function cPerf(m){const box=$("#c-perf");if(!m.rapor_url){box.innerHTML='<div class="bos">Performans raporunuz çok yakında burada olacak.</div>';return;}box.innerHTML='<div class="rapor"><iframe src="'+esc(m.rapor_url)+'" allowfullscreen></iframe></div><a class="btn btn-c" style="margin-top:12px" href="'+esc(m.rapor_url)+'" target="_blank" rel="noopener">Raporu tam ekran aç →</a>';}
 function cDosya(m){const box=$("#c-dosya");const l=m.dosyalar||[];if(!l.length){box.innerHTML='<div class="bos">Dosyalarınız çok yakında burada olacak.</div>';return;}box.innerHTML=l.map(d=>'<a class="dosya" href="'+esc(d.url)+'" target="_blank" rel="noopener"><span class="ad">'+esc(d.ad)+'</span><span style="color:var(--copper);font-weight:600">Aç ↗</span></a>').join('');}
