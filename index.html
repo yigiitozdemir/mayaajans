@@ -72,6 +72,9 @@ nav.scrolled{background:rgba(15,13,11,.92);backdrop-filter:blur(14px);box-shadow
 .btn-copper:hover{background:var(--copper-light);transform:translateY(-2px);box-shadow:0 10px 30px rgba(165,96,74,.35)}
 .btn-ghost{border:1px solid var(--line);color:var(--cream);background:transparent}
 .btn-ghost:hover{border-color:var(--copper);color:var(--copper-light);transform:translateY(-2px)}
+.nav-actions{display:flex;gap:10px;align-items:center}
+.btn-mg{border:1px solid rgba(231,224,212,.32);color:#e7e0d4;background:transparent}
+.btn-mg:hover{border-color:var(--copper);color:#fff;transform:translateY(-2px)}
 .hamburger{display:none;background:none;border:none;color:#e7e0d4;font-size:1.6rem;cursor:pointer}
 
 .hero{display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;position:relative;padding:118px 5% 72px;background:var(--dark);color:#e7e0d4;border-radius:0 0 44px 44px;overflow:hidden}
@@ -268,6 +271,7 @@ body.introlu .hero-cta{animation-delay:2.19s}
   .hamburger{display:block;z-index:101}
   .contact-grid{grid-template-columns:1fr}
   .nav-cta{display:none}
+  .nav-actions{display:none}
 }
 </style>
 </head>
@@ -301,7 +305,10 @@ body.introlu .hero-cta{animation-delay:2.19s}
     <li><a href="#instagram">Instagram</a></li>
     <li><a href="#iletisim">İletişim</a></li>
   </ul>
-  <a href="#iletisim" class="btn btn-copper nav-cta">Teklif Al</a>
+  <div class="nav-actions">
+    <a href="/panel" class="btn btn-mg">Müşteri Girişi</a>
+    <a href="#iletisim" class="btn btn-copper">Teklif Al</a>
+  </div>
   <button class="hamburger" id="hamburger" aria-label="Menü">☰</button>
 </nav>
 
@@ -477,6 +484,7 @@ body.introlu .hero-cta{animation-delay:2.19s}
     <a href="#surec">Sürecimiz</a>
     <a href="referanslar.html">Referanslar</a>
     <a href="#iletisim">İletişim</a>
+    <a href="/panel">Müşteri Girişi</a>
     <a href="tel:+905447631406">0544 763 14 06</a>
   </div>
   <div class="socials">
