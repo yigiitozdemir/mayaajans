@@ -103,6 +103,7 @@ h2{font-family:'Archivo Black',sans-serif;font-size:1.15rem;margin-bottom:12px}
     <form id="girisForm">
       <div class="field"><label>E-posta</label><input type="email" id="gEmail" required></div>
       <div class="field"><label>Şifre</label><input type="password" id="gSifre" required></div>
+      <label style="display:flex;align-items:center;gap:8px;margin:2px 0 16px;font-size:.9rem;color:var(--mut);cursor:pointer"><input type="checkbox" id="gHatirla" style="width:auto;margin:0"> Beni hatırla</label>
       <button class="btn btn-c" style="width:100%" type="submit">Giriş Yap</button>
       <div class="hata hide" id="gHata"></div>
     </form>
@@ -129,7 +130,13 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 const SB_URL = "https://vmihixfiewrwvsmlxhcb.supabase.co";
 const SB_KEY = "sb_publishable_-gsCZBOfbmJrmgnwAPWcew_tiimBwE9";
 const WA = "905447631406";
-const sb = createClient(SB_URL, SB_KEY);
+const sb = createClient(SB_URL, SB_KEY, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: false
+  }
+});
 
 // PWA service worker
 if("serviceWorker" in navigator){ navigator.serviceWorker.register("/panel/sw.js").catch(()=>{}); }
@@ -173,21 +180,42 @@ async function uploadFile(file){
 }
 
 /* ---------- GİRİŞ ---------- */
+// "Beni hatırla" — kayıtlı e-posta/şifreyi forma doldur
+(function(){
+  try{
+    const s = localStorage.getItem("maya-hatirla");
+    if(s){ const o = JSON.parse(s); if(o.e) $("#gEmail").value = o.e; if(o.p) $("#gSifre").value = atob(o.p); $("#gHatirla").checked = true; }
+  }catch(_){}
+})();
+
 $("#girisForm").addEventListener("submit", async e=>{
   e.preventDefault();
   $("#gHata").classList.add("hide");
+  const em = $("#gEmail").value.trim(), pw = $("#gSifre").value;
+  // İşaretliyse hatırla, değilse temizle
+  try{
+    if($("#gHatirla").checked) localStorage.setItem("maya-hatirla", JSON.stringify({ e:em, p:btoa(pw) }));
+    else localStorage.removeItem("maya-hatirla");
+  }catch(_){}
   yukle(true);
-  const { error } = await sb.auth.signInWithPassword({ email:$("#gEmail").value.trim(), password:$("#gSifre").value });
+  const { error } = await sb.auth.signInWithPassword({ email:em, password:pw });
   yukle(false);
   if(error){ $("#gHata").textContent = "Giriş başarısız: e-posta veya şifre hatalı."; $("#gHata").classList.remove("hide"); }
 });
-$("#cikis").onclick = async()=>{ await sb.auth.signOut(); location.reload(); };
+$("#cikis").onclick = async()=>{ await sb.auth.signOut(); localStorage.removeItem("maya-hatirla"); location.reload(); };
 
-sb.auth.onAuthStateChange((_e, session)=>{ if(session) basla(); });
+let _basladi = false;
+function _basla(){ if(_basladi) return; _basladi = true; basla(); }
+
+sb.auth.onAuthStateChange((_e, session)=>{ if(session) _basla(); });
 
 (async function(){
-  const { data:{ session } } = await sb.auth.getSession();
-  if(session) basla();
+  let { data:{ session } } = await sb.auth.getSession();
+  if(!session){
+    // Erişim bileti dolmuş olabilir; saklı yenileme biletiyle oturumu geri getirmeyi dene
+    try { const r = await sb.auth.refreshSession(); session = r.data && r.data.session; } catch(_){}
+  }
+  if(session) _basla();
 })();
 
 let AKTIF_MUSTERI = null;
