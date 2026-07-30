@@ -3,222 +3,716 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Müşteri Paneli | Maya Ajans</title>
-<meta name="robots" content="noindex, nofollow">
+<title>Maya Ajans | Çorlu Sosyal Medya Ajansı — Video Prodüksiyon & Reklam Yönetimi</title>
+<meta name="description" content="Çorlu sosyal medya ajansı Maya Ajans: Tekirdağ ve Çorlu'da sosyal medya yönetimi, video prodüksiyon, Meta & Google reklam yönetimi ve kurumsal kimlik hizmetleri. Hemen teklif alın.">
+<meta property="og:title" content="Maya Ajans | Çorlu Sosyal Medya Ajansı">
+<meta property="og:description" content="Markanızı dijitalde büyütüyoruz. Sosyal medya yönetimi, video prodüksiyon, reklam yönetimi, kurumsal kimlik.">
+<meta property="og:url" content="https://mayaajans.net">
+<meta property="og:locale" content="tr_TR">
+<link rel="canonical" href="https://mayaajans.net/">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2064%2064'%3E%3Crect%20width='64'%20height='64'%20rx='14'%20fill='%230b0a09'/%3E%3Ctext%20x='32'%20y='46'%20font-family='Arial%20Black,Arial,sans-serif'%20font-size='38'%20font-weight='900'%20text-anchor='middle'%20fill='%23ddd5c7'%3EM%3C/text%3E%3Ccircle%20cx='50'%20cy='16'%20r='6'%20fill='%23a5604a'/%3E%3C/svg%3E">
+<meta property="og:image" content="https://mayaajans.net/images/mayaajans_yataylogo_02-4x.png">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ProfessionalService",
+  "name": "Maya Ajans",
+  "description": "Çorlu ve Tekirdağ'da sosyal medya yönetimi, video prodüksiyon, reklam yönetimi ve kurumsal kimlik hizmetleri sunan sosyal medya ajansı.",
+  "url": "https://mayaajans.net",
+  "telephone": "+90-544-763-14-06",
+  "email": "yigit@mayaajans.net",
+  "image": "https://mayaajans.net/images/mayaajans_yataylogo_02-4x.png",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "Kazımiye Mah. Dumlupınar Cad. No:6/18B Daire 37",
+    "addressLocality": "Çorlu",
+    "addressRegion": "Tekirdağ",
+    "addressCountry": "TR"
+  },
+  "areaServed": ["Çorlu", "Tekirdağ", "Türkiye"],
+  "sameAs": ["https://www.instagram.com/mayaajans_/"],
+  "priceRange": "₺₺"
+}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Archivo+Black&family=Dancing+Script:wght@600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600&family=Archivo+Black&family=Dancing+Script:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#ece5d8;--bg2:#ffffff;--cream:#1c1a17;--cream-dim:#6b655c;--copper:#a5604a;--copper-light:#8a4a36;--line:rgba(28,26,23,.14);--dark:#0f0d0b;--radius:20px}
+:root{
+  --bg:#ece5d8;
+  --bg2:#ffffff;
+  --cream:#1c1a17;
+  --cream-dim:#6b655c;
+  --copper:#a5604a;
+  --copper-light:#8a4a36;
+  --line:rgba(28,26,23,.14);
+  --dark:#0f0d0b;
+  --radius:20px;
+}
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:var(--bg);color:var(--cream);font-family:'Archivo',sans-serif;line-height:1.6;min-height:100vh}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--cream);font-family:'Archivo',sans-serif;line-height:1.6;overflow-x:hidden}
 ::selection{background:var(--copper);color:#fff}
-.topbar{background:var(--dark);color:#e7e0d4;padding:14px 5%;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
-.topbar .brand{display:flex;align-items:center;gap:12px}
-.topbar .brand img{height:32px;display:block}
-.topbar .brand .pt{font-family:'Dancing Script',cursive;color:var(--copper);font-size:1.2rem;line-height:1}
-.topbar .brand .pt small{display:block;font-family:'Archivo',sans-serif;color:#8a8478;font-size:.6rem;letter-spacing:.08em;text-transform:uppercase}
-.logout{color:#b3aa9b;text-decoration:none;font-size:.8rem;border:1px solid rgba(231,224,212,.2);border-radius:100px;padding:6px 15px;transition:border-color .2s,color .2s}
-.logout:hover{border-color:var(--copper-light);color:#fff}
-.wrap{max-width:1080px;margin:0 auto;padding:34px 5% 80px}
-.hello{margin-bottom:26px}
-.hello .lbl{font-family:'Dancing Script',cursive;color:var(--copper);font-size:1.5rem}
-.hello h1{font-family:'Archivo Black',sans-serif;font-size:clamp(1.5rem,4vw,2.2rem);line-height:1.15;margin-top:2px}
-.hello p{color:var(--cream-dim);margin-top:6px;font-size:.95rem}
-.tabs{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:26px;border-bottom:1px solid var(--line)}
-.tab{background:none;border:none;border-bottom:2px solid transparent;color:var(--cream-dim);padding:11px 4px;margin-bottom:-1px;font-size:.95rem;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:7px}
-.tab .say{background:var(--copper);color:#fff;font-size:.66rem;border-radius:100px;padding:1px 7px;font-weight:700}
-.tab.on{color:var(--copper);border-bottom-color:var(--copper)}
-.pane{display:none}.pane.on{display:block}
-.bos{background:var(--bg2);border:1px dashed var(--line);border-radius:var(--radius);padding:44px 24px;text-align:center;color:var(--cream-dim)}
-.bos .ic{font-size:2rem;margin-bottom:10px}
-.pf-masonry{columns:3 220px;column-gap:16px}
-.pf-item{position:relative;border-radius:16px;overflow:hidden;break-inside:avoid;margin-bottom:16px;border:1px solid var(--line);background:var(--bg2)}
-.pf-media{position:relative;cursor:pointer}
-.pf-media img{width:100%;display:block}
-.pf-media .ph{width:100%;min-height:150px}
-.pf-badge{position:absolute;top:10px;left:10px;background:rgba(11,10,9,.72);color:#fff;font-size:.62rem;letter-spacing:.05em;padding:3px 9px;border-radius:100px;font-weight:700;z-index:2}
-.pf-play{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.92);display:flex;align-items:center;justify-content:center;z-index:2}
-.pf-play::after{content:'';border-left:16px solid var(--copper);border-top:10px solid transparent;border-bottom:10px solid transparent;margin-left:3px}
-.pf-body{padding:12px 13px 13px}
-.pf-body .bl{font-weight:600;font-size:.9rem;margin-bottom:3px}
-.pf-body .dt{color:#9a9184;font-size:.72rem;margin-bottom:10px}
-.pf-durum{font-size:.78rem;font-weight:600}
-.pf-durum.ok{color:#2f6a49}
-.pf-btns{display:flex;gap:7px}
-.pf-btns button{flex:1;border:none;border-radius:100px;padding:8px 0;font-size:.76rem;font-weight:600;cursor:pointer;font-family:inherit}
-.b-ok{background:var(--copper);color:#fff}
-.b-rev{background:var(--bg);border:1px solid var(--line)!important;color:var(--cream-dim)}
-.rapor-embed{width:100%;aspect-ratio:16/10;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:var(--bg2)}
-.rapor-embed iframe{width:100%;height:100%;border:0}
-.rapor-ac{display:inline-block;margin-top:14px;background:var(--copper);color:#fff;text-decoration:none;padding:11px 22px;border-radius:100px;font-weight:600;font-size:.9rem}
-.dosya{display:flex;align-items:center;gap:14px;background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:13px 16px;margin-bottom:11px;text-decoration:none;color:var(--cream)}
-.dosya:hover{border-color:var(--copper)}
-.dosya .ic{width:38px;height:38px;border-radius:10px;background:rgba(165,96,74,.14);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex:none}
-.dosya .ad{flex:1;font-weight:600;font-size:.9rem}
-.dosya .git{color:var(--copper);font-weight:600;font-size:.82rem}
-.lb{position:fixed;inset:0;background:rgba(8,7,6,.9);z-index:9000;display:none;align-items:center;justify-content:center;padding:24px}
-.lb.acik{display:flex}
-.lb-in{position:relative;max-width:min(92vw,900px)}
-.lb-in img,.lb-in iframe,.lb-in video{max-width:100%;max-height:86vh;border-radius:14px;display:block;background:#000}
-.lb-in iframe{width:min(90vw,420px);aspect-ratio:9/16;border:0}
-.lb-close{position:absolute;top:-16px;right:-16px;width:40px;height:40px;border-radius:50%;background:var(--copper);color:#fff;border:none;font-size:1.3rem;cursor:pointer}
-.foot{text-align:center;color:#9a9184;font-size:.8rem;margin-top:40px}
-@media(max-width:600px){.pf-masonry{columns:2 150px;column-gap:12px}}
+
+.logo{display:inline-block;position:relative;line-height:1;text-decoration:none}
+.logo .block{font-family:'Archivo Black',sans-serif;font-size:1.7rem;letter-spacing:.04em;color:#e7e0d4}
+.logo .script{font-family:'Dancing Script',cursive;font-weight:600;font-size:1.3rem;color:var(--copper);position:absolute;left:12%;top:52%;white-space:nowrap;transform:rotate(-4deg)}
+.logo img{height:42px;display:block}
+
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:18px 5%;display:flex;align-items:center;justify-content:space-between;transition:background .3s,box-shadow .3s,padding .3s}
+nav.scrolled{background:rgba(15,13,11,.92);backdrop-filter:blur(14px);box-shadow:0 6px 24px rgba(0,0,0,.25);padding:12px 5%}
+.nav-links{display:flex;gap:34px;align-items:center;list-style:none}
+.nav-links a{color:#b3aa9b;text-decoration:none;font-size:.92rem;transition:color .2s;position:relative}
+.nav-links a::after{content:'';position:absolute;left:0;bottom:-5px;width:0;height:1.5px;background:var(--copper-light);transition:width .28s ease}
+.nav-links a:hover{color:#fff}
+.nav-links a:hover::after{width:100%}
+.btn{display:inline-block;padding:13px 28px;border-radius:100px;font-weight:600;font-size:.92rem;text-decoration:none;transition:transform .2s,box-shadow .2s,background .2s;cursor:pointer;border:none}
+.btn-copper{background:var(--copper);color:#fff}
+.btn-copper:hover{background:var(--copper-light);transform:translateY(-2px);box-shadow:0 10px 30px rgba(165,96,74,.35)}
+.btn-ghost{border:1px solid var(--line);color:var(--cream);background:transparent}
+.btn-ghost:hover{border-color:var(--copper);color:var(--copper-light);transform:translateY(-2px)}
+.hamburger{display:none;background:none;border:none;color:#e7e0d4;font-size:1.6rem;cursor:pointer}
+
+.hero{display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;position:relative;padding:118px 5% 72px;background:var(--dark);color:#e7e0d4;border-radius:0 0 44px 44px;overflow:hidden}
+.blob{position:absolute;border-radius:50%;filter:blur(120px);opacity:.4;pointer-events:none}
+.blob1{width:520px;height:520px;background:var(--copper);top:-10%;right:-8%}
+.blob2{width:420px;height:420px;background:#4a3a30;bottom:-5%;left:-8%}
+.hero .eyebrow,.hero h1,.hero p,.hero-cta{position:relative;z-index:1}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(231,224,212,.2);border-radius:100px;padding:8px 18px;font-size:.85rem;color:#b3aa9b;margin-bottom:26px}
+.eyebrow .dot{width:8px;height:8px;border-radius:50%;background:var(--copper);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+h1{font-family:'Archivo Black',sans-serif;font-size:clamp(2.4rem,6vw,4.6rem);line-height:1.08;letter-spacing:-.01em;max-width:900px;color:#e7e0d4}
+h1 .script-accent{font-family:'Dancing Script',cursive;color:var(--copper-light);font-weight:700;font-size:1.2em}
+.donen-kutu{display:inline-grid;text-align:center}
+.donen{grid-area:1/1;opacity:0;transform:translateY(60%);transition:opacity .5s ease,transform .5s cubic-bezier(.22,1,.36,1)}
+.donen.aktif{opacity:1;transform:none}
+.donen.cikis{opacity:0;transform:translateY(-60%)}
+.tw-cursor{display:inline-block;color:var(--copper-light);font-weight:400;margin-left:1px;animation:twBlink .7s steps(1) infinite}
+@keyframes twBlink{50%{opacity:0}}
+.hero p{max-width:620px;margin:26px auto 40px;color:#b3aa9b;font-size:1.08rem}
+.hero-cta{display:flex;gap:16px;flex-wrap:wrap;justify-content:center}
+.hero .btn-ghost{border-color:rgba(231,224,212,.25);color:#e7e0d4}
+.hero .btn-ghost:hover{border-color:var(--copper-light);color:var(--copper-light)}
+.kelime{display:inline-block;opacity:0;transform:translateY(28px);animation:kelimeGel .6s cubic-bezier(.22,1,.36,1) forwards}
+@keyframes kelimeGel{to{opacity:1;transform:none}}
+.scroll-ind{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);z-index:1;display:flex;flex-direction:column;align-items:center;gap:6px;color:#8a8478;font-size:.7rem;letter-spacing:.1em;transition:opacity .4s}
+.scroll-ind.gizle{opacity:0;pointer-events:none}
+.scroll-ind .mouse{width:22px;height:34px;border:1.5px solid rgba(231,224,212,.35);border-radius:12px;position:relative}
+.scroll-ind .mouse::after{content:'';position:absolute;top:6px;left:50%;width:3px;height:6px;background:var(--copper-light);border-radius:2px;transform:translateX(-50%);animation:sdrop 1.5s ease-in-out infinite}
+@keyframes sdrop{0%{opacity:0;transform:translate(-50%,0)}40%{opacity:1}80%{opacity:0;transform:translate(-50%,11px)}}
+.hero-hglow{position:absolute;width:480px;height:480px;border-radius:50%;background:radial-gradient(circle,rgba(196,127,102,.22),transparent 65%);pointer-events:none;z-index:0;opacity:0;transition:opacity .4s;transform:translate(-50%,-50%)}
+.hero-canvas{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+
+section{padding:110px 5%;position:relative}
+.container{max-width:1180px;margin:0 auto}
+.sec-label{font-family:'Dancing Script',cursive;font-weight:600;color:var(--copper);font-size:1.7rem;display:block;margin-bottom:8px}
+h2{font-family:'Archivo Black',sans-serif;font-size:clamp(1.8rem,4vw,2.8rem);line-height:1.15;margin-bottom:18px}
+.sec-desc{color:var(--cream-dim);max-width:560px;margin-bottom:56px}
+
+.grid4{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:22px}
+.card{background:var(--bg2);border:1px solid var(--line);border-radius:var(--radius);padding:36px 30px;transition:transform .3s,border-color .3s,box-shadow .3s;position:relative}
+.card:hover{transform:translateY(-6px);border-color:rgba(165,96,74,.5);box-shadow:0 16px 40px rgba(28,26,23,.08)}
+@property --kartAng{syntax:'<angle>';initial-value:0deg;inherits:false}
+.card::before{content:'';position:absolute;inset:0;border-radius:inherit;padding:2px;background:conic-gradient(from var(--kartAng),transparent 55%,var(--copper) 72%,#f3c98a 85%,var(--copper-light) 96%,transparent 100%);-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;opacity:0;transition:opacity .45s;pointer-events:none}
+.card:hover::before{opacity:1;animation:kartDon 4.5s linear infinite}
+@keyframes kartDon{to{--kartAng:360deg}}
+.card .icon{width:52px;height:52px;border-radius:14px;background:rgba(165,96,74,.15);display:flex;align-items:center;justify-content:center;margin-bottom:22px}
+.card .icon svg{width:26px;height:26px;stroke:var(--copper)}
+.card h3{font-size:1.15rem;margin-bottom:10px}
+.card p{color:var(--cream-dim);font-size:.94rem}
+
+.process{background:#f4efe6;position:relative}
+.process::before,.process::after{content:'';position:absolute;left:0;width:100%;height:42px;background-repeat:no-repeat;background-size:100% 100%;pointer-events:none;z-index:1}
+.process::before{top:-1px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 42' preserveAspectRatio='none'%3E%3Cpath fill='%23ece5d8' d='M0,0 H1440 V20 C1120,46 320,-6 0,20 Z'/%3E%3C/svg%3E")}
+.process::after{bottom:-1px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 42' preserveAspectRatio='none'%3E%3Cpath fill='%23ece5d8' d='M0,42 H1440 V22 C1120,-4 320,48 0,22 Z'/%3E%3C/svg%3E")}
+.process>.container{position:relative;z-index:2}
+.konum-harita{display:block;position:relative;height:220px;border-radius:var(--radius);overflow:hidden;margin-top:44px;background:linear-gradient(135deg,#141210,#241a15);border:1px solid var(--line);text-decoration:none}
+.konum-harita .kh-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(196,127,102,.14) 1px,transparent 1px),linear-gradient(90deg,rgba(196,127,102,.14) 1px,transparent 1px);background-size:34px 34px}
+.konum-harita .kh-ping{position:absolute;top:46%;left:50%;width:20px;height:20px;border:2px solid var(--copper);border-radius:50%;transform:translate(-50%,-50%);animation:khPing 2s ease-out infinite}
+@keyframes khPing{0%{transform:translate(-50%,-50%) scale(.4);opacity:1}100%{transform:translate(-50%,-50%) scale(4);opacity:0}}
+.konum-harita .kh-pin{position:absolute;top:46%;left:50%;transform:translate(-50%,-100%);font-size:30px;filter:drop-shadow(0 4px 6px rgba(0,0,0,.4))}
+.konum-harita .kh-lbl{position:absolute;left:0;right:0;bottom:0;padding:14px 18px;background:linear-gradient(transparent,rgba(11,10,9,.88));color:#e7e0d4;font-size:.92rem}
+.konum-harita .kh-lbl b{color:var(--copper-light);font-weight:600}
+.konum-harita:hover .kh-pin{animation:khBounce .6s ease}
+@keyframes khBounce{0%,100%{transform:translate(-50%,-100%)}50%{transform:translate(-50%,-122%)}}
+.surec-timeline{position:relative;height:2px;background:rgba(28,26,23,.12);margin:0 6% 46px;border-radius:2px;display:flex;justify-content:space-between;align-items:center}
+.surec-timeline .stl-fill{position:absolute;left:0;top:0;height:100%;width:0;background:var(--copper);border-radius:2px;transition:width 1.8s ease}
+.surec-timeline.cizildi .stl-fill{width:100%}
+.surec-timeline i{width:13px;height:13px;border-radius:50%;background:var(--bg);border:2px solid var(--copper);position:relative;z-index:1}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:22px;counter-reset:step}
+.step{border:1px solid var(--line);border-radius:var(--radius);padding:34px 28px;background:var(--bg2);position:relative}
+.step .num{font-family:'Archivo Black',sans-serif;font-size:2.6rem;color:transparent;-webkit-text-stroke:1.5px var(--copper);display:block;margin-bottom:14px}
+.step h3{font-size:1.08rem;margin-bottom:8px}
+.step p{color:var(--cream-dim);font-size:.92rem}
+
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:22px;text-align:center}
+.stat .value{font-family:'Archivo Black',sans-serif;font-size:clamp(2.2rem,5vw,3.4rem);color:var(--copper)}
+.stat .label{color:var(--cream-dim);font-size:.95rem;margin-top:6px}
+
+.ref-marquee{overflow:hidden;position:relative;padding:10px 0}
+.ref-marquee::before,.ref-marquee::after{content:'';position:absolute;top:0;bottom:0;width:110px;z-index:2;pointer-events:none}
+.ref-marquee::before{left:0;background:linear-gradient(90deg,var(--bg),transparent)}
+.ref-marquee::after{right:0;background:linear-gradient(270deg,var(--bg),transparent)}
+.ref-track{display:flex;gap:26px;width:max-content;animation:kaydir 60s linear infinite}
+.ref-marquee:hover .ref-track{animation-play-state:paused}
+.ref-logo-item{background:#fff;border:1px solid var(--line);border-radius:16px;height:100px;min-width:190px;display:flex;align-items:center;justify-content:center;padding:20px 38px;flex-shrink:0}
+.ref-logo-item img{max-height:62px;max-width:150px;object-fit:contain}
+
+.galeri-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:18px}
+.galeri-grid figure{border-radius:var(--radius);overflow:hidden;border:1px solid var(--line);background:var(--bg2)}
+.galeri-grid img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block;transition:transform .4s}
+.galeri-grid figure:hover img{transform:scale(1.05)}
+.galeri-grid figcaption{padding:12px 16px;font-size:.88rem;color:var(--cream-dim)}
+
+.ig-feed-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:18px;margin-bottom:40px}
+.ig-id{display:flex;align-items:center;gap:16px}
+.ig-av{width:60px;height:60px;border-radius:50%;padding:2px;background:radial-gradient(circle at 30% 107%,#fdf497 0%,#fdf497 5%,#fd5949 45%,#d6249f 60%,#285AEB 90%);flex:none}
+.ig-av>span{display:flex;width:100%;height:100%;border-radius:50%;background:var(--dark);align-items:center;justify-content:center;color:#fff;font-family:'Archivo Black',sans-serif;font-size:1.3rem}
+.ig-av img{display:block;width:100%;height:100%;border-radius:50%;object-fit:contain;background:var(--dark);padding:9px}
+.ig-name{font-family:'Archivo Black',sans-serif;font-size:1.4rem;line-height:1.15}
+.ig-sub{color:var(--cream-dim);font-size:.9rem;margin-top:2px}
+.ig-feed{min-height:40px}
+
+.ig-band{background:linear-gradient(135deg,rgba(165,96,74,.16),rgba(165,96,74,.05));border:1px solid rgba(165,96,74,.3);border-radius:28px;padding:64px 8%;text-align:center}
+.ig-band h2{margin-bottom:14px}
+.ig-band p{color:var(--cream-dim);margin-bottom:32px}
+
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start}
+.c-item{display:flex;gap:16px;align-items:flex-start;margin-bottom:26px}
+.c-item .icon{flex:none;width:46px;height:46px;border-radius:12px;background:rgba(165,96,74,.15);display:flex;align-items:center;justify-content:center}
+.c-item .icon svg{width:22px;height:22px;stroke:var(--copper)}
+.c-item strong{display:block;font-size:.95rem;margin-bottom:2px}
+.c-item a,.c-item span{color:var(--cream-dim);text-decoration:none;font-size:.94rem}
+.c-item a:hover{color:var(--copper-light)}
+form .field{margin-bottom:16px}
+input,textarea{width:100%;background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:15px 18px;color:var(--cream);font-family:inherit;font-size:.95rem;transition:border-color .2s}
+input:focus,textarea:focus{outline:none;border-color:var(--copper)}
+textarea{min-height:130px;resize:vertical}
+
+footer{background:var(--dark);color:#e7e0d4;border-radius:44px 44px 0 0;padding:74px 5% 40px;text-align:center;margin-top:120px;position:relative;overflow:hidden}
+footer .logo{margin-bottom:14px;display:inline-block}
+footer .logo .block{color:#e7e0d4}
+footer .logo img{height:50px;margin:0 auto;display:block}
+.foot-tag{color:#b3aa9b;max-width:460px;margin:0 auto;font-size:.98rem}
+.foot-links{display:flex;gap:26px;justify-content:center;flex-wrap:wrap;margin:26px 0 2px}
+.foot-links a{color:#b3aa9b;text-decoration:none;font-size:.92rem;transition:color .2s}
+.foot-links a:hover{color:#fff}
+.socials{display:flex;gap:14px;justify-content:center;margin:20px 0}
+.socials a{width:44px;height:44px;border:1px solid rgba(231,224,212,.2);border-radius:50%;display:flex;align-items:center;justify-content:center;transition:border-color .2s,transform .2s}
+.socials a:hover{border-color:var(--copper-light);transform:translateY(-3px)}
+.socials svg{width:20px;height:20px;stroke:#b3aa9b}
+footer .copy{color:#7c766b;font-size:.85rem;margin-top:14px}
+
+.mq-sec{padding:70px 0;overflow:hidden}
+.mq-wrap{transform:rotate(-2deg);margin:0 -40px}
+.mq{display:flex;overflow:hidden;white-space:nowrap}
+.mq-in{display:flex;flex-shrink:0;animation:kaydir 22s linear infinite}
+.mq-in span{font-family:'Archivo Black',sans-serif;font-size:1.6rem;letter-spacing:.02em;padding:14px 0}
+.mq-copper{background:var(--copper)}
+.mq-copper span{color:#fff}
+.mq-dark{border-top:1px solid var(--line);border-bottom:1px solid var(--line);transform:rotate(2.6deg);margin-top:18px}
+.mq-dark .mq-in{animation-direction:reverse;animation-duration:26s}
+.mq-dark span{color:transparent;-webkit-text-stroke:1px var(--cream)}
+.yildiz{padding:14px 18px !important;font-size:1.3rem !important}
+.mq-copper .yildiz{color:#fff}
+.mq-dark .yildiz{color:var(--copper);-webkit-text-stroke:0}
+@keyframes kaydir{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+.showreel{border-radius:26px;overflow:hidden;border:1px solid var(--line);box-shadow:0 30px 90px rgba(28,26,23,.18)}
+.showreel video{width:100%;display:block}
+
+.reveal{opacity:0;transform:translateY(36px);transition:opacity .9s cubic-bezier(.22,1,.36,1),transform .9s cubic-bezier(.22,1,.36,1)}
+.reveal.visible{opacity:1;transform:none}
+
+.intro{position:fixed;inset:0;background:#0b0a09;z-index:10000;display:flex;align-items:center;justify-content:center;animation:iHide .75s cubic-bezier(.76,0,.24,1) 1.5s forwards}
+.intro-logo{position:relative;text-align:center}
+.intro-logo img{width:min(64vw,440px);display:block;animation:iLogo .9s cubic-bezier(.22,1,.36,1) .2s both}
+@keyframes iLogo{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:none}}
+@keyframes iHide{to{transform:translateY(-100%)}}
+body.introlu .hero .eyebrow{animation-delay:1.7s}
+body.introlu .hero p{animation-delay:2.03s}
+body.introlu .hero-cta{animation-delay:2.19s}
+
+@keyframes riseIn{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:none}}
+.hero .eyebrow{animation:riseIn .8s cubic-bezier(.22,1,.36,1) .15s both}
+.hero p{animation:riseIn .9s cubic-bezier(.22,1,.36,1) .48s both}
+.hero-cta{animation:riseIn .9s cubic-bezier(.22,1,.36,1) .64s both}
+
+@media(pointer:fine){
+  .cursor-dot{position:fixed;top:0;left:0;width:8px;height:8px;background:var(--copper);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%)}
+  .cursor-ring{position:fixed;top:0;left:0;width:38px;height:38px;border:1.5px solid rgba(165,96,74,.5);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .25s,height .25s,background .25s,border-color .25s}
+  .cursor-ring.buyuk{width:64px;height:64px;background:rgba(165,96,74,.12);border-color:rgba(165,96,74,.9)}
+}
+
+.wa-float{position:fixed;bottom:24px;right:24px;z-index:90;width:58px;height:58px;border-radius:50%;background:#25d366;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(0,0,0,.28);transition:transform .2s}
+.wa-float:hover{transform:scale(1.08)}
+.wa-float svg{width:30px;height:30px;fill:#fff}
+.ig-float{position:fixed;bottom:92px;right:24px;z-index:90;width:58px;height:58px;border-radius:50%;background:radial-gradient(circle at 30% 107%,#fdf497 0%,#fdf497 5%,#fd5949 45%,#d6249f 60%,#285AEB 90%);display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(0,0,0,.28);transition:transform .2s}
+.ig-float:hover{transform:scale(1.08)}
+.ig-float svg{width:30px;height:30px;stroke:#fff;fill:none}
+
+@media(max-width:860px){
+  .blob{display:none}
+  nav.scrolled{backdrop-filter:none;background:rgba(15,13,11,.97)}
+  .reveal{transition-duration:.4s}
+  .hero{border-radius:0 0 30px 30px}
+  .mq-in span{font-size:1.05rem;padding:10px 0}
+  .yildiz{font-size:.9rem !important;padding:10px 12px !important}
+  .mq-sec{padding:44px 0}
+  .ref-logo-item{height:84px;min-width:150px;padding:16px 26px}
+  .ref-logo-item img{max-height:50px;max-width:120px}
+  .nav-links{position:fixed;inset:0;background:rgba(15,13,11,.98);flex-direction:column;justify-content:center;font-size:1.3rem;display:none}
+  .nav-links.open{display:flex}
+  .nav-links a{font-size:1.2rem;color:#e7e0d4}
+  .hamburger{display:block;z-index:101}
+  .contact-grid{grid-template-columns:1fr}
+  .nav-cta{display:none}
+}
 </style>
 </head>
 <body>
 
-<div class="topbar">
-  <div class="brand">
-    <img src="/images/mayaajans_yataylogo_02-4x.png" alt="Maya Ajans">
-    <span class="pt">Müşteri Paneli<small id="firmaUst">Maya Ajans</small></span>
+<div class="intro" id="intro" aria-hidden="true">
+  <div class="intro-logo">
+    <img src="images/mayaajans_yataylogo_02-4x.png" alt="Maya Ajans">
   </div>
-  <a class="logout" href="/cdn-cgi/access/logout">Çıkış</a>
 </div>
-
-<div class="wrap">
-  <div class="hello">
-    <span class="lbl">hoş geldiniz</span>
-    <h1 id="hello">Paneliniz yükleniyor…</h1>
-    <p id="mail"></p>
-  </div>
-
-  <div id="icerik" style="display:none">
-    <div class="tabs">
-      <button class="tab on" data-t="onay">İçerik Onayı <span class="say" id="sayOnay" style="display:none">0</span></button>
-      <button class="tab" data-t="perf">Performans</button>
-      <button class="tab" data-t="dosya">Dosyalar</button>
-    </div>
-
-    <div class="pane on" id="p-onay"></div>
-    <div class="pane" id="p-perf"></div>
-    <div class="pane" id="p-dosya"></div>
-  </div>
-
-  <div id="hazir" class="bos" style="display:none">
-    <div class="ic">👋</div>
-    <b>Paneliniz hazırlanıyor.</b>
-    <p style="margin-top:6px">İçerikleriniz eklenince burada görünecek. Sorularınız için
-      <a href="https://wa.me/905447631406" style="color:var(--copper-light);font-weight:600">WhatsApp</a>.</p>
-  </div>
-
-  <div class="foot">© 2026 Maya Ajans · mayaajans.net</div>
-</div>
-
-<div class="lb" id="lb"><div class="lb-in"><button class="lb-close" id="lbClose" aria-label="Kapat">×</button><div id="lbIcerik"></div></div></div>
-
 <script>
-const WA = "905447631406"; // Maya Ajans WhatsApp (onay bildirimleri buraya gider)
-const GRAD = ["#4a7c6a,#2f5245","#7c5a4a,#4a332a","#5a6a8c,#37425a","#8c6a4a,#5a4230","#6a5a7c,#42364f","#a5604a,#6b3a2a"];
-const ETIKET = {reels:"REELS", post:"POST", video:"VIDEO"};
-
-function esc(s){return (s||"").replace(/[<>&"]/g,c=>({"<":"&lt;",">":"&gt;","&":"&amp;",'"':"&quot;"}[c]));}
-
-function driveEmbed(url){
-  const m = (url||"").match(/\/d\/([^/]+)/) || (url||"").match(/[?&]id=([^&]+)/);
-  return m ? "https://drive.google.com/file/d/"+m[1]+"/preview" : url;
-}
-
-function lbAc(html){document.getElementById("lbIcerik").innerHTML=html;document.getElementById("lb").classList.add("acik");}
-function lbKapat(){document.getElementById("lb").classList.remove("acik");document.getElementById("lbIcerik").innerHTML="";}
-
-function waLink(mesaj){return "https://wa.me/"+WA+"?text="+encodeURIComponent(mesaj);}
-
-function renderOnay(firma, liste){
-  const box=document.getElementById("p-onay");
-  const bekleyen=(liste||[]).filter(x=>x.durum!=="onaylandi");
-  const say=document.getElementById("sayOnay");
-  if(bekleyen.length){say.style.display="";say.textContent=bekleyen.length;}
-  if(!liste || !liste.length){box.innerHTML='<div class="bos"><div class="ic">✅</div>Şu an onay bekleyen içerik yok.</div>';return;}
-  box.innerHTML='<div class="pf-masonry">'+liste.map((it,i)=>{
-    const g="linear-gradient(150deg,"+GRAD[i%GRAD.length]+")";
-    const oyn=it.tur!=="post";
-    const media = it.kapak
-      ? '<img src="'+esc(it.kapak)+'" alt="'+esc(it.baslik)+'">'
-      : '<div class="ph" style="background:'+g+'"></div>';
-    const durumOk = it.durum==="onaylandi";
-    return '<div class="pf-item" data-i="'+i+'">'+
-      '<div class="pf-media" data-open="'+i+'"><span class="pf-badge">'+(ETIKET[it.tur]||"")+'</span>'+
-        (oyn?'<span class="pf-play"></span>':'')+media+'</div>'+
-      '<div class="pf-body"><div class="bl">'+esc(it.baslik)+'</div>'+
-        '<div class="dt">📅 '+esc(it.tarih||"")+'</div>'+
-        (durumOk
-          ? '<div class="pf-durum ok">✓ Onaylandı</div>'
-          : '<div class="pf-btns"><button class="b-ok" data-ok="'+i+'">✓ Onayla</button><button class="b-rev" data-rev="'+i+'">Revize İste</button></div>')+
-      '</div></div>';
-  }).join('')+'</div>';
-
-  box.querySelectorAll('[data-open]').forEach(el=>el.onclick=()=>{
-    const it=liste[+el.dataset.open];
-    if(it.tur!=="post" && it.video){lbAc('<iframe src="'+esc(driveEmbed(it.video))+'" allow="autoplay" allowfullscreen></iframe>');}
-    else if(it.kapak){lbAc('<img src="'+esc(it.kapak)+'" alt="">');}
-  });
-  box.querySelectorAll('[data-ok]').forEach(b=>b.onclick=()=>{
-    const it=liste[+b.dataset.ok];
-    window.open(waLink('Merhaba, '+firma+' panelinden "'+it.baslik+'" ('+it.tarih+') içeriğini ONAYLADIM. ✅'),'_blank');
-    b.closest('.pf-btns').outerHTML='<div class="pf-durum ok">✓ Onayladınız — ekibe iletiliyor</div>';
-  });
-  box.querySelectorAll('[data-rev]').forEach(b=>b.onclick=()=>{
-    const it=liste[+b.dataset.rev];
-    const not=prompt('Revize notunuz (nasıl düzeltelim?):','');
-    if(not===null)return;
-    window.open(waLink('Merhaba, '+firma+' panelinden "'+it.baslik+'" ('+it.tarih+') için REVİZE istiyorum: '+not),'_blank');
-    b.closest('.pf-btns').outerHTML='<div class="pf-durum">✏️ Revize notunuz ekibe iletiliyor</div>';
-  });
-}
-
-function renderPerf(rapor){
-  const box=document.getElementById("p-perf");
-  if(!rapor){box.innerHTML='<div class="bos"><div class="ic">📊</div>Performans raporunuz çok yakında burada olacak.</div>';return;}
-  box.innerHTML='<div class="rapor-embed"><iframe src="'+esc(rapor)+'" allowfullscreen></iframe></div>'+
-    '<a class="rapor-ac" href="'+esc(rapor)+'" target="_blank" rel="noopener">Raporu tam ekran aç →</a>';
-}
-
-function renderDosya(liste){
-  const box=document.getElementById("p-dosya");
-  if(!liste || !liste.length){box.innerHTML='<div class="bos"><div class="ic">📁</div>Dosyalarınız çok yakında burada olacak.</div>';return;}
-  const ikon=ad=>/rapor|pdf/i.test(ad)?'📄':/marka|logo|kit/i.test(ad)?'🎨':/görsel|foto|resim/i.test(ad)?'🖼️':'📎';
-  box.innerHTML=liste.map(d=>'<a class="dosya" href="'+esc(d.url)+'" target="_blank" rel="noopener"><span class="ic">'+ikon(d.ad)+'</span><span class="ad">'+esc(d.ad)+'</span><span class="git">Aç ↗</span></a>').join('');
-}
-
 (function(){
-  document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
-    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));t.classList.add('on');
-    document.querySelectorAll('.pane').forEach(p=>p.classList.remove('on'));
-    document.getElementById('p-'+t.dataset.t).classList.add('on');
-  });
-  document.getElementById('lbClose').onclick=lbKapat;
-  document.getElementById('lb').onclick=e=>{if(e.target.id==='lb')lbKapat();};
-  addEventListener('keydown',e=>{if(e.key==='Escape')lbKapat();});
-})();
-
-(async function(){
-  let email="";
-  try{
-    const r=await fetch('/cdn-cgi/access/get-identity',{cache:'no-store'});
-    if(r.ok){const d=await r.json();email=(d.email||'').toLowerCase();
-      const isim=(d.name&&d.name.trim())||(email?email.split('@')[0]:'');
-      if(isim)document.getElementById('hello').textContent='Hoş geldiniz, '+isim+' 👋';
-      if(email)document.getElementById('mail').textContent='Giriş: '+email;
-    }
-  }catch(e){}
-
-  let musteriler={};
-  try{const r=await fetch('musteriler.json',{cache:'no-store'});if(r.ok)musteriler=await r.json();}catch(e){}
-
-  let m=null;
-  for(const k in musteriler){if(k.toLowerCase()===email){m=musteriler[k];break;}}
-
-  if(!m){document.getElementById('hazir').style.display='';return;}
-
-  if(m.firma){document.getElementById('firmaUst').textContent=m.firma;}
-  document.getElementById('icerik').style.display='';
-  renderOnay(m.firma||'Müşteri', m.onaylar);
-  renderPerf(m.rapor_url);
-  renderDosya(m.dosyalar);
+  const intro=document.getElementById('intro');
+  if(sessionStorage.getItem('introGoruldu')||matchMedia('(prefers-reduced-motion: reduce)').matches){intro.remove();return}
+  sessionStorage.setItem('introGoruldu','1');
+  document.body.classList.add('introlu');
+  intro.addEventListener('animationend',e=>{if(e.animationName==='iHide')intro.remove()});
 })();
 </script>
+
+<nav id="nav">
+  <a href="#" class="logo" aria-label="Maya Ajans">
+    <span class="block">MAYA</span>
+    <span class="script">Maya Ajans</span>
+  </a>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="#hizmetler">Hizmetler</a></li>
+    <li><a href="#surec">Sürecimiz</a></li>
+    <li><a href="#hakkimizda">Hakkımızda</a></li>
+    <li><a href="referanslar.html">Referanslar</a></li>
+    <li><a href="#instagram">Instagram</a></li>
+    <li><a href="#iletisim">İletişim</a></li>
+  </ul>
+  <a href="#iletisim" class="btn btn-copper nav-cta">Teklif Al</a>
+  <button class="hamburger" id="hamburger" aria-label="Menü">☰</button>
+</nav>
+
+<header class="hero" id="hero">
+  <div class="blob blob1"></div>
+  <div class="blob blob2"></div>
+  <canvas class="hero-canvas" id="heroCanvas"></canvas>
+  <div class="hero-hglow" id="heroHglow"></div>
+  <span class="eyebrow"><span class="dot"></span> <span id="heroEyebrow">Tekirdağ / Çorlu — Sosyal Medya Ajansı</span></span>
+  <h1><span id="heroBaslik">Markanızı dijitalde</span><br><span class="script-accent" id="donenKutu"><span id="heroScript">büyütüyoruz.</span><span class="tw-cursor">|</span></span></h1>
+  <p id="heroDesc">Sosyal medya yönetiminden video prodüksiyona, reklam kampanyalarından kurumsal kimliğe — markanızın dijital yolculuğunu baştan sona tasarlıyor ve yönetiyoruz.</p>
+  <div class="hero-cta">
+    <a href="#iletisim" class="btn btn-copper">Hemen Teklif Alın</a>
+    <a href="#hizmetler" class="btn btn-ghost">Hizmetlerimiz</a>
+  </div>
+  <a href="#hizmetler" class="scroll-ind" id="scrollInd" aria-label="Aşağı kaydır"><span class="mouse"></span>KAYDIR</a>
+</header>
+
+<section style="padding-top:56px;padding-bottom:0">
+  <div class="container">
+    <div class="showreel reveal">
+      <video src="showreel.mp4" autoplay muted loop playsinline preload="metadata" aria-label="Maya Ajans tanıtım videosu"></video>
+    </div>
+  </div>
+</section>
+
+<div class="mq-sec" aria-hidden="true">
+  <div class="mq-wrap">
+    <div class="mq mq-copper"><div class="mq-in" id="mq1"></div></div>
+    <div class="mq mq-dark"><div class="mq-in" id="mq2"></div></div>
+  </div>
+</div>
+
+<section id="hizmetler" style="padding-top:60px">
+  <div class="container">
+    <span class="sec-label reveal">neler yapıyoruz?</span>
+    <h2 class="reveal">Hizmetlerimiz</h2>
+    <p class="sec-desc reveal">Markanızın ihtiyacına göre strateji kuruyor, içeriği üretiyor ve sonuçları ölçüyoruz.</p>
+    <div class="grid4" id="hizmetGrid">
+      <div class="card reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg></div>
+        <h3>Sosyal Medya Yönetimi</h3>
+        <p>İçerik planı, özgün tasarımlar, paylaşım takvimi ve topluluk yönetimi ile hesaplarınızı profesyonelce yönetiyoruz.</p>
+      </div>
+      <div class="card reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><rect x="2" y="5" width="14" height="14" rx="3"/><path d="M16 10l6-3v10l-6-3"/></svg></div>
+        <h3>Video Prodüksiyon</h3>
+        <p>Reels, tanıtım filmi ve drone çekimleri dahil; senaryodan kurguya tüm prodüksiyonu kendi ekibimizle üretiyoruz.</p>
+      </div>
+      <div class="card reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M3 11l18-7-7 18-2.5-7.5L3 11z"/></svg></div>
+        <h3>Reklam Yönetimi</h3>
+        <p>Meta ve Google reklamlarını hedef kitlenize göre kurguluyor, bütçenizi ölçülebilir sonuçlara dönüştürüyoruz.</p>
+      </div>
+      <div class="card reveal">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M8 12h8M12 8v8"/></svg></div>
+        <h3>Kurumsal Kimlik</h3>
+        <p>Logo, renk paleti ve marka dili ile işletmenizin her mecrada tutarlı ve akılda kalıcı görünmesini sağlıyoruz.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="instagram">
+  <div class="container">
+    <div class="ig-feed-head reveal">
+      <div class="ig-id">
+        <span class="ig-av"><img src="images/mayaajans_yataylogo_02-4x.png" alt="Maya Ajans"></span>
+        <div>
+          <span class="sec-label" style="margin-bottom:2px">bizi takip edin</span>
+          <div class="ig-name">@mayaajans_</div>
+          <div class="ig-sub">Güncel işlerimiz, reels ve kamera arkası içeriklerimiz</div>
+        </div>
+      </div>
+      <a href="https://www.instagram.com/mayaajans_/" target="_blank" rel="noopener" class="btn btn-copper">Instagram'da Takip Et</a>
+    </div>
+    <div class="ig-feed reveal">
+      <behold-widget feed-id="kK0t6wlMLGChjHeZCjWX"></behold-widget>
+    </div>
+  </div>
+</section>
+
+<section id="surec" class="process">
+  <div class="container">
+    <span class="sec-label reveal">nasıl çalışıyoruz?</span>
+    <h2 class="reveal">Sürecimiz</h2>
+    <p class="sec-desc reveal">Sıradan planlarla değil, markanıza özel akılcı adımlarla ilerliyoruz.</p>
+    <div class="surec-timeline" id="surecTL"><span class="stl-fill"></span><i></i><i></i><i></i><i></i></div>
+    <div class="steps" id="surecSteps">
+      <div class="step reveal"><span class="num">01</span><h3>Tanışma & Analiz</h3><p>Markanızı, hedef kitlenizi ve rakiplerinizi analiz ederek yol haritası çıkarıyoruz.</p></div>
+      <div class="step reveal"><span class="num">02</span><h3>Strateji</h3><p>İçerik ve kampanya stratejinizi hedeflerinize göre planlıyoruz.</p></div>
+      <div class="step reveal"><span class="num">03</span><h3>Üretim</h3><p>Tasarım, çekim ve kurgu ile markanıza özel içerikleri hayata geçiriyoruz.</p></div>
+      <div class="step reveal"><span class="num">04</span><h3>Yayın & Raporlama</h3><p>İçerikleri yayınlıyor, performansı ölçüyor ve düzenli raporluyoruz.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="hakkimizda">
+  <div class="container">
+    <span class="sec-label reveal">rakamlarla</span>
+    <h2 class="reveal">Maya Ajans</h2>
+    <p class="sec-desc reveal" id="hakkimizdaDesc">Çorlu merkezli ekibimizle markaların dijitalde görünür, akılda kalıcı ve ölçülebilir şekilde büyümesi için çalışıyoruz.</p>
+    <div class="stats" id="statsGrid">
+      <div class="stat reveal"><span class="value" data-count="70">0</span><span class="label">Mutlu Müşteri</span></div>
+      <div class="stat reveal"><span class="value" data-count="3500">0</span><span class="label">Üretilen İçerik</span></div>
+      <div class="stat reveal"><span class="value" data-count="850">0</span><span class="label">Video Prodüksiyon</span></div>
+      <div class="stat reveal"><span class="value" data-count="450">0</span><span class="label">Yönetilen Kampanya</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="referanslar" style="display:none">
+  <div class="container">
+    <span class="sec-label reveal">bize güvenenler</span>
+    <h2 class="reveal">Referanslarımız</h2>
+    <p class="sec-desc reveal">Birlikte çalıştığımız markalar.</p>
+  </div>
+  <div class="ref-marquee reveal">
+    <div class="ref-track" id="refTrack"></div>
+  </div>
+  <div class="container">
+    <div id="refMore" style="text-align:center;margin-top:44px">
+      <a href="referanslar.html" class="btn btn-ghost">Tüm Referanslarımız →</a>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <div class="ig-band reveal">
+      <span class="sec-label">bizi takip edin</span>
+      <h2>İşlerimizi Instagram'da görün</h2>
+      <p>Güncel çekimlerimiz, tasarımlarımız ve kamera arkası içeriklerimiz her hafta hesabımızda.</p>
+      <a href="https://www.instagram.com/mayaajans_/" target="_blank" rel="noopener" class="btn btn-copper">@mayaajans_ takip et</a>
+    </div>
+  </div>
+</section>
+
+<section id="iletisim" class="process">
+  <div class="container">
+    <span class="sec-label reveal">projenizi konuşalım</span>
+    <h2 class="reveal">İletişim</h2>
+    <p class="sec-desc reveal">Teklif almak veya sorularınız için bize ulaşın — aynı gün dönüş yapıyoruz.</p>
+    <div class="contact-grid">
+      <div class="reveal">
+        <div class="c-item">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.9a2 2 0 0 1-.4 2.1L8.1 10a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.9.6 2.9.7a2 2 0 0 1 1.6 1.9z"/></svg></div>
+          <div><strong>Telefon</strong><a href="tel:+905447631406" id="telLink">0544 763 14 06</a></div>
+        </div>
+        <div class="c-item">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><rect x="2" y="4" width="20" height="16" rx="3"/><path d="M2 7l10 6L22 7"/></svg></div>
+          <div><strong>E-posta</strong><a href="mailto:yigit@mayaajans.net" id="mailLink">yigit@mayaajans.net</a></div>
+        </div>
+        <div class="c-item">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M12 22s7-6.1 7-12a7 7 0 1 0-14 0c0 5.9 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg></div>
+          <div><strong>Adres</strong><span id="adresText">Kazımiye Mah. Dumlupınar Cad. No:6/18B Daire 37, Çorlu / Tekirdağ</span></div>
+        </div>
+        <div class="c-item">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg></div>
+          <div><strong>Instagram</strong><a href="https://www.instagram.com/mayaajans_/" target="_blank" rel="noopener" id="igLink">@mayaajans_</a></div>
+        </div>
+      </div>
+      <form class="reveal" action="mailto:yigit@mayaajans.net" method="get" onsubmit="return sendMail(this)">
+        <div class="field"><input type="text" name="ad" placeholder="Adınız / Firmanız" required></div>
+        <div class="field"><input type="tel" name="tel" placeholder="Telefon numaranız" required></div>
+        <div class="field"><textarea name="mesaj" placeholder="Projenizden kısaca bahsedin..." required></textarea></div>
+        <button type="submit" class="btn btn-copper" style="width:100%">Teklif Talebi Gönder</button>
+      </form>
+    </div>
+    <a class="konum-harita" href="https://www.google.com/maps/search/?api=1&query=Kaz%C4%B1miye+Mah.+Dumlup%C4%B1nar+Cad.+No+6%2F18B+%C3%87orlu+Tekirda%C4%9F" target="_blank" rel="noopener" aria-label="Haritada aç">
+      <div class="kh-grid"></div>
+      <div class="kh-ping"></div>
+      <div class="kh-pin">📍</div>
+      <div class="kh-lbl"><b>Maya Ajans</b> · Kazımiye Mah. Dumlupınar Cad. No:6/18B, Çorlu / Tekirdağ &nbsp;—&nbsp; <b>Haritada aç →</b></div>
+    </a>
+  </div>
+</section>
+
+<footer>
+  <a href="#" class="logo"><span class="block">MAYA</span><span class="script">Maya Ajans</span></a>
+  <p class="foot-tag">Markaları dijitalde büyüten Çorlu merkezli kreatif ajans. Sosyal medya, video prodüksiyon ve reklam yönetimi.</p>
+  <div class="foot-links">
+    <a href="#hizmetler">Hizmetler</a>
+    <a href="#surec">Sürecimiz</a>
+    <a href="referanslar.html">Referanslar</a>
+    <a href="#iletisim">İletişim</a>
+    <a href="/panel">Müşteri Girişi</a>
+    <a href="tel:+905447631406">0544 763 14 06</a>
+  </div>
+  <div class="socials">
+    <a href="https://www.instagram.com/mayaajans_/" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg></a>
+    <a href="https://wa.me/905447631406" target="_blank" rel="noopener" aria-label="WhatsApp"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M21 11.5a8.5 8.5 0 0 1-12.4 7.5L3 21l2-5.6A8.5 8.5 0 1 1 21 11.5z"/></svg></a>
+    <a href="mailto:yigit@mayaajans.net" aria-label="E-posta"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><rect x="2" y="4" width="20" height="16" rx="3"/><path d="M2 7l10 6L22 7"/></svg></a>
+  </div>
+  <p class="copy">© 2026 Maya Ajans — mayaajans.net · Tüm hakları saklıdır.</p>
+</footer>
+
+<a class="ig-float" href="https://www.instagram.com/mayaajans_/" target="_blank" rel="noopener" aria-label="Instagram'da takip et">
+  <svg viewBox="0 0 24 24" stroke-width="1.9"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="#fff" stroke="none"/></svg>
+</a>
+<a class="wa-float" href="https://wa.me/905447631406?text=Merhaba,%20teklif%20almak%20istiyorum." target="_blank" rel="noopener" aria-label="WhatsApp ile yazın">
+  <svg viewBox="0 0 32 32"><path d="M16 3C9.4 3 4 8.4 4 15c0 2.1.6 4.2 1.6 6L4 29l8.2-1.5c1.2.5 2.5.7 3.8.7 6.6 0 12-5.4 12-12S22.6 3 16 3zm6.1 16.9c-.3.8-1.5 1.5-2.4 1.6-.6.1-1.4.2-4.1-.9-3.4-1.4-5.6-4.9-5.8-5.1-.2-.2-1.4-1.9-1.4-3.6s.9-2.5 1.2-2.9c.3-.3.7-.4.9-.4h.6c.2 0 .5-.1.7.5s.8 2 .9 2.2c.1.2.1.4 0 .6-.1.2-.2.4-.4.6l-.6.7c-.2.2-.4.4-.2.8.2.4 1 1.6 2.1 2.6 1.5 1.3 2.7 1.7 3.1 1.9.4.2.6.2.8-.1.2-.2.9-1.1 1.2-1.5.2-.4.5-.3.8-.2.3.1 2.1 1 2.4 1.2.4.2.6.3.7.4.1.3.1 1-.2 1.6z"/></svg>
+</a>
+
+<script>
+(function(){
+  const kelimeler=['Sosyal Medya','Video Prodüksiyon','Reklam Yönetimi','Kurumsal Kimlik','Drone Çekimi','İçerik Üretimi'];
+  const blok=kelimeler.map(k=>'<span>'+k+'</span><span class="yildiz">✦</span>').join('');
+  document.getElementById('mq1').innerHTML=blok+blok;
+  document.getElementById('mq2').innerHTML=blok+blok;
+})();
+
+const nav=document.getElementById('nav');
+// Scroll ilerleme çizgisi
+const scrollBar=document.createElement('div');
+scrollBar.style.cssText='position:fixed;top:0;left:0;height:3px;width:0;background:var(--copper);z-index:200;transition:width .1s';
+document.body.appendChild(scrollBar);
+const scrollInd=document.getElementById('scrollInd');
+addEventListener('scroll',()=>{
+  nav.classList.toggle('scrolled',scrollY>40);
+  const h=document.documentElement.scrollHeight-innerHeight;
+  scrollBar.style.width=(h>0?scrollY/h*100:0)+'%';
+  if(scrollInd)scrollInd.classList.toggle('gizle',scrollY>60);
+},{passive:true});
+const links=document.getElementById('navLinks');
+document.getElementById('hamburger').onclick=()=>links.classList.toggle('open');
+links.querySelectorAll('a').forEach(a=>a.onclick=()=>links.classList.remove('open'));
+
+async function applyContent(){
+  try{
+    const r=await fetch('content.json',{cache:'no-store'});
+    if(!r.ok)return;
+    const c=await r.json();
+    const set=(id,v)=>{const el=document.getElementById(id);if(el&&v)el.textContent=v};
+    set('heroEyebrow',c.hero?.eyebrow);
+    set('heroBaslik',c.hero?.baslik);
+    set('heroScript',c.hero?.baslik_el_yazisi);
+    set('heroDesc',c.hero?.aciklama);
+    set('hakkimizdaDesc',c.hakkimizda);
+    (c.hizmetler||[]).forEach((h,i)=>{
+      const card=document.querySelectorAll('#hizmetGrid .card')[i];
+      if(card){card.querySelector('h3').textContent=h.baslik;card.querySelector('p').textContent=h.aciklama}
+    });
+    (c.surec||[]).forEach((s,i)=>{
+      const st=document.querySelectorAll('#surecSteps .step')[i];
+      if(st){st.querySelector('h3').textContent=s.baslik;st.querySelector('p').textContent=s.aciklama}
+    });
+    (c.istatistikler||[]).forEach((s,i)=>{
+      const el=document.querySelectorAll('#statsGrid .stat')[i];
+      if(el){el.querySelector('.value').dataset.count=s.deger;el.querySelector('.label').textContent=s.etiket}
+    });
+    const t=c.iletisim||{};
+    if(t.telefon){const a=document.getElementById('telLink');a.textContent=t.telefon;a.href='tel:'+(t.telefon_link||t.telefon.replace(/\s/g,''))}
+    if(t.eposta){const a=document.getElementById('mailLink');a.textContent=t.eposta;a.href='mailto:'+t.eposta}
+    set('adresText',t.adres);
+    if(t.instagram){const a=document.getElementById('igLink');a.textContent='@'+t.instagram;a.href='https://www.instagram.com/'+t.instagram+'/'}
+    if(t.whatsapp){document.querySelectorAll('a[href*="wa.me"]').forEach(a=>a.href='https://wa.me/'+t.whatsapp)}
+    if(c.logo){document.querySelectorAll('.logo').forEach(l=>{l.innerHTML='<img src="'+encodeURI(c.logo)+'" alt="Maya Ajans" decoding="async">'})}
+    if(Array.isArray(c.referanslar)&&c.referanslar.length){
+      const sec=document.getElementById('referanslar');sec.style.display='';
+      const logolar=c.referanslar.filter(r=>r.logo);
+      const tekrar=Math.max(2,Math.ceil(10/logolar.length));
+      let dizi=[];
+      for(let i=0;i<tekrar;i++)dizi=dizi.concat(logolar);
+      const blok=dizi.map(r=>
+        '<div class="ref-logo-item"><img src="'+encodeURI(r.logo)+'" alt="'+(r.firma||'Referans')+'" loading="lazy"></div>').join('');
+      document.getElementById('refTrack').innerHTML=blok+blok;
+    }
+  }catch(e){}
+}
+
+function initAnimations(){
+  const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');io.unobserve(e.target)}}),{threshold:.12});
+  document.querySelectorAll('.reveal').forEach(el=>{
+    const kardesler=[...el.parentElement.children].filter(k=>k.classList.contains('reveal'));
+    if(kardesler.length>1)el.style.transitionDelay=(kardesler.indexOf(el)*.09)+'s';
+    io.observe(el);
+  });
+  const cio=new IntersectionObserver(es=>es.forEach(e=>{
+    if(!e.isIntersecting)return;
+    const el=e.target,target=+el.dataset.count,dur=1400,t0=performance.now();
+    (function tick(t){const p=Math.min((t-t0)/dur,1);el.textContent=Math.round(target*p)+'+';if(p<1)requestAnimationFrame(tick)})(t0);
+    cio.unobserve(el);
+  }),{threshold:.5});
+  document.querySelectorAll('[data-count]').forEach(el=>cio.observe(el));
+  // Süreç zaman çizgisi
+  const tl=document.getElementById('surecTL');
+  if(tl){const tio=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){tl.classList.add('cizildi');tio.disconnect()}}),{threshold:.4});tio.observe(tl)}
+}
+
+// Hero parçacık ağı
+(function(){
+  const cv=document.getElementById('heroCanvas'),hero=document.getElementById('hero');
+  if(!cv||!hero||matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  const ctx=cv.getContext('2d');let W,H,ps=[];
+  function boyut(){
+    const r=hero.getBoundingClientRect();W=cv.width=r.width;H=cv.height=r.height;
+    const say=Math.min(60,Math.round(W*H/22000));
+    ps=[];for(let i=0;i<say;i++)ps.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.45,vy:(Math.random()-.5)*.45});
+  }
+  boyut();
+  let mx=-999,my=-999;
+  hero.addEventListener('mousemove',e=>{const r=hero.getBoundingClientRect();mx=e.clientX-r.left;my=e.clientY-r.top},{passive:true});
+  hero.addEventListener('mouseleave',()=>{mx=-999;my=-999});
+  const MESAFE=140;
+  function ciz(){
+    ctx.clearRect(0,0,W,H);
+    for(const p of ps){p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>W)p.vx*=-1;if(p.y<0||p.y>H)p.vy*=-1;
+      const dx=p.x-mx,dy=p.y-my,d=Math.hypot(dx,dy);if(d<130&&d>0){p.x+=dx/d*1.2;p.y+=dy/d*1.2}}
+    for(let i=0;i<ps.length;i++)for(let j=i+1;j<ps.length;j++){
+      const a=ps[i],b=ps[j],d=Math.hypot(a.x-b.x,a.y-b.y);
+      if(d<MESAFE){ctx.strokeStyle='rgba(196,127,102,'+(1-d/MESAFE)*.35+')';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke()}
+    }
+    ctx.fillStyle='rgba(196,127,102,.7)';
+    for(const p of ps){ctx.beginPath();ctx.arc(p.x,p.y,1.8,0,7);ctx.fill()}
+    requestAnimationFrame(ciz);
+  }
+  ciz();
+  let rt;addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(boyut,200)});
+})();
+
+applyContent().finally(()=>{
+  initAnimations();
+  // Başlık kelime kelime beliriş
+  const hb=document.getElementById('heroBaslik');
+  const acc=document.getElementById('donenKutu');
+  const base=document.body.classList.contains('introlu')?1.75:0.2;
+  let wsayi=0;
+  if(hb){
+    const ws=hb.textContent.trim().split(/\s+/);
+    wsayi=ws.length;
+    hb.innerHTML=ws.map((w,i)=>'<span class="kelime" style="animation-delay:'+(base+i*0.11).toFixed(2)+'s">'+w+'</span>').join(' ');
+  }
+  if(acc){acc.style.opacity='0';acc.style.animation='kelimeGel .7s cubic-bezier(.22,1,.36,1) '+(base+wsayi*0.11).toFixed(2)+'s forwards'}
+  // Daktilo efekti (el yazısı kelime)
+  const twEl=document.getElementById('heroScript');
+  if(twEl){
+    const ilk=twEl.textContent.trim();
+    const kelimeler=[ilk,'parlatıyoruz.','konuşturuyoruz.'].filter((k,i,a)=>a.indexOf(k)===i);
+    let wi=0,ci=ilk.length,del=false;
+    function tw(){
+      const w=kelimeler[wi];
+      if(!del){ci++;twEl.textContent=w.slice(0,ci);if(ci>=w.length){del=true;return setTimeout(tw,1700)}}
+      else{ci--;twEl.textContent=w.slice(0,ci);if(ci<=0){del=false;wi=(wi+1)%kelimeler.length;return setTimeout(tw,220)}}
+      setTimeout(tw,del?55:105);
+    }
+    if(kelimeler.length>1)setTimeout(()=>{del=true;tw()},(base+wsayi*0.11)*1000+1400);
+  }
+});
+
+if(matchMedia('(pointer:fine)').matches){
+  const dot=document.createElement('div');dot.className='cursor-dot';
+  const ring=document.createElement('div');ring.className='cursor-ring';
+  document.body.append(ring,dot);
+  let mx=innerWidth/2,my=innerHeight/2,rx=mx,ry=my;
+  addEventListener('mousemove',e=>{
+    mx=e.clientX;my=e.clientY;
+    dot.style.transform=`translate(${mx}px,${my}px) translate(-50%,-50%)`;
+    const px=(mx/innerWidth-.5),py=(my/innerHeight-.5);
+    document.querySelectorAll('.blob').forEach((b,i)=>{
+      b.style.transform=`translate(${px*(i?-24:24)}px,${py*(i?-18:18)}px)`;
+    });
+  },{passive:true});
+  (function takip(){
+    rx+=(mx-rx)*.16;ry+=(my-ry)*.16;
+    ring.style.transform=`translate(${rx}px,${ry}px) translate(-50%,-50%)`;
+    requestAnimationFrame(takip);
+  })();
+  document.addEventListener('mouseover',e=>{if(e.target.closest('a,button,input,textarea'))ring.classList.add('buyuk')});
+  document.addEventListener('mouseout',e=>{if(e.target.closest('a,button,input,textarea'))ring.classList.remove('buyuk')});
+
+  // Manyetik butonlar
+  document.querySelectorAll('.btn').forEach(b=>{
+    b.addEventListener('mousemove',e=>{
+      const r=b.getBoundingClientRect();
+      b.style.transform='translate('+((e.clientX-r.left-r.width/2)*0.28)+'px,'+((e.clientY-r.top-r.height/2)*0.4)+'px)';
+    });
+    b.addEventListener('mouseleave',()=>{b.style.transform=''});
+  });
+
+  // 3B kart eğilme
+  document.querySelectorAll('.card,.step,.ref-logo-item').forEach(c=>{
+    c.style.transformStyle='preserve-3d';
+    c.addEventListener('mousemove',e=>{
+      const r=c.getBoundingClientRect();
+      const px=(e.clientX-r.left)/r.width-0.5, py=(e.clientY-r.top)/r.height-0.5;
+      c.style.transform='perspective(700px) rotateY('+(px*10)+'deg) rotateX('+(-py*10)+'deg) translateY(-6px)';
+    });
+    c.addEventListener('mouseleave',()=>{c.style.transform=''});
+  });
+
+  // Hero'da imleci takip eden ışık
+  const hero=document.getElementById('hero'),hglow=document.getElementById('heroHglow');
+  if(hero&&hglow){
+    hero.addEventListener('mousemove',e=>{
+      const r=hero.getBoundingClientRect();
+      hglow.style.left=(e.clientX-r.left)+'px';
+      hglow.style.top=(e.clientY-r.top)+'px';
+      hglow.style.opacity='1';
+    });
+    hero.addEventListener('mouseleave',()=>{hglow.style.opacity='0'});
+  }
+}
+
+function sendMail(f){
+  const mail=document.getElementById('mailLink').textContent||'yigit@mayaajans.net';
+  const body=encodeURIComponent(`Ad/Firma: ${f.ad.value}\nTelefon: ${f.tel.value}\n\n${f.mesaj.value}`);
+  location.href=`mailto:${mail}?subject=${encodeURIComponent('Web Sitesi Teklif Talebi')}&body=${body}`;
+  return false;
+}
+</script>
+<script src="https://w.behold.so/widget.js" type="module"></script>
 </body>
 </html>
