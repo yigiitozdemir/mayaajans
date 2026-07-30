@@ -146,6 +146,24 @@ $("#lb").onclick=e=>{if(e.target.id==="lb"){$("#lb").classList.remove("on");$("#
 const wa = m => window.open("https://wa.me/"+WA+"?text="+encodeURIComponent(m),"_blank");
 async function slackBildir(mesaj){ try{ await sb.functions.invoke("slack-bildir",{ body:{ mesaj } }); }catch(e){} }
 
+// Bildirim (push)
+const VAPID_PUBLIC = "BM3OjQM0truB5AlDLWf3uB82WTpdZoQc67mfNCfA8E8Akx6_l7zjCSKIwARum5NloNAjaARwoO4nNi38xvaAGfk";
+function b64ToU8(b){const p="=".repeat((4-b.length%4)%4);const s=(b+p).replace(/-/g,"+").replace(/_/g,"/");const r=atob(s);const a=new Uint8Array(r.length);for(let i=0;i<r.length;i++)a[i]=r.charCodeAt(i);return a;}
+async function bildirimAc(musteri_id){
+  try{
+    if(!("serviceWorker" in navigator)||!("PushManager" in window)){ alert("Bu tarayıcı anlık bildirim desteklemiyor. (iPhone'da paneli önce 'Ana ekrana ekle' ile kurun.)"); return; }
+    const perm = await Notification.requestPermission();
+    if(perm!=="granted"){ alert("Bildirim izni verilmedi."); return; }
+    const reg = await navigator.serviceWorker.ready;
+    let sub = await reg.pushManager.getSubscription();
+    if(!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly:true, applicationServerKey: b64ToU8(VAPID_PUBLIC) });
+    const j = sub.toJSON();
+    await sb.from("push_abonelikleri").upsert({ musteri_id, endpoint:j.endpoint, p256dh:j.keys.p256dh, auth_key:j.keys.auth }, { onConflict:"endpoint", ignoreDuplicates:true });
+    const btn=$("#bildirimBtn"); if(btn){ btn.textContent="🔔 Bildirimler açık"; btn.disabled=true; btn.style.opacity=.6; }
+    alert("Bildirimler açıldı! ✅");
+  }catch(err){ alert("Bildirim açılamadı: "+err.message); }
+}
+
 // dosya yükle → public URL
 async function uploadFile(file){
   const ad = crypto.randomUUID()+"-"+file.name.replace(/[^\w.\-]/g,"_");
@@ -265,6 +283,7 @@ function detayAc(id){
       const f = $("#oKapak").files[0]; if(f) kapak_url = await uploadFile(f);
       const { error } = await sb.from("onaylar").insert({ musteri_id:m.id, tur:$("#oTur").value, baslik, tarih:$("#oTarih").value.trim(), kapak_url, video_url:$("#oVideo").value.trim(), durum:"bekliyor" });
       if(error) throw error;
+      sb.functions.invoke("bildirim-gonder",{ body:{ musteri_id:m.id, baslik } }).catch(()=>{});
       await adminYukle(); detayAc(id);
     }catch(err){ alert("Eklenemedi: "+err.message); }
     yukle(false);
@@ -316,10 +335,12 @@ async function musteriYukle(email){
   if(!m){ cv.innerHTML='<div class="bos" style="margin-top:20px">👋 Paneliniz hazırlanıyor. İçerikleriniz eklenince burada görünecek.</div>'; return; }
   $("#rolEt").textContent = m.firma;
   cv.innerHTML =
-    '<span class="lbl">hoş geldiniz</span><h1 style="margin-bottom:4px">'+esc(m.firma)+'</h1><p class="mut" style="margin-bottom:20px">İçeriklerinizi onaylayın, performansınızı ve dosyalarınızı görün.</p>'+
+    '<span class="lbl">hoş geldiniz</span><h1 style="margin-bottom:4px">'+esc(m.firma)+'</h1><p class="mut" style="margin-bottom:16px">İçeriklerinizi onaylayın, performansınızı ve dosyalarınızı görün.</p>'+
+    '<button class="btn btn-c" id="bildirimBtn" style="margin-bottom:22px">🔔 Bildirimleri Aç</button>'+
     '<div class="tabs"><button class="tab on" data-t="onay">İçerik Onayı</button><button class="tab" data-t="perf">Performans</button><button class="tab" data-t="dosya">Dosyalar</button></div>'+
     '<div class="pane on" id="c-onay"></div><div class="pane" id="c-perf"></div><div class="pane" id="c-dosya"></div>';
   cv.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{cv.querySelectorAll(".tab").forEach(x=>x.classList.remove("on"));t.classList.add("on");cv.querySelectorAll(".pane").forEach(p=>p.classList.remove("on"));$("#c-"+t.dataset.t).classList.add("on");});
+  const bb=$("#bildirimBtn"); if(bb){ if(("Notification" in window)&&Notification.permission==="granted") bb.textContent="🔔 Bildirimler açık"; bb.onclick=()=>bildirimAc(m.id); }
   cOnay(m); cPerf(m); cDosya(m);
 }
 function cOnay(m){
