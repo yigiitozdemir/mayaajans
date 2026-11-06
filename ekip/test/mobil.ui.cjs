@@ -50,7 +50,8 @@ const { chromium } = require('playwright');
         await p.goto(BASE + pg); await p.waitForTimeout(300);
         ok(await p.locator('.side').isVisible() && !(await vis(p, '.mtabs')) && !(await vis(p, '.mtop')), pg);
         const sb = await p.locator('.side').boundingBox(), mb = await p.locator('.main').boundingBox();
-        ok(mb.x >= sb.x + sb.width - 1 && Math.abs(mb.y - sb.y) < 2 && sb.width < 260, pg + ' menü ve içerik yan yana olmalı: menü ' + JSON.stringify(sb) + ' içerik ' + JSON.stringify(mb));
+        ok(mb.x >= sb.x + sb.width - 1 && Math.abs(mb.y - sb.y) <= 16 && sb.width < 260, // menü yüzen cam: kenardan 12 px içeride
+           pg + ' menü ve içerik yan yana olmalı: menü ' + JSON.stringify(sb) + ' içerik ' + JSON.stringify(mb));
         const ov = await p.evaluate(() => document.documentElement.scrollWidth - innerWidth);
         ok(ov <= 0, pg + ' yatay taşma: ' + ov + 'px');
       }

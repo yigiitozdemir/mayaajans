@@ -47,11 +47,11 @@ function AiQuick({ path }: { path: string }) {
   );
 }
 
-// Menünün altında: Sistem · Açık · Koyu
+// Menünün altında: Koyu (varsayılan) · Açık · Sistem
 const THEMES: { v: ThemePref; label: string; icon: string }[] = [
-  { v: 'system', label: 'Sistem', icon: 'monitor' },
-  { v: 'light', label: 'Açık', icon: 'sun' },
   { v: 'dark', label: 'Koyu', icon: 'moon' },
+  { v: 'light', label: 'Açık', icon: 'sun' },
+  { v: 'system', label: 'Sistem', icon: 'monitor' },
 ];
 function ThemePicker() {
   const p = useThemePref();

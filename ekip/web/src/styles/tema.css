@@ -1,0 +1,124 @@
+/* Yeni görünüm (Kasım 2026): arka plan ışıkları + cam yüzeyler.
+   Açık "Premium cam" · Koyu "Gece". Renkler styles.css'teki değişkenlerde; burada yalnızca yüzey dili.
+   Not: bulanıklaştırma (backdrop-filter) yalnızca sabit/üstte duran yüzeylerde — kartlarda yok (performans). */
+
+/* ---------- arka plan: yumuşak renk ışıkları (sayfa kayarken yerinde durur) ---------- */
+html { background: var(--bg); }
+body { background: transparent; position: relative; isolation: isolate; min-height: 100vh; min-height: 100dvh; }
+body::before {
+  content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(60vw 48vw at 4% -4%, rgba(255, 196, 168, 0.70) 0%, rgba(255, 196, 168, 0) 62%),
+    radial-gradient(52vw 44vw at 98% 2%, rgba(214, 206, 255, 0.75) 0%, rgba(214, 206, 255, 0) 60%),
+    radial-gradient(60vw 50vw at 76% 106%, rgba(196, 236, 224, 0.75) 0%, rgba(196, 236, 224, 0) 62%),
+    radial-gradient(46vw 40vw at 16% 104%, rgba(255, 226, 200, 0.6) 0%, rgba(255, 226, 200, 0) 60%),
+    var(--bg);
+}
+:root[data-theme="dark"] body::before {
+  background:
+    radial-gradient(56vw 42vw at 6% -8%, rgba(255, 112, 82, 0.36) 0%, rgba(255, 112, 82, 0) 64%),
+    radial-gradient(54vw 44vw at 98% -2%, rgba(124, 92, 255, 0.34) 0%, rgba(124, 92, 255, 0) 62%),
+    radial-gradient(62vw 46vw at 64% 112%, rgba(30, 200, 170, 0.20) 0%, rgba(30, 200, 170, 0) 62%),
+    var(--bg);
+}
+.shell, .main { background: transparent; }
+
+/* ---------- başlıklar: Apple ferahlığı ---------- */
+.h1 { font-size: 36px; font-weight: 700; letter-spacing: -0.035em; line-height: 1.08; }
+:root[data-theme="dark"] .h1 { font-weight: 600; letter-spacing: -0.04em; }
+@media (max-width: 640px) { .h1 { font-size: 30px; } }
+
+/* ---------- sol menü: yüzen buzlu cam ---------- */
+.side {
+  background: var(--panel);
+  -webkit-backdrop-filter: blur(30px) saturate(1.5); backdrop-filter: blur(30px) saturate(1.5);
+  border: 1px solid var(--edge);
+  box-shadow: var(--glass-shadow);
+}
+@media (min-width: 761px) {
+  .side { margin: 12px 0 12px 12px; height: calc(100vh - 24px); height: calc(100dvh - 24px); top: 12px; border-radius: 24px; }
+  .shell { gap: 6px; }
+}
+.nav a, .nav .soon { border-radius: 11px; color: var(--ink2); }
+.nav a svg { stroke: var(--mute); }
+.nav a:hover { background: rgba(var(--ink-rgb), 0.05); }
+.nav a.on { background: #FFFFFF; color: var(--ink); box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06), 0 4px 14px rgba(var(--shadow-rgb), 0.07); }
+.nav a.on svg { stroke: var(--accent); }
+:root[data-theme="dark"] .nav a.on {
+  background: linear-gradient(90deg, rgba(255, 138, 101, 0.22), rgba(255, 138, 101, 0.05));
+  box-shadow: inset 0 0 0 1px rgba(255, 138, 101, 0.28); color: #FFFFFF;
+}
+:root[data-theme="dark"] .nav a:hover:not(.on) { background: rgba(255, 255, 255, 0.05); }
+
+/* ---------- kartlar ve paneller: cam ---------- */
+.card { border-color: var(--edge); border-radius: 18px; box-shadow: var(--glass-shadow); }
+.panel { border-color: var(--edge); border-radius: 20px; box-shadow: var(--glass-shadow); }
+
+/* ---------- düğmeler ---------- */
+.btn { border-radius: 12px; border-color: var(--line2); background: var(--card); }
+.btn.primary {
+  background-color: var(--accent-fill);
+  background-image: linear-gradient(140deg, rgba(255, 255, 255, 0.16), rgba(0, 0, 0, 0.06));
+  box-shadow: 0 8px 22px rgba(var(--accent-rgb), 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+.btn.primary:hover { filter: brightness(1.05); }
+.btn.ghost { background: transparent; }
+.btn.danger { background: transparent; }
+.iconbtn { border-radius: 12px; border-color: var(--line2); background: var(--card); }
+
+/* ---------- alanlar ---------- */
+.input { border-radius: 12px; border-color: var(--line2); background: var(--card); }
+.input:focus { border-color: rgba(var(--accent-rgb), 0.7); box-shadow: 0 0 0 4px rgba(var(--accent-rgb), 0.14); }
+
+/* ---------- Apple tarzı bölmeli seçici ---------- */
+.seg { background: rgba(118, 118, 128, 0.12); border-color: transparent; border-radius: 12px; padding: 3px; gap: 2px; }
+.seg button { border-radius: 9px; color: var(--ink2); }
+.seg button.on { background: #FFFFFF; color: var(--ink); box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08); }
+:root[data-theme="dark"] .seg { background: rgba(255, 255, 255, 0.06); border: 1px solid var(--edge); }
+:root[data-theme="dark"] .seg button { color: var(--mute); }
+:root[data-theme="dark"] .seg button.on { background: rgba(255, 255, 255, 0.14); color: #FFFFFF; box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.10); }
+
+/* ---------- zil: yuvarlak cam ---------- */
+.bell { border-radius: 50%; border-color: var(--edge); background: var(--card); box-shadow: var(--shadow); }
+.bell .n { border-color: transparent; }
+
+/* ---------- üstte açılanlar: daha opak cam + bulanıklık ---------- */
+.dialog, .drawer, .bellpanel, .toast, .offline {
+  background: var(--pop);
+  -webkit-backdrop-filter: blur(30px) saturate(1.4); backdrop-filter: blur(30px) saturate(1.4);
+  border-color: var(--edge);
+}
+.dialog { border-radius: 24px; }
+.toast { border-radius: 18px; }
+.overlay .scrim, .drawer-wrap .scrim { -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); }
+:root[data-theme="dark"] .overlay .scrim, :root[data-theme="dark"] .drawer-wrap .scrim { background: rgba(0, 0, 0, 0.5); }
+
+/* ---------- etiketler ---------- */
+.chip { background: var(--chip); }
+.tag { border-radius: 8px; }
+
+/* ---------- giriş ekranı: ışıklar arka planda ---------- */
+.auth { background: transparent; }
+.auth form { background: var(--pop); border-color: var(--edge); border-radius: 24px; box-shadow: var(--glass-shadow); -webkit-backdrop-filter: blur(30px); backdrop-filter: blur(30px); }
+
+/* ---------- telefon: yüzen cam alt menü ---------- */
+@media (max-width: 760px) {
+  .mtop { background: rgba(var(--ink-rgb), 0); }
+  .mtabs {
+    left: 12px; right: 12px; bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+    padding: 6px; border-radius: 28px;
+    background: var(--pop); border: 1px solid var(--edge); box-shadow: 0 14px 40px rgba(var(--shadow-rgb), 0.18);
+  }
+  :root[data-theme="dark"] .mtabs { background: rgba(28, 28, 34, 0.78); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 18px 44px rgba(0, 0, 0, 0.5); }
+  .mtabs .on { color: var(--accent); }
+  .mtabs .on .mtab-ic { background: transparent; }
+  .main { padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
+  .side { border-radius: 0 24px 24px 0; }
+}
+
+/* ---------- Uygulamalar kısayolları ve profil kartı ---------- */
+.aiq { border-color: var(--edge); background: var(--card); border-radius: 12px; }
+.aiq-ic { border-radius: 8px; }
+
+/* koyu temada logo grafit zeminde sönük kalmasın */
+:root[data-theme="dark"] img[src="/logo.png"] { filter: brightness(1.45) saturate(1.1); }

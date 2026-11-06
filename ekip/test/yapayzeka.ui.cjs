@@ -73,6 +73,7 @@ const { chromium } = require('playwright');
   await t('tema ile uyumlu açılış rengi (koyu/açık bilgisi gönderilir)', async () => {
     await p.locator('.aiq.gpt').click(); await p.waitForTimeout(300);
     const theme = async (name) => { await p.keyboard.press('Control+k'); await p.locator('.ap-root input').fill(name); await p.waitForTimeout(250); await p.keyboard.press('Enter'); await p.waitForTimeout(400); };
+    await theme('Açık tema'); // varsayılan artık Koyu: önce Açık'a geç
     await clear(p); await theme('Koyu tema');
     eq((await last(p, 'ai_show'))[1].dark, true); eq((await last(p, 'set_theme'))[1].theme, 'dark');
     await clear(p); await theme('Açık tema');

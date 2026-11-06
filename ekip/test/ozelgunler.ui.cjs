@@ -32,7 +32,8 @@ const ok = (c, m) => { if (!c) throw new Error(m || 'koşul sağlanmadı'); };
     await page.getByLabel('E-posta').fill(email);
     await page.locator('input[autocomplete="current-password"]').fill('TestSifre123');
     await page.getByRole('button', { name: 'Giriş yap' }).click();
-    await page.getByRole('link', { name: /Özel Günler/ }).first().waitFor({ timeout: 10000 });
+    // masaüstünde sol menü, telefonda alt sekmeler (menü çekmecede)
+    await page.locator('.nav a[href="/ozel-gunler"]:visible, .mtabs:visible').first().waitFor({ timeout: 10000 });
   };
   const shot = (p, n) => p.screenshot({ path: path.join(OUT, 'ozelgunler-' + n + '.png') });
   const A = await mk(); const P = await mk();

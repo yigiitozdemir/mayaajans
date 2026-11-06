@@ -155,6 +155,8 @@ const auditFn = () => {
     const wide = await m.evaluate(() => [...document.querySelectorAll('.yo *')].filter((e) => { const r = e.getBoundingClientRect(); return r.right > 391 && !e.closest('.yo-scroll') && !e.closest('.sr'); }).map((e) => e.className || e.tagName).slice(0, 5));
     eq(wide.length, 0, 'taşan: ' + wide.join(','));
     await m.screenshot({ path: OUT + '/yonetici-mobil.png', fullPage: true });
+    await m.locator('.mtabs button').click(); await m.waitForTimeout(350); // telefonda tema seçici Menü'de
+    await m.getByRole('radio', { name: 'Açık' }).click(); await m.waitForTimeout(300);
     await m.getByRole('radio', { name: 'Koyu' }).click(); await m.waitForTimeout(300);
     await m.screenshot({ path: OUT + '/yonetici-mobil-koyu.png', fullPage: true });
     await m.getByRole('radio', { name: 'Açık' }).click(); await m.waitForTimeout(300);

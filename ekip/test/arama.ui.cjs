@@ -251,7 +251,7 @@ const audit = (p, root) => p.evaluate((root) => {
     await mp.goto(UI + '/giris');
     await mp.fill('input[type=email]', 'yigiitozdemir@gmail.com'); await mp.fill('input[type=password]', 'TestSifre123'); await mp.keyboard.press('Enter');
     await mp.waitForURL((u) => !u.pathname.startsWith('/giris')); await mp.waitForTimeout(700);
-    const fab = mp.getByRole('button', { name: 'Ara (komut paleti)' });
+    const fab = mp.locator('.mtop').getByRole('button', { name: 'Ara' }); // telefonda arama üst başlıkta
     ok(await fab.isVisible(), 'düğme yok');
     const bb = await fab.boundingBox(); ok(bb.height >= 44 && bb.x + bb.width <= 390 && bb.y + bb.height <= 844, 'boyut/konum ' + JSON.stringify(bb));
     await shot(mp, 'mobil-dugme');

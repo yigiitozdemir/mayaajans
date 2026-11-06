@@ -90,7 +90,8 @@ const STUB = ({ endpoint, keys }) => {
     await page.locator('.shell').waitFor({ timeout: 10000 });
     return { ctx, page };
   }
-  const openProfile = async (p) => { await p.getByRole('button', { name: 'Profilimi düzenle' }).click(); await p.getByRole('dialog').or(p.locator('.dialog')).first().waitFor(); };
+  const openProfile = async (p) => { if (await p.locator('.mtabs').isVisible()) { await p.locator('.mtabs button').click(); await p.waitForTimeout(350); } // telefonda profil Menü'de
+    await p.getByRole('button', { name: 'Profilimi düzenle' }).click(); await p.getByRole('dialog').or(p.locator('.dialog')).first().waitFor(); };
   const subCount = () => sql("SELECT COUNT(*) AS n FROM push_subscriptions WHERE user_id = 'u_pelin'")[0].n;
 
   // ---------- 0) gerçek push servisi var mı? ----------

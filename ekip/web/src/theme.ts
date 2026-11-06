@@ -1,4 +1,4 @@
-// Tema: Sistem (varsayılan) · Açık · Koyu. Seçim kişinin hesabına ve bu cihaza kaydedilir.
+// Tema: Koyu "Gece" (varsayılan) · Açık "Premium cam" · Sistem. Seçim kişinin hesabına ve bu cihaza kaydedilir.
 import { useEffect, useState } from 'preact/hooks';
 import { desktopInvoke } from './desktop';
 
@@ -8,7 +8,7 @@ const mq = window.matchMedia('(prefers-color-scheme: dark)');
 
 function readLocal(): ThemePref {
   try { const v = localStorage.getItem(KEY); if (v === 'light' || v === 'dark' || v === 'system') return v; } catch { /* */ }
-  return 'system';
+  return 'dark'; // hiç seçim yapılmadıysa: Gece
 }
 let pref: ThemePref = readLocal();
 
@@ -21,7 +21,7 @@ export function applyTheme(p: ThemePref = pref) {
   try { localStorage.setItem(KEY, p); } catch { /* */ }
   const r = resolvedTheme();
   document.documentElement.dataset.theme = r;
-  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', r === 'dark' ? '#1A1512' : '#F4F1EC');
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', r === 'dark' ? '#0B0B0F' : '#F6F3EF');
   desktopInvoke('set_theme', { theme: p }); // Mac uygulamasında başlık çubuğu da uysun
   window.dispatchEvent(new Event('maya-theme'));
 }

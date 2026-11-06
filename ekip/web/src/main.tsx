@@ -28,6 +28,7 @@ import { NudgeReceiver } from './components/NudgeReceiver';
 import { ChatUnread } from './components/ChatUnread';
 import { Portal } from './pages/Portal';
 import { Misafir } from './pages/Misafir';
+import './styles/tema.css'; // yeni görünüm — en sonda yüklenir
 
 function App() {
   const s = useStore();

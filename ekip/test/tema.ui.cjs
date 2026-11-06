@@ -21,7 +21,7 @@ const OUT = process.argv[2] || '.';
   await p.fill('input[type=email]', 'yigiitozdemir@gmail.com'); await p.fill('input[type=password]', 'TestSifre123'); await p.keyboard.press('Enter');
   await p.waitForURL((u) => !u.pathname.startsWith('/giris'));
 
-  const PAGES = [['/', 'bugun'], ['/isler', 'isler'], ['/ozel-gunler', 'ozelgunler'], ['/cekim', 'cekim'], ['/musteriler?id=c_01', 'musteriler'], ['/sohbet?c=ch_genel', 'sohbet'], ['/durt', 'durt'], ['/ekip', 'ekip']];
+  const PAGES = [['/', 'bugun'], ['/isler', 'isler'], ['/ozel-gunler', 'ozelgunler'], ['/cekim', 'cekim'], ['/musteriler?id=c_01', 'musteriler'], ['/sohbet?c=ch_genel', 'sohbet'], ['/durt', 'durt'], ['/ekip', 'ekip'], ['/ajanda', 'ajanda'], ['/vatan', 'vatan'], ['/yonetici', 'yonetici']];
   // görünen her yazının rengini, arkasındaki gerçek zemin rengiyle karşılaştır (WCAG oranı)
   const audit = () => p.evaluate(() => {
     const parse = (c) => { const m = c.match(/rgba?\(([^)]+)\)/); if (!m) return null; const a = m[1].split(',').map((x) => parseFloat(x)); return { r: a[0], g: a[1], b: a[2], a: a.length > 3 ? a[3] : 1 }; };
@@ -34,7 +34,7 @@ const OUT = process.argv[2] || '.';
         if (cs.backgroundImage !== 'none' && !cs.backgroundImage.includes('gradient')) return null; // resim üstü: ölçme
         const c = parse(cs.backgroundColor); if (c && c.a > 0) { stack.push(c); if (c.a >= 1) break; }
       }
-      let base = parse(getComputedStyle(document.body).backgroundColor) || { r: 255, g: 255, b: 255, a: 1 };
+      let base = parse(getComputedStyle(document.documentElement).backgroundColor) || { r: 255, g: 255, b: 255, a: 1 }; // zemin: html (arka plan ışıkları bunun üstünde, çok hafif)
       for (let i = stack.length - 1; i >= 0; i--) base = blend(stack[i], base);
       return base;
     };
@@ -98,6 +98,13 @@ const OUT = process.argv[2] || '.';
     eq(await p3.evaluate(() => document.documentElement.dataset.theme), 'dark');
     await p3.waitForTimeout(500); await p3.screenshot({ path: `${OUT}/dark-giris.png` });
     await c3.close();
+  });
+  await t('hiç seçim yapılmamışsa varsayılan: Koyu (Gece)', async () => {
+    const c4 = await b.newContext({ colorScheme: 'light' }); const p4 = await c4.newPage();
+    await p4.goto(BASE + '/giris'); await p4.waitForTimeout(300);
+    eq(await p4.evaluate(() => document.documentElement.dataset.theme), 'dark');
+    eq(await p4.evaluate(() => document.querySelector('meta[name=theme-color]').content), '#0B0B0F');
+    await c4.close();
   });
   await t('konsol hatası yok', async () => eq(errs.length, 0, errs.join(' | ')));
   for (const [k, v] of Object.entries(report)) if (v.length) console.log(`\nKONTRAST ${k}: ${v.length}\n  ` + v.slice(0, 12).join('\n  '));
