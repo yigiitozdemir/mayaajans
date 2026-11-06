@@ -78,8 +78,8 @@ export function Ekip() {
             <button type="button" class="btn primary" onClick={async () => { try { await navigator.clipboard.writeText(link.url); snack('Bağlantı kopyalandı'); } catch { snack('Kopyalanamadı, elle seç'); } }}><Icon n="copy" size={15} />Kopyala</button>
           </div>
           <div class="row" style="gap:8px;flex-wrap:wrap">
-            <a class="btn" href={inviteMail(link)}><Icon n="mail" size={15} />E-postayla gönder</a>
-            <a class="btn" href={'https://wa.me/?text=' + encodeURIComponent(inviteText(link))} target="_blank" rel="noopener noreferrer"><Icon n="chat" size={15} />WhatsApp'ta gönder</a>
+            <a class="btn" style="text-decoration:none" href={inviteMail(link)}><Icon n="mail" size={15} />E-postayla gönder</a>
+            <a class="btn" style="text-decoration:none" href={'https://wa.me/?text=' + encodeURIComponent(inviteText(link))} target="_blank" rel="noopener noreferrer"><Icon n="chat" size={15} />WhatsApp'ta gönder</a>
           </div>
           <span class="sub">Program e-postayı kendisi göndermez: bağlantıyı kopyalayıp ilet ya da yukarıdaki düğmelerle kendi e-postandan / WhatsApp'tan gönder. Bağlantı tek kullanımlık ve 14 gün geçerli; sadece bir kez gösterilir, kaybolursa yenisini oluşturabilirsin.</span>
         </section>
