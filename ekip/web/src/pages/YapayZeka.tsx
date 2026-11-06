@@ -52,15 +52,16 @@ function AiEmbed({ ai, openTask, onHelp, onFail }: { ai: AiId; openTask: (id: st
         if (!alive || !host.current) return;
         if (covered()) { desktopCall('ai_hide').catch(() => {}); return; }
         const r = host.current.getBoundingClientRect();
-        desktopCall('ai_show', { which: ai, x: r.left, y: r.top, w: r.width, h: r.height }).catch(() => { if (alive) onFail(); });
+        desktopCall('ai_show', { which: ai, x: r.left, y: r.top, w: r.width, h: r.height, dark: document.documentElement.dataset.theme === 'dark' }).catch(() => { if (alive) onFail(); });
       });
     };
     sync();
     const ro = new ResizeObserver(sync); if (host.current) ro.observe(host.current);
     const mo = new MutationObserver(sync); mo.observe(document.body, { childList: true, subtree: true });
     window.addEventListener('resize', sync);
+    window.addEventListener('maya-theme', sync); // tema değişince zemin rengi de uysun
     return () => {
-      alive = false; cancelAnimationFrame(raf); ro.disconnect(); mo.disconnect(); window.removeEventListener('resize', sync);
+      alive = false; cancelAnimationFrame(raf); ro.disconnect(); mo.disconnect(); window.removeEventListener('resize', sync); window.removeEventListener('maya-theme', sync);
       desktopCall('ai_hide').catch(() => {});
     };
   }, [ai]);

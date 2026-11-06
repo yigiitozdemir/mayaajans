@@ -172,7 +172,7 @@ const AI_EMBED: [(&str, &str, &str); 2] = [
 ];
 
 #[tauri::command]
-fn ai_show(app: AppHandle, which: String, x: f64, y: f64, w: f64, h: f64) -> Result<(), String> {
+fn ai_show(app: AppHandle, which: String, x: f64, y: f64, w: f64, h: f64, dark: Option<bool>) -> Result<(), String> {
     let Some(&(_, label, url)) = AI_EMBED.iter().find(|(id, _, _)| *id == which) else {
         return Err("bilinmeyen".into());
     };
@@ -186,7 +186,10 @@ fn ai_show(app: AppHandle, which: String, x: f64, y: f64, w: f64, h: f64) -> Res
     }
     let pos = tauri::LogicalPosition::new(x.max(0.0), y.max(0.0));
     let size = tauri::LogicalSize::new(w.max(200.0), h.max(200.0));
+    // yüklenirken beyaz parlama olmasın: zemin programın temasıyla aynı
+    let bg = if dark.unwrap_or(false) { tauri::window::Color(26, 21, 18, 255) } else { tauri::window::Color(244, 241, 236, 255) };
     if let Some(v) = app.get_webview(label) {
+        let _ = v.set_background_color(Some(bg));
         let _ = v.set_position(pos);
         let _ = v.set_size(size);
         let _ = v.show();
@@ -197,6 +200,7 @@ fn ai_show(app: AppHandle, which: String, x: f64, y: f64, w: f64, h: f64) -> Res
     let dl = app.clone();
     let builder = tauri::webview::WebviewBuilder::new(label, WebviewUrl::External(url.parse().map_err(|_| "adres")?))
         .user_agent(SAFARI_UA)
+        .background_color(bg)
         .on_new_window(move |url, _features| {
             if is_auth_or_ai_host(&url) {
                 tauri::webview::NewWindowResponse::Allow

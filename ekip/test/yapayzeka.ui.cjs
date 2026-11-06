@@ -61,6 +61,13 @@ const { chromium } = require('playwright');
     await clear(p); await p.getByRole('button', { name: 'Sohbete dön' }).click(); await p.waitForTimeout(300);
     ok(await last(p, 'ai_show'), 'dönünce gösterilmeli');
   });
+  await t('tema ile uyumlu açılış rengi (koyu/açık bilgisi gönderilir)', async () => {
+    await p.locator('.aiq.gpt').click(); await p.waitForTimeout(300); await clear(p);
+    await p.getByRole('radio', { name: 'Koyu' }).click(); await p.waitForTimeout(300);
+    eq((await last(p, 'ai_show'))[1].dark, true); eq((await last(p, 'set_theme'))[1].theme, 'dark');
+    await clear(p); await p.getByRole('radio', { name: 'Açık' }).click(); await p.waitForTimeout(300);
+    eq((await last(p, 'ai_show'))[1].dark, false);
+  });
   await t('konsol hatası yok', async () => eq(errs.length, 0, errs.join(' | ')));
   await p.screenshot({ path: (process.argv[2] || '.') + '/yz-gomulu.png' });
   await ctx.close();
