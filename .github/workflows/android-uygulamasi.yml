@@ -45,6 +45,8 @@ jobs:
           mkdir -p out
           "$BT/zipalign" -p -f 4 app/build/outputs/apk/release/app-release-unsigned.apk out/MayaEkip-imzasiz.apk
           "$BT/zipalign" -c -p 4 out/MayaEkip-imzasiz.apk && echo hizali
+          cp "$BT/lib/apksigner.jar" out/apksigner.jar   # Google'ın resmi imzalama aracı (yerelde imzalamak için)
+          basename "$BT" > out/BUILD_TOOLS
           grep -o "versionName '[^']*'" app/build.gradle | cut -d"'" -f2 > out/VERSION
           echo "${GITHUB_SHA}" > out/COMMIT
           ls -la out

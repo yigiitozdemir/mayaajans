@@ -19,7 +19,7 @@ public class ApkImzala {
     ApkSigner.SignerConfig sc = new ApkSigner.SignerConfig.Builder("MAYA", key, Collections.singletonList(cert)).build();
     new ApkSigner.Builder(Collections.singletonList(sc))
         .setInputApk(new File(a[0])).setOutputApk(new File(a[1]))
-        .setV1SigningEnabled(true).setV2SigningEnabled(true)
+        .setV1SigningEnabled(false).setV2SigningEnabled(true) // minSdk 24: v2 imzası yeterli
         .build().sign();
     ApkVerifier.Result r = new ApkVerifier.Builder(new File(a[1])).build().verify();
     System.out.println("doğrulandı=" + r.isVerified() + " v1=" + r.isVerifiedUsingV1Scheme() + " v2=" + r.isVerifiedUsingV2Scheme());
