@@ -12,11 +12,18 @@ function readLocal(): ThemePref {
 }
 let pref: ThemePref = readLocal();
 
+let gecisT: ReturnType<typeof setTimeout> | undefined;
 export const themePref = () => pref;
 export const resolvedTheme = (): 'light' | 'dark' => (pref === 'system' ? (mq.matches ? 'dark' : 'light') : pref);
 
-/** Temayı uygular (sayfa yenilenmez). */
-export function applyTheme(p: ThemePref = pref) {
+/** Temayı uygular (sayfa yenilenmez). `yumusak`: kullanıcı seçtiyse eski ve yeni görünüm yumuşakça geçer. */
+export function applyTheme(p: ThemePref = pref, yumusak = false) {
+  // kullanıcı seçtiyse renkler yarım saniyede yumuşakça değişir (tema hemen uygulanır)
+  if (yumusak && p !== pref && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const root = document.documentElement;
+    root.classList.add('tema-gecis');
+    clearTimeout(gecisT); gecisT = setTimeout(() => root.classList.remove('tema-gecis'), 500);
+  }
   pref = p;
   try { localStorage.setItem(KEY, p); } catch { /* */ }
   const r = resolvedTheme();

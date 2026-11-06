@@ -1,7 +1,7 @@
 // Özel Günler: yaklaşan günler, firma satırları, sorumlu, Hazırladım
 import { useEffect, useMemo, useState } from 'preact/hooks';
 import { api, onLive, reloadClients, snack, todayIso, parseD, DAY, LMON, memberName, fmtDate } from '../api';
-import { Avatar, Icon, useStore } from '../ui';
+import { Avatar, Icon, useStore, Sayi } from '../ui';
 import { Bell } from '../components/Notify';
 import { DayDetail, DayForm, prepTag, toneLabel, type SDay, type SRow } from '../components/OzelGunPanels';
 import '../styles/ozelgunler.css';
@@ -136,7 +136,7 @@ export function OzelGunler({ openTask }: { openTask: (id: string) => void }) {
 
       <div class="stats">
         {stats.map((st) => (
-          <div class="stat"><span class="row sub" style="gap:8px;color:var(--mute)"><span class="dot" style={{ background: st.dot }} />{st.label}</span><span class="v">{st.v}</span></div>
+          <div class="stat"><span class="row sub" style="gap:8px;color:var(--mute)"><span class="dot" style={{ background: st.dot }} />{st.label}</span><span class="v"><Sayi v={st.v} /></span></div>
         ))}
       </div>
 

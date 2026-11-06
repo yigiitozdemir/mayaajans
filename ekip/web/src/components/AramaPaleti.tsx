@@ -1,7 +1,7 @@
 // ⌘K hızlı arama ve komutlar (her ekranda)
 // ⌘K / Ctrl+K ya da "/" (yazı alanında değilken) açar · ↑/↓ gezin · Enter aç · Escape kapat.
 // Dar ekranda (≤880px) sağ altta küçük bir "Ara" düğmesi görünür.
-import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
+import { useEffect, useMemo, useRef, useState, useLayoutEffect } from 'preact/hooks';
 import type { ComponentChildren } from 'preact';
 import { api, fmtDate, memberName, snack, store } from '../api';
 import { Avatar, Icon, navigate, useStore } from '../ui';
@@ -107,16 +107,17 @@ export function AramaPaleti({ openTask }: { openTask: (id: string) => void }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const seq = useRef(0);
-  const openRef = useRef(false);
-  openRef.current = open;
+  const openRef = useRef(false); // yalnızca aç/kapa anında değişir (yeniden çizimde eski değere dönmesin)
   const lastFocus = useRef<HTMLElement | null>(null);
   const pendingEnter = useRef(false); // sonuç gelmeden Enter'a basıldıysa, gelince ilk sonucu aç
 
-  const show = () => { if (!store.get().me) return; pendingEnter.current = false; lastFocus.current = document.activeElement as HTMLElement; setOpen(true); setQ(''); setRes(null); setSel(0); };
+  const show = () => { if (!store.get().me) return; pendingEnter.current = false; lastFocus.current = document.activeElement as HTMLElement; openRef.current = true; setOpen(true); setQ(''); setRes(null); setSel(0); };
   const hide = () => {
+    openRef.current = false; // hemen: kapanır kapanmaz basılan Escape açılan pencereye gitsin
     setOpen(false);
     const f = lastFocus.current; lastFocus.current = null;
-    if (f && document.contains(f)) setTimeout(() => { try { f.focus(); } catch { /* */ } }, 0);
+    // komut bir pencere açtıysa odağı geri alma (pencerenin yazı kutusunda kalsın)
+    if (f && document.contains(f)) setTimeout(() => { try { if (!document.querySelector('.overlay, .drawer-wrap')) f.focus(); } catch { /* */ } }, 0);
   };
 
   // kısayollar (yakalama aşamasında: palet açıkken başka pencereler Escape'i almasın)
@@ -138,8 +139,9 @@ export function AramaPaleti({ openTask }: { openTask: (id: string) => void }) {
     return () => window.removeEventListener('keydown', k, true);
   }, []);
 
-  useEffect(() => { if (open) setTimeout(() => inputRef.current?.focus(), 0); }, [open]);
-  useEffect(() => { if (!s.me && open) setOpen(false); }, [s.me]);
+  // açılır açılmaz yazılabilsin: odak çizimle aynı anda (ilk harf kaybolmasın)
+  useLayoutEffect(() => { if (open) inputRef.current?.focus(); }, [open]);
+  useEffect(() => { if (!s.me && open) { openRef.current = false; setOpen(false); } }, [s.me]);
 
   // arama: 150 ms gecikmeli, sorgu başına tek istek; eski cevaplar yok sayılır
   const tokens = useMemo(() => tokensOf(q), [q]);

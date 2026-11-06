@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'preact/hooks';
 import { api, reloadTasks, snack, store, type Task, fmtDate, dayDiff, DAY as SDAY, memberName } from '../api';
-import { Avatar, Icon, Modal, useStore } from '../ui';
+import { Avatar, Icon, Modal, useStore, kutla } from '../ui';
 import { markTaskRead } from './Notify';
 import { ClientMark } from './ClientMark';
 import { ApprovalStrip } from './Onay';
@@ -108,9 +108,10 @@ export function TaskDrawer({ taskId, onClose }: { taskId: string; onClose: () =>
     try { await api('PATCH', '/tasks/' + t!.id, body); await reloadTasks(); }
     catch (e: any) { snack(e.message); reloadTasks(); }
   }
-  function setStatus(i: 0 | 1 | 2) {
+  function setStatus(i: 0 | 1 | 2, el?: EventTarget | null) {
     if (i === t!.status) return;
     patch({ status: i });
+    if (i === 2) kutla(el);
     if (i === 2) { setDoneDraft(t!.doneLink || ''); setAskLink(true); } else setAskLink(false);
   }
   async function saveDoneLink() {
@@ -141,7 +142,7 @@ export function TaskDrawer({ taskId, onClose }: { taskId: string; onClose: () =>
         <h2 style="margin:0;font-family:var(--display);font-size:22px;line-height:1.3">{t.title}</h2>
         <div class="seg" role="group" aria-label="Durum">
           {STATUS.map((st, i) => (
-            <button type="button" style="flex:1" class={t.status === i ? 'on' : ''} aria-pressed={t.status === i} onClick={() => setStatus(i as 0 | 1 | 2)}>
+            <button type="button" style="flex:1" class={t.status === i ? 'on' : ''} aria-pressed={t.status === i} onClick={(e) => setStatus(i as 0 | 1 | 2, e.currentTarget)}>
               <span class="dot" style={{ background: st.dot, display: 'inline-block', marginRight: '6px' }} />{st.label}
             </button>
           ))}

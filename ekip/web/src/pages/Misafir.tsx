@@ -2,7 +2,7 @@
 // Ekip programının hiçbir bölümüne erişim yok.
 import { useEffect, useMemo, useState } from 'preact/hooks';
 import { api, snack } from '../api';
-import { Icon, Modal } from '../ui';
+import { Icon, Modal, Sayi, kutla } from '../ui';
 import { applyTheme, themePref } from '../theme';
 import {
   DriveButton, NoteBox, NoteThread, StatusPill, itemDate, type PItem, type PNote,
@@ -66,9 +66,9 @@ export function Misafir() {
           <h1>Merhaba {me.firstName} 👋</h1>
           <p>{me.client.name} için hazırladığımız içerikler burada. Drive'dan inceleyip <b>onaylayabilir</b> ya da <b>revize notu</b> yazabilirsiniz. Yeni bir isteğinizi <b>Talepler</b>'den iletebilirsiniz.</p>
           <div class="ms-stats">
-            <div><b>{pending.length}</b><span>onayınızı bekliyor</span></div>
-            <div><b>{contents.filter((i) => i.status === 'revize').length}</b><span>revize hazırlanıyor</span></div>
-            <div><b>{contents.filter((i) => i.status === 'onaylandi' || i.status === 'paylasildi').length}</b><span>onaylandı / paylaşıldı</span></div>
+            <div><b><Sayi v={pending.length} /></b><span>onayınızı bekliyor</span></div>
+            <div><b><Sayi v={contents.filter((i) => i.status === 'revize').length} /></b><span>revize hazırlanıyor</span></div>
+            <div><b><Sayi v={contents.filter((i) => i.status === 'onaylandi' || i.status === 'paylasildi').length} /></b><span>onaylandı / paylaşıldı</span></div>
           </div>
         </section>
 
@@ -130,7 +130,7 @@ function ApproveButton({ id, reload }: { id: string; reload: () => void }) {
   return (
     <button type="button" class="btn sm ms-approve" disabled={busy} onClick={async () => {
       setBusy(true);
-      try { await api('POST', `/misafir/items/${id}/approve`, {}); snack('Onaylandı — Maya Ajans\'a iletildi'); reload(); } catch (e: any) { snack(e.message); } finally { setBusy(false); }
+      try { await api('POST', `/misafir/items/${id}/approve`, {}); kutla(document.activeElement); snack('Onaylandı — Maya Ajans\'a iletildi'); reload(); } catch (e: any) { snack(e.message); } finally { setBusy(false); }
     }}><Icon n="check" size={14} stroke="#fff" />Onaylıyorum</button>
   );
 }
@@ -143,7 +143,9 @@ function GuestItem({ item, notes, onClose, reload }: { item: PItem; notes: PNote
     if (action === 'revise' && !rev.trim()) { snack('Revize notunu yazın'); return; }
     setBusy(true);
     try {
+      const at = document.activeElement;
       await api('POST', `/misafir/items/${item.id}/${action}`, { body: action === 'revise' ? rev.trim() : '' });
+      if (action === 'approve') kutla(at);
       snack(action === 'approve' ? 'Onaylandı — Maya Ajans\'a iletildi' : 'Revize notunuz Maya Ajans\'a iletildi');
       setRev(''); reload();
     } catch (e: any) { snack(e.message); } finally { setBusy(false); }

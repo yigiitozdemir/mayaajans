@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from 'preact/hooks';
 import type { Ref } from 'preact';
 import { snack, reloadTasks } from '../api';
-import { Icon, Modal, useStore } from '../ui';
+import { Icon, Modal, useStore, kutla } from '../ui';
 import {
   type Todo, type Ev, type Remind, type Repeat, OFFSETS, REPEATS, agendaApi, byTodo, dayWord, istToday, soonLocal, remindLabel, whenIso, isoLocal, addDays,
 } from './AjandaData';
@@ -49,7 +49,7 @@ function TodoRow({ t, onToggle, onStar, onOpen, hl }: { t: Todo; onToggle: () =>
   const cls = t.dueDate ? (late ? 'late' : t.dueDate === today ? 'today' : t.dueDate <= addDays(today, 6) ? 'soon' : 'far') : '';
   return (
     <li class={'aj-todo' + (t.done ? ' done' : '') + (hl ? ' hl' : '')} id={'aj-' + t.id}>
-      <input type="checkbox" checked={t.done} onChange={onToggle} aria-label={(t.done ? 'Geri al: ' : 'Tamamla: ') + t.title} />
+      <input type="checkbox" checked={t.done} onChange={(e) => { if (!t.done) kutla(e.currentTarget); onToggle(); }} aria-label={(t.done ? 'Geri al: ' : 'Tamamla: ') + t.title} />
       <button type="button" class="aj-todo-b" onClick={onOpen} aria-label={t.title + ' · düzenle'}>
         <span class="aj-todo-t">{t.title}</span>
         <span class="aj-todo-m">

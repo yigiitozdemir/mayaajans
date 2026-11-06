@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'preact/hooks';
+import { useEffect, useLayoutEffect, useState } from 'preact/hooks';
 import type { ComponentChildren } from 'preact';
 import { createPortal } from 'preact/compat';
 import { store, type State, type Member, type Me, initials, moodOf } from './api';
@@ -107,7 +107,8 @@ export function Switch({ on, label, hint, onToggle }: { on: boolean; label: stri
 }
 
 export function Modal({ title, onClose, children, width }: { title: string; onClose: () => void; children: ComponentChildren; width?: number }) {
-  useEffect(() => {
+  // çizimden önce kurulur: pencere göründüğü an basılan Escape de kapatır
+  useLayoutEffect(() => {
     const k = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
     window.addEventListener('keydown', k); return () => window.removeEventListener('keydown', k);
   }, [onClose]);
@@ -132,4 +133,57 @@ export function Portal({ children }: { children: ComponentChildren }) {
 
 export function meAsMember(me: Me): AvatarMember {
   return { id: me.id, firstName: me.firstName, lastName: me.lastName, color: me.color, photo: me.photo, mood: moodOf(me.settings) };
+}
+
+// ---------- canlı dokunuşlar ----------
+const reduceMotion = () => typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+const easeOut = (x: number) => 1 - Math.pow(1 - x, 3);
+
+/** Sayı yumuşakça sayarak gelir (ilk açılışta 0'dan, sonra eski değerden). Sayı değilse olduğu gibi yazılır. */
+export function Sayi({ v }: { v: number | string | null | undefined }) {
+  const n = typeof v === 'number' && isFinite(v) ? v : null;
+  const [shown, setShown] = useState<number>(n === null || reduceMotion() ? (n ?? 0) : 0);
+  useEffect(() => {
+    if (n === null) return;
+    if (reduceMotion()) { setShown(n); return; }
+    const from = shown; if (from === n) return;
+    const dur = Math.min(900, 380 + Math.abs(n - from) * 25);
+    const t0 = performance.now(); let raf = 0;
+    const step = (t: number) => {
+      const k = Math.min(1, (t - t0) / dur);
+      setShown(Math.round(from + (n - from) * easeOut(k)));
+      if (k < 1) raf = requestAnimationFrame(step);
+    };
+    raf = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(raf);
+  }, [n]);
+  if (n === null) return <>{v ?? ''}</>;
+  return <span class="sayi">{shown}</span>;
+}
+
+/** Tamamlama kutlaması: tıklanan yerden küçük bir parıltı patlaması. */
+export function kutla(from?: Element | EventTarget | null) {
+  if (reduceMotion() || typeof document === 'undefined') return;
+  const el = from instanceof Element ? from : null;
+  const r = el?.getBoundingClientRect();
+  const x = r ? r.left + r.width / 2 : innerWidth / 2;
+  const y = r ? r.top + r.height / 2 : innerHeight / 2;
+  const box = document.createElement('div');
+  box.className = 'kutla'; box.setAttribute('aria-hidden', 'true');
+  box.style.left = x + 'px'; box.style.top = y + 'px';
+  const colors = ['#FF8A65', '#8B7CFF', '#3FD9B5', '#FFC857', '#FF6B9A'];
+  for (let i = 0; i < 16; i++) {
+    const s = document.createElement('i');
+    const a = (Math.PI * 2 * i) / 16 + Math.random() * 0.4;
+    const d = 34 + Math.random() * 38;
+    s.style.setProperty('--dx', Math.cos(a) * d + 'px');
+    s.style.setProperty('--dy', Math.sin(a) * d - 10 + 'px');
+    s.style.setProperty('--rot', Math.round(Math.random() * 360) + 'deg');
+    s.style.background = colors[i % colors.length];
+    if (i % 3 === 0) s.style.borderRadius = '50%';
+    box.appendChild(s);
+  }
+  const ring = document.createElement('b'); box.appendChild(ring);
+  document.body.appendChild(box);
+  setTimeout(() => box.remove(), 900);
 }

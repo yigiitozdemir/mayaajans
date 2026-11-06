@@ -57,7 +57,7 @@ function ThemePicker() {
   const p = useThemePref();
   function choose(v: ThemePref) {
     if (v === p) return;
-    applyTheme(v);
+    applyTheme(v, true);
     if (store.get().me) api('PATCH', '/me', { settings: { theme: v } }).catch(() => {});
   }
   return (

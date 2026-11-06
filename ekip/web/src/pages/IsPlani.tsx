@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'preact/hooks';
 import { api, reloadTasks, snack, type Task, todayIso, dayDiff, memberName } from '../api';
-import { Avatar, Icon, useStore } from '../ui';
+import { Avatar, Icon, useStore, Sayi } from '../ui';
 import { Bell } from '../components/Notify';
 import { ClientMark, findClient } from '../components/ClientMark';
 import { NewTaskModal, STATUS, dueTag } from '../components/TaskPanels';
@@ -104,7 +104,7 @@ export function IsPlani({ openTask }: { openTask: (id: string) => void }) {
         {stats.map((st) => (
           <button type="button" class={'stat' + (quick === st.k ? ' on' : '')} aria-pressed={quick === st.k} onClick={() => setQuick(quick === st.k ? null : st.k)}>
             <span class="row sub" style="gap:8px;color:var(--mute)"><span class="dot" style={{ background: st.dot }} />{st.label}</span>
-            <span class="v">{scoped.filter(quickTest[st.k]).length}</span>
+            <span class="v"><Sayi v={scoped.filter(quickTest[st.k]).length} /></span>
           </button>
         ))}
       </div>

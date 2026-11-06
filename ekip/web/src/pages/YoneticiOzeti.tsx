@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from 'preact/hooks';
 import type { ComponentChildren } from 'preact';
 import { api, fmtDate, onLive, snack } from '../api';
-import { Avatar, Icon, navigate, useStore } from '../ui';
+import { Avatar, Icon, navigate, useStore, Sayi } from '../ui';
 import { Bell } from '../components/Notify';
 import '../styles/yonetici.css';
 
@@ -106,7 +106,7 @@ export function YoneticiOzeti({ openTask }: { openTask: (id: string) => void }) 
         {boxes.map((b) => {
           const inner = (<>
             <span class="row sub" style="gap:8px;color:var(--mute)"><span class="dot" style={{ background: b.dot }} />{b.label}</span>
-            <span class={'v' + (b.warn ? ' yo-warn' : '')}>{b.v}</span>
+            <span class={'v' + (b.warn ? ' yo-warn' : '')}><Sayi v={b.v as any} /></span>
             {b.sub && <span class="yo-statsub">{b.sub}</span>}
           </>);
           return b.go

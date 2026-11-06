@@ -1,7 +1,7 @@
 // Çekim Planı
 import { useEffect, useMemo, useState } from 'preact/hooks';
 import { api, onLive, snack, todayIso, parseD, LMON, LDAY, DAY } from '../api';
-import { Icon, useStore } from '../ui';
+import { Icon, useStore, Sayi } from '../ui';
 import { Bell } from '../components/Notify';
 import { ClientMark, findClient } from '../components/ClientMark';
 import {
@@ -184,7 +184,7 @@ export function Cekim({ openTask }: { openTask: (id: string) => void }) {
         {stats.map((st) => (
           <div class="stat">
             <span class="row sub" style="gap:8px;color:var(--mute)"><span class="dot" style={{ background: st.dot }} />{st.label}</span>
-            <span class="v">{st.value}</span>
+            <span class="v"><Sayi v={st.value} /></span>
           </div>
         ))}
       </div>

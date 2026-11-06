@@ -2,7 +2,7 @@
 // Yalnızca portal üyeleri (Pelin) ve yönetici görür.
 import { useEffect, useMemo, useState } from 'preact/hooks';
 import { api, onLive, snack } from '../api';
-import { Icon, Modal } from '../ui';
+import { Icon, Modal, Sayi } from '../ui';
 import { Bell } from '../components/Notify';
 import {
   CONTENT_STATUS, REQUEST_STATUS, DriveButton, NoteBox, NoteThread, StatusPill, fmtTime, itemDate,
@@ -69,9 +69,9 @@ export function Portal({ client, openTask }: { client: string; openTask: (id: st
       </header>
 
       <div class="pt-stats">
-        <button type="button" class="card pt-stat amber" onClick={() => { setTab('content'); setFilter('onay_bekliyor'); }}><span>Onay bekleyen</span><b>{waiting}</b></button>
-        <button type="button" class="card pt-stat red" onClick={() => { setTab('content'); setFilter('revize'); }}><span>Revize istenen</span><b>{revise}</b></button>
-        <button type="button" class="card pt-stat blue" onClick={() => { setTab('request'); setFilter('bekliyor'); }}><span>Yeni talep ({data.client.short})</span><b>{newReq}</b></button>
+        <button type="button" class="card pt-stat amber" onClick={() => { setTab('content'); setFilter('onay_bekliyor'); }}><span>Onay bekleyen</span><b><Sayi v={waiting} /></b></button>
+        <button type="button" class="card pt-stat red" onClick={() => { setTab('content'); setFilter('revize'); }}><span>Revize istenen</span><b><Sayi v={revise} /></b></button>
+        <button type="button" class="card pt-stat blue" onClick={() => { setTab('request'); setFilter('bekliyor'); }}><span>Yeni talep ({data.client.short})</span><b><Sayi v={newReq} /></b></button>
         <button type="button" class="card pt-stat" onClick={() => setTab('guests')}><span>Misafir hesap</span><b>{data.guests.filter((g) => g.status === 'active').length}<small>/{data.guests.length}</small></b></button>
       </div>
 
