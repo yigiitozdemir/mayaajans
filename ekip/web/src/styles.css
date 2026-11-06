@@ -315,3 +315,10 @@ textarea.input { height: auto; padding: 10px 12px; line-height: 1.5; resize: ver
 .cline { display: inline-flex; align-items: center; gap: 6px; min-width: 0; }
 .cline > span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .stripe { border-left: 3px solid var(--stripe) !important; }
+
+/* ---------- sol menü: Ara ⌘K ---------- */
+.searchbtn { display: flex; align-items: center; gap: 8px; min-height: 36px; margin: -6px 2px 12px; padding: 0 10px; border-radius: 10px; border: 1px solid var(--line); background: var(--card); color: var(--mute); font-size: 13px; text-align: left; }
+.searchbtn span { flex: 1; }
+.searchbtn kbd { font: 600 11px var(--font); padding: 1px 6px; border-radius: 5px; border: 1px solid var(--line2); color: var(--mute2); }
+.searchbtn:hover { border-color: var(--line2); color: var(--ink); }
+@media (max-width: 880px) { .searchbtn { display: none; } }

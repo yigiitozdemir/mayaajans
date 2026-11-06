@@ -143,11 +143,12 @@ const STUB = ({ endpoint, keys }) => {
     ok(await until(() => got.length > n0), 'push gelmedi');
     const p = decrypt(got[got.length - 1].body);
     ok(p.title === 'Deneme bildirimi' && /Pelin/.test(p.body), JSON.stringify(p));
-    ok(await dp.locator('.snack').filter({ hasText: 'Deneme bildirimi gönderildi' }).isVisible());
+    ok(await until(() => dp.locator('.snack').filter({ hasText: 'Deneme bildirimi gönderildi' }).isVisible()), 'snack');
+    await dp.locator('.snack').waitFor({ state: 'detached', timeout: 6000 }).catch(() => {});
   });
   await shot(dp, 'profil-acik');
   // kontrast (açık + koyu) — Profilim penceresi
-  const audit = () => dp.evaluate(() => {
+  const audit = (pg = dp) => pg.evaluate(() => {
     const parse = (c) => { const m = c.match(/rgba?\(([^)]+)\)/); if (!m) return null; const a = m[1].split(',').map((x) => parseFloat(x)); return { r: a[0], g: a[1], b: a[2], a: a.length > 3 ? a[3] : 1 }; };
     const lum = ({ r, g, b }) => { const f = (v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }; return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b); };
     const blend = (top, bot) => ({ r: top.r * top.a + bot.r * (1 - top.a), g: top.g * top.a + bot.g * (1 - top.a), b: top.b * top.a + bot.b * (1 - top.a), a: 1 });
@@ -162,7 +163,7 @@ const STUB = ({ endpoint, keys }) => {
       const need = size >= 24 || (bold && size >= 18.66) ? 3 : 4.5; if (ratio < need) bad.push(`${ratio.toFixed(2)} "${n.textContent.trim().slice(0, 30)}"`); }
     return bad;
   });
-  const setTheme = async (p, name) => { await p.evaluate((n) => { document.documentElement.setAttribute('data-theme', n); }, name); await p.waitForTimeout(150); };
+  const setTheme = async (p, name) => { await p.evaluate((n) => { document.documentElement.setAttribute('data-theme', n); }, name); await p.waitForTimeout(700); };
   await t('kontrast: Profilim (açık tema) 4.5 üstü', async () => { const b = await audit(); ok(!b.length, b.join(' | ')); });
   await setTheme(dp, 'dark');
   await t('kontrast: Profilim (koyu tema) 4.5 üstü', async () => { const b = await audit(); ok(!b.length, b.join(' | ')); });
@@ -244,8 +245,8 @@ const STUB = ({ endpoint, keys }) => {
       ok(!(await page.getByRole('switch', { name: /bildirim gönder/ }).count()), 'anahtar görünmemeli');
     });
     await t('kontrast: iPhone notu (açık/koyu)', async () => {
-      let b = await audit(); ok(!b.length, 'açık ' + b.join(' | '));
-      await setTheme(page, 'dark'); b = await audit(); ok(!b.length, 'koyu ' + b.join(' | '));
+      await page.waitForTimeout(700); let b = await audit(page); ok(!b.length, 'açık ' + b.join(' | '));
+      await setTheme(page, 'dark'); b = await audit(page); ok(!b.length, 'koyu ' + b.join(' | '));
     });
     await shot(page, 'iphone-safari-koyu');
     await setTheme(page, 'light');
@@ -267,8 +268,8 @@ const STUB = ({ endpoint, keys }) => {
     });
     await shot(page, 'iphone-bant');
     await t('kontrast: bant (açık/koyu)', async () => {
-      let b = await audit(); ok(!b.length, 'açık ' + b.join(' | '));
-      await setTheme(page, 'dark'); b = await audit(); ok(!b.length, 'koyu ' + b.join(' | '));
+      await page.waitForTimeout(700); let b = await audit(page); ok(!b.length, 'açık ' + b.join(' | '));
+      await setTheme(page, 'dark'); b = await audit(page); ok(!b.length, 'koyu ' + b.join(' | '));
     });
     await shot(page, 'iphone-bant-koyu');
     await setTheme(page, 'light');

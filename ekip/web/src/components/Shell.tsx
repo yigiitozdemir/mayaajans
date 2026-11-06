@@ -87,6 +87,9 @@ export function Shell({ path, children }: { path: string; children: ComponentChi
     <div class="shell">
       <aside class="side">
         <Link href="/" class="brand"><img src="/logo.png" alt="Maya Ajans" /><span>Ekip alanı</span></Link>
+        <button type="button" class="searchbtn" onClick={() => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true, metaKey: /Mac/.test(navigator.platform) }))}>
+          <Icon n="search" size={15} /><span>Ara</span><kbd>⌘K</kbd>
+        </button>
         <ProfileCard />
         <nav class="nav" aria-label="Ana menü">
           {(isDesktop ? [...NAV.slice(0, 2), { href: '/ekran', label: 'Ekran Görüntüleri', icon: 'image' }, ...NAV.slice(2)] : NAV).map((n) => (
