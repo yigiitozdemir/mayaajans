@@ -257,6 +257,16 @@ fn wa_notify(app: AppHandle, title: String, body: String) {
         .show();
 }
 
+/// WhatsApp'taki bir linke tıklanınca varsayılan tarayıcıda aç (yalnızca http/https).
+#[tauri::command]
+fn wa_open(app: AppHandle, url: String) {
+    if let Ok(u) = tauri::Url::parse(&url) {
+        if matches!(u.scheme(), "http" | "https") {
+            open_external(&app, &u);
+        }
+    }
+}
+
 /// WhatsApp sayfasına eklenen köprü: tarayıcı bildirim özelliği varmış gibi davranır, bildirimleri Mac'e iletir.
 const WA_BRIDGE: &str = r#"(function () {
   if (location.hostname !== 'web.whatsapp.com') return;
@@ -282,6 +292,35 @@ const WA_BRIDGE: &str = r#"(function () {
       var body = (o && o.body) ? String(o.body) : '';
       window.__TAURI_INTERNALS__.invoke('wa_notify', { title: String(t || 'WhatsApp'), body: body });
     } catch (e) {}
+  };
+  // Linkler: WhatsApp önce boş pencere açıp adresi sonra yazıyor; program boş pencereyi engellediği için
+  // tıklama hiçbir şey yapmıyordu. Dış linkler doğrudan Mac'in tarayıcısında açılır.
+  var isInternal = function (h) { return /(^|\.)whatsapp\.(com|net)$/.test(h); };
+  var openOut = function (u) { try { window.__TAURI_INTERNALS__.invoke('wa_open', { url: String(u) }); } catch (e) {} };
+  document.addEventListener('click', function (ev) {
+    if (ev.defaultPrevented && !ev.isTrusted) return;
+    var a = ev.target && ev.target.closest ? ev.target.closest('a[href]') : null;
+    if (!a) return;
+    var u; try { u = new URL(a.href, location.href); } catch (e) { return; }
+    if ((u.protocol !== 'http:' && u.protocol !== 'https:') || isInternal(u.hostname)) return;
+    ev.preventDefault(); ev.stopImmediatePropagation();
+    openOut(u.href);
+  }, true);
+  var nativeOpen = window.open;
+  window.open = function (u, t, f) {
+    var s = u == null ? '' : String(u);
+    if (s && s !== 'about:blank') {
+      try { var x = new URL(s, location.href); if (!isInternal(x.hostname) && /^https?:$/.test(x.protocol)) { openOut(x.href); return null; } } catch (e) {}
+      return nativeOpen.call(window, u, t, f);
+    }
+    // boş pencere: adres sonradan yazılınca tarayıcıda aç
+    var go = function (v) { if (v) openOut(new URL(String(v), location.href).href); };
+    var loc = { assign: go, replace: go };
+    Object.defineProperty(loc, 'href', { set: go, get: function () { return 'about:blank'; } });
+    var w = { closed: false, opener: null, close: function () { this.closed = true; }, focus: function () {}, blur: function () {},
+      document: { write: function () {}, writeln: function () {}, open: function () {}, close: function () {} } };
+    Object.defineProperty(w, 'location', { get: function () { return loc; }, set: go });
+    return w;
   };
   function N(t, o) { this.title = t; this.body = o && o.body; this.tag = o && o.tag; this.onclick = null; this.onshow = null; this.onclose = null; this.onerror = null; send(t, o); }
   N.prototype.close = function () {};
@@ -711,7 +750,7 @@ pub fn run() {
             set_unread, notify, app_info, set_theme, open_ai, ai_show, ai_hide,
             ekran::shots_status, ekran::shots_enable, ekran::shots_list, ekran::shots_thumb, ekran::shots_read,
             ekran::shots_copy, ekran::shots_reveal, ekran::shots_open, ekran::shots_trash, ekran::shots_save_as,
-            ekran::shots_set_cleanup, wa_notify
+            ekran::shots_set_cleanup, wa_notify, wa_open
         ])
         .setup(|app| {
             let handle = app.handle().clone();

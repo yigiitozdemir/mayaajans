@@ -4,5 +4,5 @@
   "description": "Program içindeki WhatsApp Web: yalnızca yeni mesaj bildirimini Mac bildirimi olarak gösterebilir, başka hiçbir şeye erişemez",
   "webviews": ["ai-in-whatsapp"],
   "remote": { "urls": ["https://web.whatsapp.com/*"] },
-  "permissions": ["allow-wa-notify"]
+  "permissions": ["allow-wa-notify", "allow-wa-open"]
 }

@@ -1,6 +1,9 @@
 # Maya Ekip — sürüm notları
 # Her sürüm için "## <sürüm>" başlığı altına kısa maddeler yaz. Güncelleme penceresinde ekibe aynen gösterilir.
 
+## 1.0.8
+• WhatsApp'taki linkler artık tıklanınca açılıyor (Safari/Chrome'da).
+
 ## 1.0.7
 • Yeni görünüm: ayrı başlık çubuğu kalktı, pencere düğmeleri sol menünün üst köşesinde. ChatGPT, Claude ve WhatsApp her pencere boyutunda tam yerine oturuyor.
 • WhatsApp bildirimleri düzeltildi: başka sayfadayken ya da başka programdayken gelen mesajlar Mac bildirimi olarak (gönderen + mesaj) görünüyor.
