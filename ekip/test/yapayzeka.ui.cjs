@@ -87,6 +87,7 @@ const { chromium } = require('playwright');
   await t('eski Mac sürümü (gömme yok) → bilgi sayfası ve ayrı pencere', async () => {
     await F.p.locator('.aiq.gpt').click(); await F.p.waitForTimeout(500);
     await F.p.getByRole('heading', { name: 'Uygulamalar' }).waitFor();
+    await F.p.locator('.ai-old', { hasText: 'Şu anki sürüm' }).waitFor(); // güncelleme uyarısı
     await F.p.getByRole('button', { name: "ChatGPT'yi aç" }).click(); await F.p.waitForTimeout(200);
     eq((await last(F.p, 'open_ai'))[1].which, 'chatgpt');
   });

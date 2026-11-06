@@ -103,6 +103,19 @@ function AiEmbed({ ai, openTask, onHelp, onFail }: { ai: AiId; openTask: (id: st
   );
 }
 
+/** Mac programı panel içi görünümü desteklemiyorsa (1.0.2 öncesi) güncelleme uyarısı. */
+function OldAppNotice() {
+  const [ver, setVer] = useState<string | null>(null);
+  useEffect(() => { if (isDesktop && embedBroken) desktopCall<{ version: string }>('app_info').then((r) => setVer(r?.version || '?')).catch(() => setVer('?')); }, []);
+  if (!isDesktop || !embedBroken || !ver) return null;
+  return (
+    <section class="card ai-old" role="status">
+      <strong>ChatGPT, Claude ve WhatsApp'ın programın içinde açılması için Mac programını güncelle</strong>
+      <span class="sub">Şu anki sürüm: {ver}. Gereken: 1.0.2 veya üstü. Ekranın üstündeki menü çubuğunda <b>Maya</b> simgesine tıkla → <b>Güncellemeleri denetle</b> → <b>Yeniden başlat</b>. Güncelleyene kadar düğmeler tarayıcıda açar.</span>
+    </section>
+  );
+}
+
 function AiInfo({ openTask, onBack }: { openTask: (id: string) => void; onBack?: () => void }) {
   const open = (t: (typeof AI_TOOLS)[number]) => (t.id === 'whatsapp' ? openAppOutside(t.id, t.url) : desktopOr('open_ai', { which: t.id }, () => openAppOutside(t.id, t.url)));
   return (
@@ -114,6 +127,7 @@ function AiInfo({ openTask, onBack }: { openTask: (id: string) => void; onBack?:
         </div>
         <div class="row">{onBack && <button type="button" class="btn" onClick={onBack}><Icon n="chat" size={15} />Sohbete dön</button>}<Bell onOpenTask={openTask} /></div>
       </header>
+      <OldAppNotice />
       <div class="ai-grid">
         {AI_TOOLS.map((t) => (
           <section class={'ai-card ai-' + t.id}>

@@ -19,3 +19,6 @@
 .ai-tips { padding: 18px 20px; }
 .ai-tips h2 { margin: 0 0 8px; font-size: 15px; font-weight: 800; }
 .ai-tips ol { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 8px; font-size: 14px; line-height: 1.5; color: var(--ink2); }
+
+.ai-old { padding: 14px 16px; display: flex; flex-direction: column; gap: 6px; border-color: var(--amber); background: var(--note-bg); }
+.ai-old strong { font-size: 14px; }
