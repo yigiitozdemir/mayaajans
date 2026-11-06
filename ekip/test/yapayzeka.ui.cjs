@@ -8,7 +8,7 @@ const { chromium } = require('playwright');
     const ctx = await b.newContext({ viewport: { width: 1300, height: 820 } }); const p = await ctx.newPage();
     await p.addInitScript((fail) => {
       window.__calls = [];
-      window.__TAURI__ = { core: { invoke: (cmd, args) => { window.__calls.push([cmd, args || {}]); if (fail && cmd === 'ai_show') return Promise.reject(new Error('yok')); return Promise.resolve(cmd === 'app_info' ? { version: '1.0.2' } : null); } } };
+      window.__TAURI__ = { core: { invoke: (cmd, args) => { window.__calls.push([cmd, args || {}]); if (fail && cmd === 'ai_show') return Promise.reject(new Error('yok')); return Promise.resolve(cmd === 'app_info' ? { version: '1.0.5' } : null); } } };
     }, failEmbed);
     const errs = []; p.on('pageerror', (e) => errs.push(e.message));
     await p.goto(BASE + '/giris'); await p.fill('input[type=email]', 'pelin@mayaajans.net'); await p.fill('input[type=password]', 'TestSifre123'); await p.keyboard.press('Enter');
@@ -24,10 +24,13 @@ const { chromium } = require('playwright');
     const c = await last(p, 'ai_show'); ok(c, 'ai_show çağrılmadı');
     eq(c[1].which, 'chatgpt');
     const side = await p.locator('.side').boundingBox(); const host = await p.locator('.ai-host').boundingBox();
-    ok(Math.abs(c[1].x - side.width) < 2, 'x sol menünün sağı olmalı: ' + c[1].x + ' / ' + side.width);
+    ok(c[1].x >= side.width, 'x sol menünün sağında olmalı: ' + c[1].x + ' / ' + side.width);
     ok(Math.abs(c[1].y - host.y) < 2 && Math.abs(c[1].h - host.height) < 2 && c[1].w > 900, JSON.stringify(c[1]));
-    ok(c[1].y < 2, 'üst çubuk yok: uygulama en üstten başlamalı (y=' + c[1].y + ')');
-    const vh = await p.evaluate(() => innerHeight); ok(Math.abs(c[1].h - vh) < 2, 'tam yükseklik');
+    const top = await p.locator('.ai-top').boundingBox();
+    ok(c[1].y >= top.y + top.height, 'uygulama üst çubuğun ALTINDAN başlamalı (y=' + c[1].y + ')');
+    ok(c[1].x > side.width + 4, 'sol menüden boşluklu olmalı');
+    const vw = await p.evaluate(() => innerWidth), vh = await p.evaluate(() => innerHeight);
+    ok(c[1].x + c[1].w < vw - 4 && c[1].y + c[1].h < vh - 4, 'sağ ve altta kart boşluğu olmalı');
     ok(await p.locator('.aiq.gpt.on').count() === 1, 'menüde seçili görünmeli');
     ok(await p.locator('.shell.rail').count() === 1 && side.width < 80, 'uygulama açıkken sol menü simge şeridi olmalı: ' + side.width);
     await p.screenshot({ path: (process.argv[2] || '.') + '/yz-serit.png' });
@@ -43,8 +46,9 @@ const { chromium } = require('playwright');
     ok(await last(p, 'ai_show'), 'geri gelmedi');
   });
   await t('bildirim paneli açılınca gizlenir', async () => {
-    await clear(p); await p.evaluate(() => { const d = document.createElement('div'); d.className = 'bellpanel'; d.id = 'sahte-panel'; document.body.appendChild(d); }); await p.waitForTimeout(300);
-    ok(await last(p, 'ai_hide'), 'gizlenmedi'); await p.evaluate(() => document.getElementById('sahte-panel').remove()); await p.waitForTimeout(300);
+    await clear(p); await p.locator('.ai-top .bell').click(); await p.waitForTimeout(300);
+    ok(await last(p, 'ai_hide'), 'gizlenmedi'); await p.locator('.ai-top .bell').click(); await p.waitForTimeout(300);
+    ok(await last(p, 'ai_show'), 'panel kapanınca geri gelmeli');
   });
   await t('pencere boyutu değişince yeni ölçü gönderilir', async () => {
     await clear(p); await p.setViewportSize({ width: 1100, height: 700 }); await p.waitForTimeout(400);

@@ -52,9 +52,14 @@ export function YapayZeka({ openTask }: { openTask: (id: string) => void }) {
   return <AiEmbed ai={ai} onFail={() => { embedBroken = true; document.documentElement.classList.add('ai-broken'); window.dispatchEvent(new Event('maya-ai-broken')); setBroken(true); }} />;
 }
 
+/** 1.0.5 öncesi Mac programı başlık çubuğu payını eklemiyordu: sayfa tarafında telafi et (standart macOS başlık çubuğu). */
+let appVersion = '';
+const needsTitlebarFix = () => /^1\.0\.[0-4]$/.test(appVersion);
+
 function AiEmbed({ ai, onFail }: { ai: AiId; onFail: () => void }) {
   const host = useRef<HTMLDivElement>(null);
   const tool = AI_TOOLS.find((t) => t.id === ai)!;
+  useEffect(() => { if (!appVersion) desktopCall<{ version: string }>('app_info').then((r) => { appVersion = r?.version || ''; }).catch(() => {}); }, []);
   useEffect(() => {
     let raf = 0, alive = true;
     const covered = () => !!document.querySelector('.overlay, .drawer-wrap, .bellpanel');
@@ -64,24 +69,41 @@ function AiEmbed({ ai, onFail }: { ai: AiId; onFail: () => void }) {
         if (!alive || !host.current) return;
         if (covered()) { desktopCall('ai_hide').catch(() => {}); return; }
         const r = host.current.getBoundingClientRect();
-        desktopCall('ai_show', { which: ai, x: r.left, y: r.top, w: r.width, h: r.height, dark: document.documentElement.dataset.theme === 'dark' }).then((i) => { if (i) embedInfo = JSON.stringify(i) + ' sayfa:' + innerWidth + 'x' + innerHeight + ' dpr:' + devicePixelRatio; }).catch((e) => { embedError = String((e && (e.message || e)) || 'bilinmeyen hata'); if (alive) onFail(); });
+        const dy = needsTitlebarFix() ? 28 : 0;
+        desktopCall('ai_show', { which: ai, x: r.left, y: r.top + dy, w: r.width, h: r.height, dark: document.documentElement.dataset.theme === 'dark' })
+          .then((i) => { if (i) embedInfo = JSON.stringify(i) + ' sayfa:' + innerWidth + 'x' + innerHeight + ' dpr:' + devicePixelRatio + ' sürüm:' + appVersion; })
+          .catch((e) => { embedError = String((e && (e.message || e)) || 'bilinmeyen hata'); if (alive) onFail(); });
       });
     };
     sync();
+    const again = setTimeout(sync, 400); // sürüm bilgisi gelince telafiyi uygula
     const ro = new ResizeObserver(sync); if (host.current) ro.observe(host.current);
     const mo = new MutationObserver(sync); mo.observe(document.body, { childList: true, subtree: true });
     window.addEventListener('resize', sync);
     window.addEventListener('maya-theme', sync); // tema değişince zemin rengi de uysun
     return () => {
-      alive = false; cancelAnimationFrame(raf); ro.disconnect(); mo.disconnect(); window.removeEventListener('resize', sync); window.removeEventListener('maya-theme', sync);
+      alive = false; cancelAnimationFrame(raf); clearTimeout(again); ro.disconnect(); mo.disconnect(); window.removeEventListener('resize', sync); window.removeEventListener('maya-theme', sync);
       desktopCall('ai_hide').catch(() => {});
     };
   }, [ai]);
 
   return (
     <div class="ai-embed">
-      <div ref={host} class="ai-host" aria-label={tool.name}>
-        <span class="sub">{tool.name} yükleniyor…</span>
+      <header class="ai-top">
+        <span class={'aiq-ic ' + appIconCls(ai)} aria-hidden="true"><Icon n={tool.icon} size={14} stroke="#fff" w={2.4} /></span>
+        <div class="ai-top-t"><strong>{tool.name}</strong><span>{tool.by} · kendi hesabınla</span></div>
+        <span class="spacer" />
+        {ai !== 'whatsapp' && (
+          <button type="button" class="btn ghost sm" onClick={() => desktopOr('open_ai', { which: ai }, () => window.open(tool.url, '_blank', 'noopener'))} title="Yan yana çalışmak için ayrı pencerede aç">
+            <Icon n="ext" size={14} />Ayrı pencere
+          </button>
+        )}
+        <Bell onOpenTask={(id) => navigate('/?is=' + id)} />
+      </header>
+      <div class="ai-frame">
+        <div ref={host} class="ai-host" aria-label={tool.name}>
+          <span class="sub">{tool.name} yükleniyor…</span>
+        </div>
       </div>
     </div>
   );
