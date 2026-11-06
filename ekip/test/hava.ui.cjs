@@ -1,8 +1,8 @@
-// Hava durumu (Paket B): dış çekim işareti, Open-Meteo özeti (HAVA_SAHTE ile), kart rozeti + detay, 18:00 uyarısı.
-// Sunucu: wrangler dev ... --var HAVA_SAHTE:'{"now":"<bugün>T15:05:00Z","konumlar":{"Kumsal":{"pop":75,"wind":20,"temp":14,"code":63},
+// Hava durumu (Paket B): dış çekim işareti, Open-Meteo özeti (HAVA_SAHTE ile), kart rozeti + detay, 17:00 uyarısı.
+// Sunucu: wrangler dev ... --var HAVA_SAHTE:'{"now":"<bugün>T14:05:00Z","konumlar":{"Kumsal":{"pop":75,"wind":20,"temp":14,"code":63},
 //   "Tepe":{"pop":10,"wind":45,"temp":12,"code":3},"Park":{"pop":5,"wind":10,"temp":18,"code":1}},"hata":["Ağsız"],"bulunamaz":["Bilinmeyen"]}'
 // Çalıştırma: BASE=http://127.0.0.1:8812 WEB=http://127.0.0.1:8912 PERSIST=<db> NODE_PATH=$(npm root -g) node test/hava.ui.cjs [ekran klasörü]
-// SAAT_DISI=1 ile (HAVA_SAHTE.now 18:00 dışında başlatılmış sunucuda) yalnızca "18:00 dışında uyarı gitmez" denetlenir.
+// SAAT_DISI=1 ile (HAVA_SAHTE.now 17:00 dışında başlatılmış sunucuda) yalnızca "17:00 dışında uyarı gitmez" denetlenir.
 const { chromium } = require('playwright');
 const OUT = process.argv[2] || '.';
 const WEB = process.env.WEB || 'http://127.0.0.1:8912';
@@ -18,7 +18,7 @@ const WEB = process.env.WEB || 'http://127.0.0.1:8912';
   const havaN = (uid) => sql(`SELECT COUNT(*) n FROM notifications WHERE kind='hava' AND user_id='${uid}'`)[0].n;
 
   if (process.env.SAAT_DISI) {
-    await t('18:00 dışında hava uyarısı gönderilmez', async () => {
+    await t('17:00 dışında hava uyarısı gönderilmez', async () => {
       const r = await yigit.post('/api/shoots', { title: 'Saat dışı deneme', client: 'Saatdent', date: TOM, time: '14:00', location: 'Kumsal', outdoor: true, crew: ['u_pelin'] });
       eq(r.status, 201);
       const before = havaN('u_pelin');
@@ -66,7 +66,7 @@ const WEB = process.env.WEB || 'http://127.0.0.1:8912';
     const f = H[S.fine.id]; eq(f.risk, false); eq(f.reason, '');
     eq(H[S.unknown.id].place, 'Çorlu (varsayılan)'); eq(H[S.unknown.id].range, '08:00–11:00');
   });
-  await t('18:00 cron: riskli yarınki dış çekimler için ekip + yöneticiye bildirim; ayarı kapalı olana gitmez', async () => {
+  await t('17:00 cron: riskli yarınki dış çekimler için ekip + yöneticiye bildirim; ayarı kapalı olana gitmez', async () => {
     eq((await emre.patch('/api/me', { settings: { havaUyarisi: false } })).status, 200);
     const live = openLive(pelin); await live.ready;
     await runCron('5 * * * *');

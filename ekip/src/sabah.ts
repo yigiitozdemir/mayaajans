@@ -2,7 +2,7 @@
 // Saatlik cron'dan çağrılır; aynı gün ikinci kez gönderilmez.
 import type { Env } from './types';
 import { notify } from './notify';
-import { istanbulHour } from './util';
+import { istanbulHour, BILDIRIM_ILK, BILDIRIM_SON } from './util';
 import { ajandaBugun } from './routes/ajanda';
 
 /** İstanbul'a göre bugünün tarihi (YYYY-MM-DD) ve haftanın günü (0 Pazar). */
@@ -21,8 +21,9 @@ export async function sabahOzeti(env: Env, now = new Date()): Promise<void> {
     let s: Record<string, unknown> = {};
     try { s = JSON.parse(u.settings || '{}'); } catch { /* */ }
     if (s.morning === false) continue;
-    if (s.weekendQuiet !== false && (weekday === 0 || weekday === 6)) continue;
-    const at = typeof s.morningTime === 'string' ? parseInt(s.morningTime.slice(0, 2), 10) : 9;
+    if (weekday === 0) continue; // pazar bildirim yok (cumartesi çalışılıyor)
+    const secilen = typeof s.morningTime === 'string' ? parseInt(s.morningTime.slice(0, 2), 10) : 9;
+    const at = Math.min(BILDIRIM_SON - 1, Math.max(BILDIRIM_ILK, isNaN(secilen) ? 9 : secilen)); // 09–17 dışı seçilemez
     if (hour !== at) continue;
     // bugün (İstanbul) gönderildiyse tekrar gönderme — created_at UTC
     const sent = await env.DB.prepare("SELECT 1 FROM notifications WHERE user_id = ? AND kind = 'morning' AND created_at >= datetime(?, '-3 hours')")

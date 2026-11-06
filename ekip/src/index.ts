@@ -5,7 +5,7 @@ import type { Context } from 'hono';
 import type { Env, UserRow, Vars } from './types';
 import { authRoutes, createInviteLink, publicOrigin, requireAdmin, requireUser, sameOrigin } from './auth';
 import { Hub, broadcast } from './hub';
-import { activeMood, clean, isDate, isEmail, istanbulHour, newId } from './util';
+import { activeMood, clean, isDate, isEmail, bildirimSaatinde, istanbulHour, newId } from './util';
 import { serveStatic } from './static';
 import { BUILD_ID } from './static.gen';
 import { indir } from './indir';
@@ -463,8 +463,7 @@ app.route('/indir', indir);
 app.get('*', (c) => serveStatic(c.req.raw));
 
 // ---------- saatlik hatırlatma ----------
-async function hourlyReminders(env: Env) {
-  const hour = istanbulHour();
+async function hourlyReminders(env: Env, now = new Date()) {
   const { results } = await env.DB.prepare(
     `SELECT n.*, u.settings, t.title AS task_title, t.client AS task_client, t.due_date AS task_due
      FROM notifications n JOIN users u ON u.id = n.user_id LEFT JOIN tasks t ON t.id = n.task_id
@@ -476,7 +475,7 @@ async function hourlyReminders(env: Env) {
     let s: Record<string, unknown> = {};
     try { s = JSON.parse(n.settings || '{}'); } catch { /* */ }
     if (s.remindHourly === false) continue;
-    if (s.quietHours !== false && (hour >= 19 || hour < 9)) continue;
+    if (!bildirimSaatinde(now)) continue; // sabit saatler: Pzt–Cmt 09–18
     await env.DB.prepare("UPDATE notifications SET reminders = reminders + 1, last_reminded_at = datetime('now') WHERE id = ?").bind(n.id).run();
     await broadcast(env, {
       type: 'remind',
@@ -494,9 +493,11 @@ async function hourlyReminders(env: Env) {
 export default {
   fetch: app.fetch,
   scheduled: async (e: ScheduledController, env: Env, ctx: ExecutionContext) => {
+    const sahte = env.SIMDI_SAHTE ? new Date(env.SIMDI_SAHTE) : null;
+    const now = sahte && !isNaN(sahte.getTime()) ? sahte : new Date();
     if (e.cron === '* * * * *') ctx.waitUntil(ajandaHatirlatma(env)); // Ajandam anımsatıcıları (dakikalık)
     else if (e.cron === '17 0 * * 1') ctx.waitUntil(haftalikYedek(env)); // haftalık yedek
-    else if (e.cron === '30 13 * * *') ctx.waitUntil(cekimHatirlatma(env)); // 16:30 İstanbul
-    else ctx.waitUntil(Promise.all([hourlyReminders(env), sabahOzeti(env), onayHatirlatma(env), havaUyarisi(env), haftalikRozetler(env), gecikmeUyarisi(env)]));
+    else if (e.cron === '30 13 * * *') ctx.waitUntil(cekimHatirlatma(env, now)); // 16:30 İstanbul
+    else ctx.waitUntil(Promise.all([hourlyReminders(env, now), sabahOzeti(env, now), onayHatirlatma(env, now), havaUyarisi(env), haftalikRozetler(env), gecikmeUyarisi(env, now)]));
   },
 } satisfies ExportedHandler<Env>;

@@ -1,9 +1,10 @@
 // Sabah özeti testi: kullanıcının saatini şu anki İstanbul saatine ayarlar, cron'u tetikler.
 import { loginAs, t, ok, eq, done, runCron, sql, openLive, until } from './lib.mjs';
 
-const hour = String((new Date().getUTCHours() + 3) % 24).padStart(2, '0') + ':00';
-const today = new Date(Date.now() + 3 * 3600_000).toISOString().slice(0, 10);
-const weekday = new Date(Date.now() + 3 * 3600_000).getUTCDay();
+// sunucu SIMDI_SAHTE ile (Pzt–Cmt 09–17 arası bir saat) başlatılmalı; sabah özeti saati bu aralıkla sınırlı
+const hour = String((new Date(process.env.SIMDI_SAHTE || Date.now()).getUTCHours() + 3) % 24).padStart(2, '0') + ':00';
+const today = new Date((process.env.SIMDI_SAHTE ? Date.parse(process.env.SIMDI_SAHTE) : Date.now()) + 3 * 3600_000).toISOString().slice(0, 10);
+const weekday = new Date((process.env.SIMDI_SAHTE ? Date.parse(process.env.SIMDI_SAHTE) : Date.now()) + 3 * 3600_000).getUTCDay();
 const pelin = await loginAs('u_pelin', 'Pelin');
 sql(`UPDATE users SET settings = '{"morningTime":"${hour}","weekendQuiet":false}' WHERE id = 'u_pelin'`);
 sql(`INSERT INTO tasks (id, title, client, assignee_id, due_date, status) VALUES ('t_sabah1', 'Bugünkü iş', 'Nevvital', 'u_pelin', '${today}', 0), ('t_sabah2', 'Geciken iş', 'Nevvital', 'u_pelin', '2020-01-01', 0)`);

@@ -30,9 +30,9 @@ const PZT = '2026-11-09T07:00:00Z', SALI = '2026-11-10T07:00:00Z', CUMA = '2026-
 const run = async (iso) => { calls.length = 0; const n = await mod.gecikmeUyarisi(env, new Date(iso)); return { n, c: calls.map((x) => x.taskId + '>' + x.userId).sort() }; };
 
 console.log('Geç kalma uyarısı');
-await t('kalanIsGunu: hafta sonunu saymaz', () => {
+await t('kalanIsGunu: cumartesi iş günü, pazar sayılmaz', () => {
   eq(mod.kalanIsGunu('2026-11-09', '2026-11-09'), 0); eq(mod.kalanIsGunu('2026-11-09', '2026-11-11'), 2);
-  eq(mod.kalanIsGunu('2026-11-13', '2026-11-16'), 1, 'Cuma→Pzt'); eq(mod.kalanIsGunu('2026-11-13', '2026-11-17'), 2, 'Cuma→Salı');
+  eq(mod.kalanIsGunu('2026-11-13', '2026-11-16'), 2, 'Cuma→Pzt (Cmt + Pzt)'); eq(mod.kalanIsGunu('2026-11-14', '2026-11-16'), 1, 'Cmt→Pzt');
   eq(mod.kalanIsGunu('2026-11-09', '2026-11-08'), -1);
 });
 ins('g1', '2026-11-11', { title: 'Vatan reels', client: 'Vatan' }); // 2 iş günü → sorumlu
@@ -44,8 +44,8 @@ ins('g6', '2026-11-20');                                              // uzak �
 ins('g7', '2026-11-11', { assignee: null, by: 'u_pelin' });           // sorumlusuz → ekleyen
 ins('g8', '2026-11-11', { assignee: 'u_emre', by: 'u_pelin' });       // sorumlu ayrılmış → ekleyen
 ins('g9', '2026-11-10', { assignee: 'u_yigit' });                     // yönetici kendi işi → tek bildirim
-await t('saat 10 dışında ve hafta sonu çalışmaz', async () => {
-  eq((await run('2026-11-09T08:00:00Z')).n, 0, '11:00'); eq((await run('2026-11-14T07:00:00Z')).n, 0, 'Cumartesi');
+await t('saat 10 dışında ve pazar çalışmaz', async () => {
+  eq((await run('2026-11-09T08:00:00Z')).n, 0, '11:00'); eq((await run('2026-11-15T07:00:00Z')).n, 0, 'Pazar');
   eq(db.prepare('SELECT COUNT(*) AS n FROM tasks WHERE gecikme_uyari IS NOT NULL').get().n, 0);
 });
 await t('pazartesi 10:00: doğru kişilere doğru aşama', async () => {
@@ -60,13 +60,13 @@ await t('ertesi gün: 2. aşamaya geçen iş yönetici ile birlikte bir kez daha
   eq(r.c, ['g1>u_pelin', 'g1>u_yigit', 'g7>u_pelin', 'g7>u_yigit', 'g8>u_pelin', 'g8>u_yigit']);
 });
 await t('teslim tarihi ertelenirse uyarı baştan başlar', async () => {
-  db.exec("UPDATE tasks SET due_date = '2026-11-17' WHERE id = 'g1'");
-  eq((await run(CUMA)).c.filter((x) => x.startsWith('g1')), ['g1>u_pelin'], 'Cuma→Salı 2 iş günü');
+  db.exec("UPDATE tasks SET due_date = '2026-11-16' WHERE id = 'g1'");
+  eq((await run(CUMA)).c.filter((x) => x.startsWith('g1')), ['g1>u_pelin'], 'Cuma→Pzt 2 iş günü (cumartesi dahil)');
 });
-await t('ayarı kapatan bildirim almaz', async () => {
+await t('cumartesi de çalışır; kimse kapatamaz (eski ayar yok sayılır)', async () => {
   db.exec(`UPDATE users SET settings = '{"gecikmeUyari":false}' WHERE id = 'u_pelin'`);
   ins('h1', '2026-11-16');
-  eq((await run(CUMA)).c.filter((x) => x.startsWith('h1')), ['h1>u_yigit']);
+  eq((await run('2026-11-14T07:00:00Z')).c.filter((x) => x.startsWith('h1')), ['h1>u_pelin', 'h1>u_yigit'], 'Cmt→Pzt 1 iş günü');
 });
 console.log(`GEÇEN: ${gecen}  KALAN: ${kalan}`);
 process.exit(kalan ? 1 : 0);

@@ -4,7 +4,7 @@ import type { Context } from 'hono';
 import type { Env, Vars } from '../types';
 import { notify, changed } from '../notify';
 import { broadcast } from '../hub';
-import { clean, isDate, newId } from '../util';
+import { clean, hatirlatmaGunleri, isDate, newId } from '../util';
 import { cekimHavalari, istanbulDate, HAVA_GUN } from '../hava';
 
 export const r = new Hono<{ Bindings: Env; Variables: Vars }>();
@@ -247,9 +247,12 @@ export function istanbulTomorrow(now = new Date()): string {
   return new Date(now.getTime() + 3 * 3600_000 + 86_400_000).toISOString().slice(0, 10);
 }
 
-/** Her gün 16:30 (İstanbul): yarın çekimi olan ekibe ve #çekim-planı kanalına hatırlatma. */
-export async function cekimHatirlatma(env: Env): Promise<void> {
-  const date = istanbulTomorrow();
+/** Pzt–Cmt 16:30 (İstanbul): yarın çekimi olan ekibe ve #çekim-planı kanalına hatırlatma. Cumartesi pazartesinin çekimleri de; pazar bildirim yok. */
+export async function cekimHatirlatma(env: Env, now = new Date()): Promise<void> {
+  for (const g of hatirlatmaGunleri(now)) await cekimGunuHatirlat(env, g.date, g.ad);
+}
+
+async function cekimGunuHatirlat(env: Env, date: string, gun: string): Promise<void> {
   const { results } = await env.DB.prepare(
     'SELECT * FROM shoots WHERE date = ? AND status = 0 AND (reminded_for IS NULL OR reminded_for != ?)',
   ).bind(date, date).all<ShootRow>();
@@ -264,12 +267,12 @@ export async function cekimHatirlatma(env: Env): Promise<void> {
     for (const uid of s.crew) {
       if (!nameOf.has(uid)) continue;
       try {
-        await notify(env, { userId: uid, kind: 'shoot', title: 'Yarın çekim var', body: bodyLine(s), link: '/cekim?id=' + s.id, meta: metaLine(s) });
+        await notify(env, { userId: uid, kind: 'shoot', title: gun + ' çekim var', body: bodyLine(s), link: '/cekim?id=' + s.id, meta: metaLine(s) });
       } catch (e) { console.error('çekim hatırlatma bildirimi', e); }
     }
   }
 
-  const lines = ['Yarınki çekimler – ' + longDate(date)];
+  const lines = [(gun === 'Yarın' ? 'Yarınki çekimler' : gun + ' çekimleri') + ' – ' + longDate(date)];
   for (const s of list) {
     lines.push('• ' + [s.time, [s.client, s.title].filter(Boolean).join(': ')].filter(Boolean).join(' – '));
     if (s.location) lines.push('Konum: ' + s.location);

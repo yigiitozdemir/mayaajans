@@ -318,7 +318,7 @@ function ProfileModal({ onClose }: { onClose: () => void }) {
     setBusy(true);
     try {
       // yalnızca bu pencerenin kendi ayarlarını gönder; anında kaydedilen ayarlar (ses, titreşim, hava, tema…) geri dönmesin
-      const OWN = ['remindHourly', 'gecikmeUyari', 'quietHours', 'morning', 'morningTime', 'weekendQuiet'];
+      const OWN = ['remindHourly', 'morning', 'morningTime'];
       const own = Object.fromEntries(OWN.filter((k) => k in settings).map((k) => [k, (settings as any)[k]]));
       await api('PATCH', '/me', { firstName: first, lastName: last, photo: photo || null, settings: own });
       await loadMe(); snack('Profilin güncellendi'); onClose();
@@ -348,9 +348,11 @@ function ProfileModal({ onClose }: { onClose: () => void }) {
       </div>
       <span class="sub">Ekipte görünen adın: <strong style="color:var(--ink)">{(first + ' ' + last).trim() || '—'}</strong> · bütün ekranlarda bu bilgi kullanılır.</span>
       <div style="display:flex;flex-direction:column;border-top:1px solid var(--line);padding-top:6px">
+        <div class="bildirim-saat" role="note">
+          <Icon n="bell" size={15} />
+          <span><b>Bildirim saatleri:</b> Pazartesi–Cumartesi 09:00–18:00. Pazar bildirim gelmez. Teslimi yaklaşan başlanmamış işlerin hatırlatması herkese açıktır.</span>
+        </div>
         <Switch on={flag('remindHourly')} label="Okumadığım atamaları saatte bir hatırlat" hint="İşi açana kadar" onToggle={() => toggle('remindHourly')} />
-        <Switch on={flag('gecikmeUyari')} label="Teslimi yaklaşan başlanmamış işlerimi hatırlat" hint="2 iş günü ve 1 iş günü kala, sabah 10:00" onToggle={() => toggle('gecikmeUyari')} />
-        <Switch on={flag('quietHours')} label="Mesai dışında hatırlatma gönderme" hint="19:00 – 09:00 arası sessiz" onToggle={() => toggle('quietHours')} />
         <PushToggle />
         <SesAyari />
         <Switch on={flag('morning')} label="Sabah özeti gönder" hint="Bugünkü işlerim, çekimlerim ve özel günler" onToggle={() => toggle('morning')} />
@@ -359,12 +361,8 @@ function ProfileModal({ onClose }: { onClose: () => void }) {
             <label class="sub" for="maya-sabah">Saat</label>
             <select id="maya-sabah" class="input" style="width:auto" value={typeof settings.morningTime === 'string' ? settings.morningTime : '09:00'}
               onChange={(e) => setSettings({ ...settings, morningTime: (e.target as HTMLSelectElement).value })}>
-              {['07:00', '08:00', '09:00', '10:00', '11:00'].map((h) => <option value={h}>{h}</option>)}
+              {['09:00', '10:00', '11:00', '12:00'].map((h) => <option value={h}>{h}</option>)}
             </select>
-            <span class="spacer" />
-            <label class="sub" style="display:flex;align-items:center;gap:6px">
-              <input type="checkbox" checked={flag('weekendQuiet')} onChange={() => toggle('weekendQuiet')} />Hafta sonu gönderme
-            </label>
           </div>
         )}
       </div>

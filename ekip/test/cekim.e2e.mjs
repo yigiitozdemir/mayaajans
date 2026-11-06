@@ -2,8 +2,10 @@
 // BASE=http://127.0.0.1:8803 PERSIST=.wrangler/state-cekim node test/cekim.e2e.mjs
 import { loginAs, Client, t, ok, eq, done, openLive, until, runCron, sql, wait } from './lib.mjs';
 
-const istTomorrow = () => new Date(Date.now() + 3 * 3600_000 + 86_400_000).toISOString().slice(0, 10);
-const istToday = () => new Date(Date.now() + 3 * 3600_000).toISOString().slice(0, 10);
+// Sunucu SIMDI_SAHTE ile başlatıldıysa testler de aynı 'şimdi'yi kullanır (bildirimler Pzt–Cmt 09–18 arası gider)
+const SIMDI = () => (process.env.SIMDI_SAHTE ? Date.parse(process.env.SIMDI_SAHTE) : Date.now());
+const istTomorrow = () => new Date(SIMDI() + 3 * 3600_000 + 86_400_000).toISOString().slice(0, 10);
+const istToday = () => new Date(SIMDI() + 3 * 3600_000).toISOString().slice(0, 10);
 const addDays = (s, n) => new Date(Date.parse(s + 'T00:00:00Z') + n * 86_400_000).toISOString().slice(0, 10);
 
 const yigit = await loginAs('u_yigit', 'Yiğit');
@@ -202,10 +204,15 @@ await t('16:30 hatırlatması: yarınki çekim için ekibe bildirim + #çekim-pl
   await wait(300);
   const remOf = (id) => sql(`SELECT user_id FROM notifications WHERE title='Yarın çekim var' AND link='/cekim?id=${id}' ORDER BY user_id`).map((x) => x.user_id).join(',');
   eq(remOf(s1.id), 'u_emre,u_pelin', 'yarınki planlanan çekimin ekibi');
-  eq(remOf(s2.id) + remOf(s3.id) + remOf(s4.id), '', 'iptal / öbür gün / bugün hatırlatılmaz');
+  // cumartesi: pazar bildirim olmadığından pazartesinin (öbür gün) çekimleri de hatırlatılır
+  const cmt = new Date(SIMDI() + 3 * 3600_000).getUTCDay() === 6;
+  eq(remOf(s2.id) + remOf(s4.id), '', 'iptal / bugün hatırlatılmaz');
+  if (cmt) ok(sql(`SELECT title FROM notifications WHERE link='/cekim?id=${s3.id}'`).some((x) => x.title === 'Pazartesi çekim var'), 'cumartesi → pazartesi');
+  else eq(remOf(s3.id), '', 'öbür gün hatırlatılmaz');
   const msgs = sql("SELECT user_id, text FROM messages WHERE channel_id='ch_cekim' ORDER BY created_at DESC");
-  eq(msgs.length, msgBefore + 1, 'tek özet mesajı');
-  const m = msgs[0];
+  eq(msgs.length, msgBefore + (cmt ? 2 : 1), 'gün başına tek özet mesajı');
+  const m = msgs.find((x) => x.text.startsWith('Yarınki'));
+  if (cmt) ok(msgs.some((x) => x.text.startsWith('Pazartesi çekimleri – ') && x.text.includes('Öbür gün')), 'pazartesi özeti');
   eq(m.user_id, 'u_yigit', 'mesaj yazarı çekimi ekleyen');
   ok(m.text.startsWith('Yarınki çekimler – '), m.text);
   ok(m.text.includes('• 10:00 – Furkan Biçer: Yarınki Program'), m.text);
@@ -218,7 +225,7 @@ await t('16:30 hatırlatması: yarınki çekim için ekibe bildirim + #çekim-pl
   eq(await runCron('30 13 * * *'), 200);
   await wait(1500);
   eq(remOf(s1.id), 'u_emre,u_pelin', 'tekrar bildirim');
-  eq(sql("SELECT COUNT(*) AS n FROM messages WHERE channel_id='ch_cekim'")[0].n, msgBefore + 1, 'tekrar mesaj');
+  eq(sql("SELECT COUNT(*) AS n FROM messages WHERE channel_id='ch_cekim'")[0].n, msgBefore + (cmt ? 2 : 1), 'tekrar mesaj');
 
   // tarihi başka güne alıp geri getirince yeniden hatırlatılabilir
   await yigit.patch('/api/shoots/' + s1.id, { date: addDays(tom, 2) });

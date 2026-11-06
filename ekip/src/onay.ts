@@ -1,6 +1,6 @@
 // İçerik onay takibi: uzun süredir müşteriden dönüş bekleyen işler için sorumluya hatırlatma (saatlik cron'dan çağrılır).
 // Kural: 'sent' (Onaya gönderildi) adımında 72 saati geçen, tamamlanmamış işler → sorumluya (yoksa ekleyene) günde en fazla bir bildirim,
-// yalnızca hafta içi ve İstanbul mesai saatinde (09:00–17:59).
+// yalnızca Pzt–Cmt ve İstanbul mesai saatinde (09:00–17:59).
 import type { Env } from './types';
 import { notify } from './notify';
 import { istanbulHour } from './util';
@@ -8,11 +8,11 @@ import { istanbulHour } from './util';
 const HOUR = 3_600_000;
 const sqlTime = (d: Date) => d.toISOString().replace('T', ' ').slice(0, 19);
 
-/** Hafta içi (Pzt–Cum) ve İstanbul saatiyle 09–18 arası mı? (İstanbul UTC+3, yaz saati yok) */
+/** Pzt–Cmt ve İstanbul saatiyle 09–18 arası mı? (İstanbul UTC+3, yaz saati yok) */
 export function onayMesaide(now: Date): boolean {
   const day = new Date(now.getTime() + 3 * HOUR).getUTCDay();
   const h = istanbulHour(now);
-  return day >= 1 && day <= 5 && h >= 9 && h < 18;
+  return day >= 1 && day <= 6 && h >= 9 && h < 18; // cumartesi de mesai
 }
 
 /** Gönderilen hatırlatma sayısını döndürür. `now` testler için. */

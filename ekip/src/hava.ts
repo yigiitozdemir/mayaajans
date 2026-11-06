@@ -1,7 +1,7 @@
 // Dış çekimler için hava durumu (Open-Meteo, anahtarsız) + "yarın yağmur var" uyarısı (her gün 18:00 İstanbul)
 import type { Env } from './types';
 import { notify } from './notify';
-import { istanbulHour } from './util';
+import { istanbulHour, hatirlatmaGunleri } from './util';
 
 // ---------- tipler ----------
 export interface HavaSaatlik { time: string[]; pop: number[]; mm: number[]; wind: number[]; temp: number[]; code: number[] }
@@ -229,27 +229,31 @@ export async function cekimHavalari(env: Env, shoots: HavaCekim[]): Promise<Reco
   return out;
 }
 
-// ---------- 18:00 uyarısı ----------
+// ---------- 17:00 uyarısı (Pzt–Cmt; cumartesi pazartesinin çekimlerini de kapsar) ----------
 interface UyariRow { id: string; title: string; client: string; date: string; time: string; location: string; crew: string }
 
 /** "🌧️ Yarın Çavuşdent dış çekiminde yağmur bekleniyor (%70, 14:00)" */
-export function uyariMetni(name: string, o: HavaOzet): string {
+export function uyariMetni(name: string, o: HavaOzet, gun = 'Yarın'): string {
   const k = havaKodu(o.code).kind;
   if (o.pop >= RISK_POP) {
     const [ic, what] = k === 'kar' ? ['🌨️', 'kar'] : k === 'firtina' ? ['⛈️', 'sağanak ve gök gürültüsü'] : ['🌧️', 'yağmur'];
-    return `${ic} Yarın ${name} dış çekiminde ${what} bekleniyor (%${o.pop}, ${o.hour})` + (o.wind >= RISK_WIND ? ` · rüzgâr ${o.wind} km/sa` : '');
+    return `${ic} ${gun} ${name} dış çekiminde ${what} bekleniyor (%${o.pop}, ${o.hour})` + (o.wind >= RISK_WIND ? ` · rüzgâr ${o.wind} km/sa` : '');
   }
-  return `💨 Yarın ${name} dış çekiminde kuvvetli rüzgâr bekleniyor (${o.wind} km/sa)`;
+  return `💨 ${gun} ${name} dış çekiminde kuvvetli rüzgâr bekleniyor (${o.wind} km/sa)`;
 }
 
-/** Saatlik cron'dan çağrılır; yalnızca İstanbul saatiyle 18:00'de çalışır. Ertesi günün riskli dış çekimleri için ekip + yöneticiye bildirim. */
+export const HAVA_SAAT = 17;
+/** Saatlik cron'dan çağrılır; yalnızca İstanbul saatiyle 17:00'de (bildirim saatleri içinde) çalışır. Ertesi iş gününün riskli dış çekimleri için ekip + yöneticiye bildirim. */
 export async function havaUyarisi(env: Env, now: Date = sahteNow(env) ?? new Date()): Promise<number> {
-  if (istanbulHour(now) !== 18) return 0;
-  const today = istanbulDate(now), tomorrow = istanbulDate(now, 1);
+  if (istanbulHour(now) !== HAVA_SAAT) return 0;
+  const gunler = hatirlatmaGunleri(now);
+  if (!gunler.length) return 0;
+  const today = istanbulDate(now);
+  const gunAdi = new Map(gunler.map((g) => [g.date, g.ad]));
   const { results } = await env.DB.prepare(
     `SELECT id, title, client, date, time, location, crew FROM shoots
-     WHERE date = ? AND status = 0 AND outdoor = 1 AND id NOT IN (SELECT shoot_id FROM weather_alerts WHERE day = ?)`,
-  ).bind(tomorrow, today).all<UyariRow>();
+     WHERE date IN (${gunler.map(() => '?').join(', ')}) AND status = 0 AND outdoor = 1 AND id NOT IN (SELECT shoot_id FROM weather_alerts WHERE day = ?)`,
+  ).bind(...gunler.map((g) => g.date), today).all<UyariRow>();
   if (!results.length) return 0;
   const hava = await cekimHavalari(env, results);
   const { results: users } = await env.DB.prepare("SELECT id, role, settings FROM users WHERE status = 'active'").all<{ id: string; role: string; settings: string }>();
@@ -266,7 +270,7 @@ export async function havaUyarisi(env: Env, now: Date = sahteNow(env) ?? new Dat
     let crew: string[] = [];
     try { const a = JSON.parse(s.crew || '[]'); if (Array.isArray(a)) crew = a.filter((x) => typeof x === 'string'); } catch { /* */ }
     const to = [...new Set([...crew, ...admins])].filter((id) => byId.has(id) && wants(byId.get(id)!));
-    const title = uyariMetni(s.client || s.title, o);
+    const title = uyariMetni(s.client || s.title, o, gunAdi.get(s.date) || 'Yarın');
     const body = [s.title, s.client].filter(Boolean).join(' · ') + ' · ' + o.icon + ' ' + o.label + ', ' + o.temp + '°C' + (o.reason ? ' · ' + o.reason : '');
     for (const uid of to) {
       try {

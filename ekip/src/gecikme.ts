@@ -1,4 +1,4 @@
-// Akıllı geç kalma uyarısı (saatlik cron'dan çağrılır; yalnızca hafta içi İstanbul 10:00'da çalışır).
+// Akıllı geç kalma uyarısı (saatlik cron'dan çağrılır; Pzt–Cmt İstanbul 10:00'da çalışır, herkes için açık, kapatılamaz).
 // Kural: teslim tarihi yaklaşan ve hâlâ "Başlanmadı" (status 0) duran işler —
 //   teslime 2 iş günü kala → sorumluya (yoksa ekleyene),
 //   teslime 1 iş günü kala ya da teslim günü → sorumluya + yöneticilere.
@@ -16,7 +16,7 @@ function istanbulGun(now: Date) {
   return { date: d.toISOString().slice(0, 10), day: d.getUTCDay() };
 }
 
-/** `bugun`den sonra `teslim` dahil kaç iş günü (Pzt–Cum) var. Teslim bugünse 0, geçmişse -1. */
+/** `bugun`den sonra `teslim` dahil kaç iş günü (Pzt–Cmt; pazar sayılmaz) var. Teslim bugünse 0, geçmişse -1. */
 export function kalanIsGunu(bugun: string, teslim: string): number {
   if (teslim < bugun) return -1;
   let n = 0;
@@ -24,7 +24,7 @@ export function kalanIsGunu(bugun: string, teslim: string): number {
   while (d < son) {
     d.setUTCDate(d.getUTCDate() + 1);
     const g = d.getUTCDay();
-    if (g !== 0 && g !== 6) n++;
+    if (g !== 0) n++;
   }
   return n;
 }
@@ -42,8 +42,8 @@ const kalanYazi = (k: number) => (k === 0 ? 'teslim bugün' : k === 1 ? 'teslim 
 /** Gönderilen bildirim sayısını döndürür. `now` testler için. */
 export async function gecikmeUyarisi(env: Env, now: Date = new Date()): Promise<number> {
   const { date: bugun, day } = istanbulGun(now);
-  if (day === 0 || day === 6 || istanbulHour(now) !== GECIKME_SAAT) return 0;
-  const ufuk = new Date(Date.parse(bugun + 'T00:00:00Z') + 6 * 24 * HOUR).toISOString().slice(0, 10); // hafta sonu dahil yeterli pay
+  if (day === 0 || istanbulHour(now) !== GECIKME_SAAT) return 0;
+  const ufuk = new Date(Date.parse(bugun + 'T00:00:00Z') + 4 * 24 * HOUR).toISOString().slice(0, 10); // hafta sonu dahil yeterli pay
   const { results } = await env.DB.prepare(
     `SELECT t.id, t.title, t.client, t.due_date, t.gecikme_uyari, t.assignee_id, t.created_by
      FROM tasks t
@@ -53,9 +53,6 @@ export async function gecikmeUyarisi(env: Env, now: Date = new Date()): Promise<
   if (!results.length) return 0;
   const { results: users } = await env.DB.prepare("SELECT id, role, settings FROM users WHERE status = 'active'").all<{ id: string; role: string; settings: string }>();
   const byId = new Map(users.map((u) => [u.id, u]));
-  const istiyor = (id: string) => {
-    try { return JSON.parse(byId.get(id)?.settings || '{}').gecikmeUyari !== false; } catch { return true; }
-  };
   const admins = users.filter((u) => u.role === 'admin').map((u) => u.id);
   let sent = 0;
   for (const t of results) {
@@ -72,7 +69,6 @@ export async function gecikmeUyarisi(env: Env, now: Date = new Date()): Promise<
     if (sorumlu) alicilar.add(sorumlu);
     if (asama === 2) admins.forEach((a) => alicilar.add(a));
     for (const uid of alicilar) {
-      if (!istiyor(uid)) continue;
       const kendi = uid === sorumlu;
       await notify(env, {
         userId: uid, kind: 'gecikme', taskId: t.id, link: '/isler?is=' + t.id,

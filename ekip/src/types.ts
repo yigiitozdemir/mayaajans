@@ -7,6 +7,8 @@ export interface Env {
   VAPID_PRIVATE?: string;
   DRIVE_API_KEY?: string;   // Google Drive API anahtarı (gizli) — yoksa önizleme kapalı
   DRIVE_SAHTE?: string;     // test: Drive yanıtları yerine kullanılacak JSON
+  /** Yalnızca yerel test: zamanlanmış görevlerin 'şimdi'si (ISO). */
+  SIMDI_SAHTE?: string;
   /** Test: Open-Meteo yerine sahte hava verisi (JSON). Canlıda boş. */
   HAVA_SAHTE?: string;
 }

@@ -114,13 +114,14 @@ await t('iş silinince onay geçmişi de silinir', async () => {
 });
 
 console.log('Hatırlatma (cron, gerçek saat)');
-const ist = new Date(Date.now() + 3 * 3600e3); const mesai = ist.getUTCDay() >= 1 && ist.getUTCDay() <= 5 && ist.getUTCHours() >= 9 && ist.getUTCHours() < 18;
+const ist = new Date((process.env.SIMDI_SAHTE ? Date.parse(process.env.SIMDI_SAHTE) : Date.now()) + 3 * 3600e3); const mesai = ist.getUTCDay() >= 1 && ist.getUTCDay() <= 6 && ist.getUTCHours() >= 9 && ist.getUTCHours() < 18;
 const noAssignee = await mk({ title: 'Sorumlusuz onay işi', assigneeId: null });
 await P.post(`/api/tasks/${noAssignee.id}/approval`, { approval: 'sent' });
-sql(`UPDATE tasks SET sent_at = datetime('now', '-4 days') WHERE id IN ('${task.id}', '${noAssignee.id}')`);
+const SIMDI_SQL = process.env.SIMDI_SAHTE ? new Date(process.env.SIMDI_SAHTE).toISOString().replace('T', ' ').slice(0, 19) : 'now'; // sunucunun 'şimdi'si
+sql(`UPDATE tasks SET sent_at = datetime('${SIMDI_SQL}', '-4 days') WHERE id IN ('${task.id}', '${noAssignee.id}')`);
 const fresh = await mk({ title: 'Yeni gönderilen' });
 await P.post(`/api/tasks/${fresh.id}/approval`, { approval: 'sent' });
-sql(`UPDATE tasks SET sent_at = datetime('now', '-71 hours') WHERE id = '${fresh.id}'`);
+sql(`UPDATE tasks SET sent_at = datetime('${SIMDI_SQL}', '-71 hours') WHERE id = '${fresh.id}'`);
 const pl = openLive(P); await pl.ready;
 const notif = (uid, id) => sql(`SELECT * FROM notifications WHERE user_id='${uid}' AND kind='approval' AND task_id='${id}'`);
 await t(mesai ? 'mesaide: 3 günü geçen iş için sorumluya bildirim (canlı, kind approval)' : 'mesai dışı/hafta sonu: bildirim gitmez', async () => {
@@ -180,15 +181,15 @@ ins('a7', { assignee: 'u_emre', by: 'u_pelin' });                 // sorumlu eki
 ins('a8', { approval: 'approved' });
 const run = async (iso) => { calls.length = 0; const n = await mod.onayHatirlatma(env, new Date(iso)); return { n, ids: calls.map((c) => c.taskId).sort() }; };
 
-await t('onayMesaide: hafta içi 09:00–17:59 İstanbul', async () => {
+await t('onayMesaide: Pzt–Cmt 09:00–17:59 İstanbul', async () => {
   const m = (iso) => mod.onayMesaide(new Date(iso));
   eq(m('2026-11-06T05:59:00Z'), false, '08:59'); eq(m('2026-11-06T06:00:00Z'), true, '09:00');
   eq(m('2026-11-06T14:59:00Z'), true, '17:59'); eq(m('2026-11-06T15:00:00Z'), false, '18:00');
-  eq(m('2026-11-07T10:00:00Z'), false, 'Cumartesi'); eq(m('2026-11-08T10:00:00Z'), false, 'Pazar');
-  eq(m('2026-11-09T06:30:00Z'), true, 'Pazartesi'); eq(m('2026-11-06T22:00:00Z'), false, 'Cumartesi 01:00 İst');
+  eq(m('2026-11-07T10:00:00Z'), true, 'Cumartesi (mesai)'); eq(m('2026-11-08T10:00:00Z'), false, 'Pazar');
+  eq(m('2026-11-09T06:30:00Z'), true, 'Pazartesi'); eq(m('2026-11-06T22:00:00Z'), false, 'Cumartesi 01:00 İst'); eq(m('2026-11-07T22:00:00Z'), false, 'Pazar 01:00 İst');
 });
-await t('hafta sonu ve mesai dışı hiçbir şey göndermez, işaretlemez', async () => {
-  eq((await run('2026-11-07T10:00:00Z')).n, 0); eq((await run('2026-11-06T16:00:00Z')).n, 0); eq((await run('2026-11-06T05:00:00Z')).n, 0);
+await t('pazar ve mesai dışı hiçbir şey göndermez, işaretlemez', async () => {
+  eq((await run('2026-11-08T10:00:00Z')).n, 0); eq((await run('2026-11-06T16:00:00Z')).n, 0); eq((await run('2026-11-06T05:00:00Z')).n, 0);
   eq(db.prepare("SELECT COUNT(*) AS n FROM tasks WHERE approval_reminded_at IS NOT NULL").get().n, 0);
 });
 await t('mesaide: yalnız sent + 72 saati geçmiş + açık işler; sorumlu yoksa ekleyen', async () => {
