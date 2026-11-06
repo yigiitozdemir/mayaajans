@@ -1,6 +1,11 @@
 # Maya Ekip — sürüm notları
 # Her sürüm için "## <sürüm>" başlığı altına kısa maddeler yaz. Güncelleme penceresinde ekibe aynen gösterilir.
 
+## 1.0.3
+• ChatGPT, Claude ve WhatsApp artık gerçekten programın içinde açılıyor (1.0.2'de ayrı pencerede açılıyordu).
+• Arka planda bekleyen WhatsApp görünümünün menüdeki tıklamaları engellemesi düzeltildi.
+• Dock'taki okunmamış sayısı ve tema, uygulamalar açıkken de doğru çalışıyor.
+
 ## 1.0.2
 • Uygulamalar: ChatGPT, Claude ve WhatsApp artık Maya Ekip'in içinde, kendi hesabınla. WhatsApp'ta yeni mesajlarda bildirim ve menüde okunmamış sayısı.
 • Ajandam: sana özel notlar (ekran görüntüleriyle), yapılacaklar, takvim ve anımsatıcı bildirimleri.

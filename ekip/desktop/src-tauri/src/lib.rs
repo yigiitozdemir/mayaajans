@@ -46,8 +46,13 @@ pub(crate) fn set_flag(app: &AppHandle, name: &str, on: bool) {
     }
 }
 
+// Not: ana pencereye ChatGPT / Claude / WhatsApp görünümleri eklenince Tauri onu artık "tek görünümlü pencere"
+// saymaz ve get_webview_window("main") None döner. Bu yüzden pencere ve görünüm her yerde AYRI alınır.
+fn main_window(app: &AppHandle) -> Option<tauri::Window> { app.get_window("main") }
+fn main_webview(app: &AppHandle) -> Option<tauri::Webview> { app.get_webview("main") }
+
 fn show_main(app: &AppHandle) {
-    if let Some(w) = app.get_webview_window("main") {
+    if let Some(w) = main_window(app) {
         let _ = w.unminimize();
         let _ = w.show();
         let _ = w.set_focus();
@@ -56,7 +61,7 @@ fn show_main(app: &AppHandle) {
 
 /// Sayfaya pencereyi öne getirmeden olay gönderir (ör. yeni ekran görüntüsü).
 pub(crate) fn page_emit(app: &AppHandle, detail: &str) {
-    if let Some(w) = app.get_webview_window("main") {
+    if let Some(w) = main_webview(app) {
         let js = format!("window.dispatchEvent(new CustomEvent('maya-desktop', {{ detail: {detail} }}))");
         let _ = w.eval(&js);
     }
@@ -65,7 +70,7 @@ pub(crate) fn page_emit(app: &AppHandle, detail: &str) {
 /// Sayfaya masaüstü olayı gönderir (ör. "Yeni iş ekle" penceresini aç).
 fn page_event(app: &AppHandle, detail: &str) {
     show_main(app);
-    if let Some(w) = app.get_webview_window("main") {
+    if let Some(w) = main_webview(app) {
         let js = format!(
             "window.dispatchEvent(new CustomEvent('maya-desktop', {{ detail: {detail} }}))"
         );
@@ -213,7 +218,7 @@ fn on_app_title(app: &AppHandle, which: &str, title: &str) {
     }
     page_emit(app, &format!("{{ action: 'app-unread', app: '{which}', count: {n} }}"));
     if n > prev && which == "whatsapp" {
-        let focused = app.get_webview_window("main").and_then(|w| w.is_focused().ok()).unwrap_or(false);
+        let focused = main_window(app).and_then(|w| w.is_focused().ok()).unwrap_or(false);
         let showing = VISIBLE_APP.lock().map(|v| v.as_str() == "whatsapp").unwrap_or(false);
         if !(focused && showing) {
             let _ = app.notification().builder().title("WhatsApp").body(format!("{n} okunmamış mesaj")).show();
@@ -223,7 +228,7 @@ fn on_app_title(app: &AppHandle, which: &str, title: &str) {
 
 /// Uygulama görünümünü oluşturur (gizli ya da görünür).
 fn create_app_view(app: &AppHandle, which: &str, label: &str, url: &str, pos: tauri::LogicalPosition<f64>, size: tauri::LogicalSize<f64>, bg: tauri::window::Color) -> Result<tauri::Webview, String> {
-    let main = app.get_webview_window("main").ok_or("ana pencere yok")?;
+    let window = main_window(app).ok_or("ana pencere yok")?;
     let ext = app.clone();
     let dl = app.clone();
     let tt = app.clone();
@@ -241,7 +246,7 @@ fn create_app_view(app: &AppHandle, which: &str, label: &str, url: &str, pos: ta
         })
         .on_download(move |_webview, event| handle_download(&dl, event))
         .on_document_title_changed(move |_w, title| on_app_title(&tt, &which_s, &title));
-    main.as_ref().window().add_child(builder, pos, size).map_err(|e| e.to_string())
+    window.add_child(builder, pos, size).map_err(|e| e.to_string())
 }
 
 /// WhatsApp bir kez açıldıysa program açılınca arka planda bağlansın (mesajlar ve bildirimler gelsin).
@@ -250,20 +255,20 @@ fn preload_whatsapp(app: &AppHandle) {
         return;
     }
     if let Ok(v) = create_app_view(app, "whatsapp", "ai-in-whatsapp", "https://web.whatsapp.com/",
-        tauri::LogicalPosition::new(0.0, 0.0), tauri::LogicalSize::new(800.0, 600.0), tauri::window::Color(244, 241, 236, 255)) {
-        let _ = v.hide();
+        tauri::LogicalPosition::new(-20000.0, -20000.0), tauri::LogicalSize::new(800.0, 600.0), tauri::window::Color(244, 241, 236, 255)) {
+        park(&v);
     }
 }
 
 #[tauri::command]
-fn ai_show(app: AppHandle, which: String, x: f64, y: f64, w: f64, h: f64, dark: Option<bool>) -> Result<(), String> {
+async fn ai_show(app: AppHandle, which: String, x: f64, y: f64, w: f64, h: f64, dark: Option<bool>) -> Result<(), String> {
     let Some(&(_, label, url)) = AI_EMBED.iter().find(|(id, _, _)| *id == which) else {
         return Err("bilinmeyen".into());
     };
     for (_, other, _) in AI_EMBED.iter() {
         if *other != label {
             if let Some(v) = app.get_webview(other) {
-                let _ = v.hide();
+                park(&v);
             }
         }
     }
@@ -290,13 +295,19 @@ fn ai_show(app: AppHandle, which: String, x: f64, y: f64, w: f64, h: f64, dark: 
 
 /// Başka sayfaya geçilince ya da üstte bir pencere (profil, iş detayı, bildirimler) açılınca gizle; sohbet kaybolmaz.
 #[tauri::command]
-fn ai_hide(app: AppHandle) {
+async fn ai_hide(app: AppHandle) {
     if let Ok(mut v) = VISIBLE_APP.lock() { v.clear(); }
     for (_, label, _) in AI_EMBED.iter() {
         if let Some(v) = app.get_webview(label) {
-            let _ = v.hide();
+            park(&v);
         }
     }
+}
+
+/// Gizle ve ekranın çok dışına taşı: gizleme tam çalışmasa bile tıklamaların önüne geçmesin.
+fn park(v: &tauri::Webview) {
+    let _ = v.hide();
+    let _ = v.set_position(tauri::LogicalPosition::new(-20000.0, -20000.0));
 }
 
 /// Sayfadaki "Ayrı pencerede aç" düğmesi.
@@ -319,7 +330,7 @@ fn set_unread(app: AppHandle, count: u32) {
         };
         let _ = tray.set_tooltip(Some(tip));
     }
-    if let Some(w) = app.get_webview_window("main") {
+    if let Some(w) = main_window(&app) {
         let _ = w.set_badge_count(if count > 0 { Some(count as i64) } else { None });
     }
 }
@@ -333,7 +344,7 @@ fn notify(app: AppHandle, title: String, body: String) {
 /// Tema: "dark" / "light" pencerenin başlık çubuğunu da o renge çevirir, "system" Mac ayarına bırakır.
 #[tauri::command]
 fn set_theme(app: AppHandle, theme: String) {
-    if let Some(w) = app.get_webview_window("main") {
+    if let Some(w) = main_window(&app) {
         let t = match theme.as_str() {
             "dark" => Some(tauri::Theme::Dark),
             "light" => Some(tauri::Theme::Light),
@@ -553,6 +564,7 @@ pub fn run() {
                 .min_inner_size(960.0, 620.0)
                 .center()
                 .visible(visible)
+                .auto_resize() // içine uygulama görünümleri eklense de pencereyle birlikte boyutlansın
                 .on_navigation({
                     let app = handle.clone();
                     move |url| {
@@ -589,8 +601,7 @@ pub fn run() {
             let wa = handle.clone();
             std::thread::spawn(move || {
                 std::thread::sleep(Duration::from_secs(4));
-                let h = wa.clone();
-                let _ = wa.run_on_main_thread(move || preload_whatsapp(&h));
+                preload_whatsapp(&wa); // add_child kendisi ana iş parçacığında çalıştırır
             });
 
             // açılışta ve 6 saatte bir güncelleme denetimi
