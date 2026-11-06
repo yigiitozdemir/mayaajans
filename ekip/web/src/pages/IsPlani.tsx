@@ -62,6 +62,7 @@ export function IsPlani({ openTask }: { openTask: (id: string) => void }) {
         </span>
         <span class="title">{t.title}</span>
         {t.items.length > 0 && <span class="chip" style="align-self:flex-start;font-size:11px">{t.items.length} firma / kalem</span>}
+        {t.status === 2 && t.doneLink && <span class="chip donechip" style="align-self:flex-start;font-size:11px"><Icon n="link" size={12} />Teslim linki var</span>}
         <span class="row" style="justify-content:space-between;flex-wrap:nowrap">
           <span class={'tag ' + due.cls}>{due.label}</span>
           {m && <span title={m.name}><Avatar m={m} size={24} radius={8} /></span>}
@@ -191,7 +192,14 @@ function ListTable({ rows, openTask, empty, muted }: { rows: Task[]; openTask: (
                 <td style="color:var(--mute);white-space:nowrap">{t.client || '—'}</td>
                 <td style="color:var(--mute);white-space:nowrap">{memberName(s.team, t.assigneeId)}</td>
                 <td style="white-space:nowrap"><span class={'tag ' + due.cls}>{due.label}</span></td>
-                <td style="white-space:nowrap;color:var(--mute)"><span class="dot" style={{ background: STATUS[t.status].dot, display: 'inline-block', marginRight: '6px' }} />{STATUS[t.status].label}</td>
+                <td style="white-space:nowrap;color:var(--mute)"><span class="dot" style={{ background: STATUS[t.status].dot, display: 'inline-block', marginRight: '6px' }} />{STATUS[t.status].label}
+                  {t.status === 2 && t.doneLink && (
+                    <button type="button" class="btn sm" style="margin-left:10px" aria-label={'Teslim linkini kopyala: ' + t.title}
+                      onClick={async () => { try { await navigator.clipboard.writeText(t.doneLink); snack('Teslim linki kopyalandı'); } catch { snack('Kopyalanamadı'); } }}>
+                      <Icon n="copy" size={13} />Linki kopyala
+                    </button>
+                  )}
+                </td>
               </tr>
             );
           })}

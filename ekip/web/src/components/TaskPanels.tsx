@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'preact/hooks';
+import { useEffect, useRef, useState } from 'preact/hooks';
 import { api, reloadTasks, snack, store, type Task, fmtDate, dayDiff, DAY as SDAY, memberName } from '../api';
 import { Avatar, Icon, Modal, useStore } from '../ui';
 import { markTaskRead } from './Notify';
@@ -84,6 +84,12 @@ export function TaskDrawer({ taskId, onClose }: { taskId: string; onClose: () =>
   const t = s.tasks.find((x) => x.id === taskId);
   const [confirmDel, setConfirmDel] = useState(false);
   const [note, setNote] = useState(t?.note || '');
+  // tamamlanınca: bitmiş çalışmanın linki (isteğe bağlı)
+  const [askLink, setAskLink] = useState(false);
+  const [doneDraft, setDoneDraft] = useState('');
+  const doneRef = useRef<HTMLInputElement>(null);
+  useEffect(() => { setAskLink(false); }, [taskId]);
+  useEffect(() => { if (askLink) setTimeout(() => doneRef.current?.focus(), 0); }, [askLink]);
   useEffect(() => { if (t) markTaskRead(t.id); }, [taskId]);
   useEffect(() => { setNote(t?.note || ''); }, [t?.note]);
   useEffect(() => {
@@ -99,6 +105,22 @@ export function TaskDrawer({ taskId, onClose }: { taskId: string; onClose: () =>
     store.set({ tasks: store.get().tasks.map((x) => (x.id === t!.id ? { ...x, ...body } : x)) });
     try { await api('PATCH', '/tasks/' + t!.id, body); await reloadTasks(); }
     catch (e: any) { snack(e.message); reloadTasks(); }
+  }
+  function setStatus(i: 0 | 1 | 2) {
+    if (i === t!.status) return;
+    patch({ status: i });
+    if (i === 2) { setDoneDraft(t!.doneLink || ''); setAskLink(true); } else setAskLink(false);
+  }
+  async function saveDoneLink() {
+    const v = doneDraft.trim();
+    try {
+      await api('PATCH', '/tasks/' + t!.id, { doneLink: v });
+      await reloadTasks(); setAskLink(false);
+      snack(v ? 'Teslim linki kaydedildi' : 'Teslim linki kaldırıldı');
+    } catch (e: any) { snack(e.message); }
+  }
+  async function copyDone() {
+    try { await navigator.clipboard.writeText(t!.doneLink); snack('Teslim linki kopyalandı'); } catch { snack('Kopyalanamadı'); }
   }
   async function del() {
     if (!confirmDel) { setConfirmDel(true); return; }
@@ -117,11 +139,39 @@ export function TaskDrawer({ taskId, onClose }: { taskId: string; onClose: () =>
         <h2 style="margin:0;font-family:var(--display);font-size:22px;line-height:1.3">{t.title}</h2>
         <div class="seg" role="group" aria-label="Durum">
           {STATUS.map((st, i) => (
-            <button type="button" style="flex:1" class={t.status === i ? 'on' : ''} aria-pressed={t.status === i} onClick={() => patch({ status: i as 0 | 1 | 2 })}>
+            <button type="button" style="flex:1" class={t.status === i ? 'on' : ''} aria-pressed={t.status === i} onClick={() => setStatus(i as 0 | 1 | 2)}>
               <span class="dot" style={{ background: st.dot, display: 'inline-block', marginRight: '6px' }} />{st.label}
             </button>
           ))}
         </div>
+        {t.status === 2 && askLink && (
+          <div class="donelink ask" role="group" aria-label="Teslim linki">
+            <strong style="font-size:14px"><Icon n="check" size={15} /> İş tamamlandı</strong>
+            <span class="sub">Bitmiş çalışmanın Drive linkini yapıştır, ekip buradan kopyalayabilsin. <b>İsteğe bağlı.</b></span>
+            <input ref={doneRef} class="input" type="text" inputMode="url" aria-label="Bitmiş çalışmanın Drive linki" placeholder="https://drive.google.com/…"
+              value={doneDraft} onInput={(e) => setDoneDraft((e.target as HTMLInputElement).value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); saveDoneLink(); } if (e.key === 'Escape') { e.stopPropagation(); setAskLink(false); } }} />
+            <div class="row" style="gap:8px">
+              <button type="button" class="btn primary sm" onClick={saveDoneLink}>Linki kaydet</button>
+              <button type="button" class="btn ghost sm" onClick={() => setAskLink(false)}>Şimdilik geç</button>
+            </div>
+          </div>
+        )}
+        {t.status === 2 && !askLink && (
+          <div class="donelink">
+            <span class="sub" style="font-weight:600;text-transform:uppercase;letter-spacing:.06em;font-size:11px">Teslim linki</span>
+            {t.doneLink ? (
+              <div class="row" style="gap:8px;flex-wrap:nowrap">
+                <a href={t.doneLink} target="_blank" rel="noopener noreferrer" class="donelink-url" title={t.doneLink}>{t.doneLink.replace(/^https?:\/\/(www\.)?/, '')}</a>
+                <button type="button" class="btn primary sm" onClick={copyDone}><Icon n="copy" size={14} />Kopyala</button>
+                <a class="btn sm" style="text-decoration:none" href={t.doneLink} target="_blank" rel="noopener noreferrer"><Icon n="ext" size={14} />Aç</a>
+                <button type="button" class="iconbtn" style="width:32px;height:32px" aria-label="Teslim linkini değiştir" title="Değiştir" onClick={() => { setDoneDraft(t.doneLink); setAskLink(true); }}><Icon n="link" size={14} /></button>
+              </div>
+            ) : (
+              <button type="button" class="btn sm" style="align-self:flex-start" onClick={() => { setDoneDraft(''); setAskLink(true); }}><Icon n="plus" size={14} />Teslim linki ekle</button>
+            )}
+          </div>
+        )}
         <dl style="margin:0;display:grid;grid-template-columns:110px 1fr;gap:12px;align-items:center;font-size:13px">
           <dt style="color:var(--mute2)">Sorumlu</dt>
           <dd style="margin:0" class="row"><Avatar m={s.team.find((m) => m.id === t.assigneeId)} size={24} />

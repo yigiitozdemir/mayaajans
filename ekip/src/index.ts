@@ -45,7 +45,7 @@ function teamView(u: UserRow, admin: boolean) {
 
 interface TaskRow {
   id: string; title: string; client: string; assignee_id: string | null; due_date: string | null; status: number;
-  note: string; items: string; link: string; source: string; created_by: string | null;
+  note: string; items: string; link: string; done_link: string; source: string; created_by: string | null;
   created_at: string; updated_at: string; completed_at: string | null;
 }
 function taskView(t: TaskRow) {
@@ -53,7 +53,7 @@ function taskView(t: TaskRow) {
   try { items = JSON.parse(t.items || '[]'); } catch { /* */ }
   return {
     id: t.id, title: t.title, client: t.client, assigneeId: t.assignee_id, dueDate: t.due_date, status: t.status,
-    note: t.note, items, link: t.link, source: t.source, createdBy: t.created_by,
+    note: t.note, items, link: t.link, doneLink: t.done_link || '', source: t.source, createdBy: t.created_by,
     createdAt: t.created_at, updatedAt: t.updated_at, completedAt: t.completed_at,
   };
 }
@@ -273,6 +273,12 @@ api.patch('/tasks/:id', async (c) => {
   if ('note' in b) { sets.push('note = ?'); vals.push(clean(b.note, 4000)); }
   if ('items' in b) { sets.push('items = ?'); vals.push(cleanItems(b.items)); }
   if ('link' in b) { const l = clean(b.link, 1000); if (l && !/^https?:\/\//i.test(l)) return c.json({ error: 'Link http:// ya da https:// ile başlamalı' }, 400); sets.push('link = ?'); vals.push(l); }
+  if ('doneLink' in b) {
+    let l = clean(b.doneLink, 1000);
+    if (l && !/^[a-z]+:\/\//i.test(l) && /^[\w.-]+\.[a-z]{2,}(\/|$)/i.test(l)) l = 'https://' + l; // "drive.google.com/…" yapıştırılırsa
+    if (l && !/^https?:\/\//i.test(l)) return c.json({ error: 'Teslim linki http:// ya da https:// ile başlamalı' }, 400);
+    sets.push('done_link = ?'); vals.push(l);
+  }
   let assigneeChanged = false;
   if ('assigneeId' in b) {
     const a = await validAssignee(c, b.assigneeId);

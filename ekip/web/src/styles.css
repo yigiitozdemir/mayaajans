@@ -160,3 +160,10 @@ textarea.input { height: auto; padding: 10px 12px; line-height: 1.5; resize: ver
 .check .box { flex: none; width: 20px; height: 20px; margin-top: 1px; border-radius: 6px; display: flex; align-items: center; justify-content: center; border: 1.5px solid rgba(43, 30, 23, .3); }
 .check.on .box { background: var(--accent); border: 0; }
 .nodatelink, .nodatelink:hover { text-decoration: none; color: inherit; }
+
+/* ---------- teslim linki (tamamlanan iş) ---------- */
+.donelink { display: flex; flex-direction: column; gap: 8px; padding: 12px 14px; border-radius: 12px; background: var(--panel); border: 1px solid var(--line); }
+.donelink.ask { background: rgba(46,125,74,.07); border-color: rgba(46,125,74,.35); }
+.donelink.ask strong { display: flex; align-items: center; gap: 6px; color: var(--green); }
+.donelink-url { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; }
+.donechip { display: inline-flex; align-items: center; gap: 4px; color: var(--green); }

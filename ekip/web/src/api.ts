@@ -10,7 +10,7 @@ export interface Member {
 }
 export interface Task {
   id: string; title: string; client: string; assigneeId: string | null; dueDate: string | null; status: 0 | 1 | 2;
-  note: string; items: string[]; link: string; source: string; createdBy: string | null;
+  note: string; items: string[]; link: string; doneLink: string; source: string; createdBy: string | null;
   createdAt: string; updatedAt: string; completedAt: string | null;
 }
 export interface Notification {
