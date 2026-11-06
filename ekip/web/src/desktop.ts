@@ -26,3 +26,9 @@ export function desktopOr(cmd: string, args: Record<string, unknown>, fallback: 
   if (!isDesktop) { fallback(); return; }
   tauri.core.invoke(cmd, args).catch(fallback);
 }
+
+/** Mac uygulaması komutu; tarayıcıda ya da komut yoksa (eski sürüm) hata verir. */
+export function desktopCall<T = unknown>(cmd: string, args?: Record<string, unknown>): Promise<T> {
+  if (!isDesktop) return Promise.reject(new Error('masaüstü değil'));
+  return tauri.core.invoke(cmd, args);
+}

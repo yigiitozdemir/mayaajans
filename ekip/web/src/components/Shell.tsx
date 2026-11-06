@@ -1,9 +1,10 @@
-import { useState } from 'preact/hooks';
+import { useEffect, useState } from 'preact/hooks';
 import type { ComponentChildren } from 'preact';
 import { api, loadMe, snack, shrinkImage, disconnectLive, store, initials } from '../api';
 import { Avatar, Icon, Link, Modal, Switch, meAsMember, navigate, useStore } from '../ui';
 import { applyTheme, useThemePref, type ThemePref } from '../theme';
-import { desktopOr } from '../desktop';
+import { isDesktop } from '../desktop';
+import { lastAi } from '../pages/YapayZeka';
 
 // Menünün altında: ChatGPT ve Claude kısayolları (kişinin kendi hesabıyla; Mac'te programın içinde açılır)
 const AI = [
@@ -11,6 +12,9 @@ const AI = [
   { id: 'claude', name: 'Claude', url: 'https://claude.ai/new', icon: 'asterisk', cls: 'cld' },
 ];
 function AiQuick({ path }: { path: string }) {
+  const [, tick] = useState(0);
+  useEffect(() => { const f = () => tick((n) => n + 1); window.addEventListener('maya-nav', f); window.addEventListener('popstate', f); return () => { window.removeEventListener('maya-nav', f); window.removeEventListener('popstate', f); }; }, []);
+  const cur = path === '/yapay-zeka' ? (new URLSearchParams(location.search).get('ai') || lastAi()) : null;
   return (
     <div class="aiquick">
       <div class="aiquick-h">
@@ -20,11 +24,11 @@ function AiQuick({ path }: { path: string }) {
       </div>
       <div class="aiquick-row" role="group" aria-labelledby="maya-yz">
         {AI.map((a) => (
-          <button type="button" class={'aiq ' + a.cls} title={a.name + "'ı aç (kendi hesabınla)"}
-            onClick={() => desktopOr('open_ai', { which: a.id }, () => window.open(a.url, '_blank', 'noopener'))}>
+          <button type="button" class={'aiq ' + a.cls + (cur === a.id ? ' on' : '')} aria-current={cur === a.id ? 'page' : undefined} title={a.name + ' (kendi hesabınla)'}
+            onClick={() => (isDesktop ? navigate('/yapay-zeka?ai=' + a.id) : window.open(a.url, '_blank', 'noopener'))}>
             <span class="aiq-ic" aria-hidden="true"><Icon n={a.icon} size={15} stroke="#fff" w={2.2} /></span>
             <span class="aiq-n">{a.name}</span>
-            <span class="aiq-go" aria-hidden="true"><Icon n="ext" size={13} /></span>
+            {!isDesktop && <span class="aiq-go" aria-hidden="true"><Icon n="ext" size={13} /></span>}
           </button>
         ))}
       </div>

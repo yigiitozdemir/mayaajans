@@ -1,3 +1,14 @@
+/* gömülü görünüm: üstte ince çubuk, altı tamamen ChatGPT / Claude */
+.ai-embed { height: 100vh; height: 100dvh; display: flex; flex-direction: column; }
+.ai-bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 10px 16px; border-bottom: 1px solid var(--line); background: var(--panel); }
+.ai-bar .seg button { display: inline-flex; align-items: center; gap: 7px; }
+.ai-bar .bell { width: 38px; height: 38px; }
+.ai-bar-note { font-size: 12px; }
+@media (max-width: 1100px) { .ai-bar-note { display: none; } }
+.ai-host { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; background: var(--bg); }
+.aiq-ic.sm { width: 18px; height: 18px; border-radius: 5px; }
+.aiq-ic.lg { width: 46px; height: 46px; border-radius: 14px; }
+/* bilgi sayfası */
 .ai-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
 .ai-card { display: flex; flex-direction: column; gap: 14px; padding: 20px; border-radius: 18px; background: var(--card); border: 1px solid var(--line); box-shadow: var(--shadow); }
 .ai-card h2 { margin: 0; font-family: var(--display); font-size: 22px; font-weight: 800; }
@@ -5,8 +16,6 @@
 .ai-card li { display: flex; gap: 8px; align-items: flex-start; line-height: 1.4; }
 .ai-card li svg { flex: none; margin-top: 3px; stroke: var(--green); }
 .ai-card .btn { align-self: flex-start; min-height: 44px; padding: 0 20px; font-size: 15px; }
-.ai-ic { width: 46px; height: 46px; border-radius: 14px; display: inline-flex; align-items: center; justify-content: center; background: var(--accent-soft); color: var(--accent-ink); flex: none; }
-.ai-claude .ai-ic { background: rgba(var(--ink-rgb), .07); color: var(--ink); }
 .ai-tips { padding: 18px 20px; }
 .ai-tips h2 { margin: 0 0 8px; font-size: 15px; font-weight: 800; }
 .ai-tips ol { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 8px; font-size: 14px; line-height: 1.5; color: var(--ink2); }

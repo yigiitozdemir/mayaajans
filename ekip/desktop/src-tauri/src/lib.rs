@@ -164,7 +164,65 @@ fn open_ai_window(app: &AppHandle, which: &str) -> tauri::Result<()> {
     Ok(())
 }
 
-/// Sayfadaki "ChatGPT'yi aç" / "Claude'u aç" düğmeleri.
+/// Panelin içinde (sol menü yerinde kalır): ChatGPT / Claude, ana pencerenin içerik alanına yerleşen ayrı bir görünüm.
+/// Konum ve boyut sayfadan gelir (içerik alanının dikdörtgeni, mantıksal piksel).
+const AI_EMBED: [(&str, &str, &str); 2] = [
+    ("chatgpt", "ai-in-chatgpt", "https://chatgpt.com/"),
+    ("claude", "ai-in-claude", "https://claude.ai/new"),
+];
+
+#[tauri::command]
+fn ai_show(app: AppHandle, which: String, x: f64, y: f64, w: f64, h: f64) -> Result<(), String> {
+    let Some(&(_, label, url)) = AI_EMBED.iter().find(|(id, _, _)| *id == which) else {
+        return Err("bilinmeyen".into());
+    };
+    let main = app.get_webview_window("main").ok_or("ana pencere yok")?;
+    for (_, other, _) in AI_EMBED.iter() {
+        if *other != label {
+            if let Some(v) = app.get_webview(other) {
+                let _ = v.hide();
+            }
+        }
+    }
+    let pos = tauri::LogicalPosition::new(x.max(0.0), y.max(0.0));
+    let size = tauri::LogicalSize::new(w.max(200.0), h.max(200.0));
+    if let Some(v) = app.get_webview(label) {
+        let _ = v.set_position(pos);
+        let _ = v.set_size(size);
+        let _ = v.show();
+        let _ = v.set_focus();
+        return Ok(());
+    }
+    let ext = app.clone();
+    let dl = app.clone();
+    let builder = tauri::webview::WebviewBuilder::new(label, WebviewUrl::External(url.parse().map_err(|_| "adres")?))
+        .user_agent(SAFARI_UA)
+        .on_new_window(move |url, _features| {
+            if is_auth_or_ai_host(&url) {
+                tauri::webview::NewWindowResponse::Allow
+            } else {
+                open_external(&ext, &url);
+                tauri::webview::NewWindowResponse::Deny
+            }
+        })
+        .on_download(move |_webview, event| handle_download(&dl, event));
+    let window = main.as_ref().window();
+    let v = window.add_child(builder, pos, size).map_err(|e| e.to_string())?;
+    let _ = v.set_focus();
+    Ok(())
+}
+
+/// Başka sayfaya geçilince ya da üstte bir pencere (profil, iş detayı, bildirimler) açılınca gizle; sohbet kaybolmaz.
+#[tauri::command]
+fn ai_hide(app: AppHandle) {
+    for (_, label, _) in AI_EMBED.iter() {
+        if let Some(v) = app.get_webview(label) {
+            let _ = v.hide();
+        }
+    }
+}
+
+/// Sayfadaki "Ayrı pencerede aç" düğmesi.
 #[tauri::command]
 fn open_ai(app: AppHandle, which: String) -> Result<(), String> {
     open_ai_window(&app, &which).map_err(|e| e.to_string())
@@ -363,8 +421,8 @@ fn build_tray(app: &AppHandle) -> tauri::Result<()> {
                 let app = app.clone();
                 tauri::async_runtime::spawn(check_update(app, true));
             }
-            "chatgpt" => { let _ = open_ai_window(app, "chatgpt"); }
-            "claude" => { let _ = open_ai_window(app, "claude"); }
+            "chatgpt" => page_event(app, "{ action: 'go', path: '/yapay-zeka?ai=chatgpt' }"),
+            "claude" => page_event(app, "{ action: 'go', path: '/yapay-zeka?ai=claude' }"),
             "cik" => app.exit(0),
             _ => {}
         })
@@ -391,7 +449,7 @@ pub fn run() {
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
-        .invoke_handler(tauri::generate_handler![set_unread, notify, app_info, set_theme, open_ai])
+        .invoke_handler(tauri::generate_handler![set_unread, notify, app_info, set_theme, open_ai, ai_show, ai_hide])
         .setup(|app| {
             let handle = app.handle().clone();
 
