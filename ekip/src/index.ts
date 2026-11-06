@@ -33,6 +33,12 @@ app.onError((err, c) => { console.error(err); return c.json({ error: 'Beklenmeye
 app.route('/api/auth', authRoutes);
 app.get('/api/health', (c) => c.json({ ok: true }));
 // Web sürüm kimliği: açık sayfalar yeni yayını fark edip kendini yeniler
+// Android uygulamasının (APK) bu siteyi tam ekran açabilmesi için doğrulama (Digital Asset Links)
+const ANDROID_SHA256 = '3F:46:FB:F9:AD:45:19:75:42:19:5B:6D:13:B3:79:D5:AB:6E:2D:24:F5:5F:F7:60:9C:1F:B6:10:C7:F1:26:2C';
+app.get('/.well-known/assetlinks.json', (c) => c.json([{
+  relation: ['delegate_permission/common.handle_all_urls'],
+  target: { namespace: 'android_app', package_name: 'net.mayaajans.ekip', sha256_cert_fingerprints: [ANDROID_SHA256] },
+}], 200, { 'Cache-Control': 'public, max-age=3600' }));
 app.get('/api/version', (c) => c.json({ build: BUILD_ID }, 200, { 'Cache-Control': 'no-store' }));
 
 const api = new Hono<{ Bindings: Env; Variables: Vars }>();

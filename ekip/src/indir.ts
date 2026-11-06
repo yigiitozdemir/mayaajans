@@ -7,6 +7,7 @@ const FILES: Record<string, string> = {
   'latest.json': 'application/json',
   'MayaEkip.dmg': 'application/x-apple-diskimage',
   'MayaEkip.app.tar.gz': 'application/gzip',
+  'MayaEkip.apk': 'application/vnd.android.package-archive',
 };
 
 const KUR_SH = `#!/bin/bash
@@ -25,13 +26,13 @@ open "/Applications/Maya Ekip.app"
 echo "Maya Ekip kuruldu. Program açılıyor ve bundan sonra bilgisayar açılınca kendiliğinden başlayacak."
 `;
 
-const page = (version: string | null) => `<!doctype html>
+const page = (version: string | null, apk: boolean, ua: string) => `<!doctype html>
 <html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Maya Ekip · Mac'e indir</title><link rel="icon" href="/favicon-32.png">
+<title>Maya Ekip · İndir</title><link rel="icon" href="/favicon-32.png">
 <style>
 :root{color-scheme:light}body{margin:0;background:#F4F1EC;color:#2B1E17;font:15px/1.6 -apple-system,BlinkMacSystemFont,Inter,sans-serif}
 main{max-width:620px;margin:0 auto;padding:56px 20px}img.logo{width:180px;display:block;margin-bottom:32px}
-h1{font-size:26px;margin:0 0 6px}p.sub{color:#6E5F55;margin:0 0 28px}
+h1{font-size:26px;margin:0 0 6px}h1#mac{margin-top:44px}p.sub{color:#6E5F55;margin:0 0 28px}
 .card{background:#FBF9F6;border:1px solid #E4DCD2;border-radius:14px;padding:22px;margin-bottom:16px}
 .card h2{font-size:16px;margin:0 0 6px}.card p{margin:0 0 14px;color:#4A3C33}
 code{display:block;background:#2B1E17;color:#F4F1EC;border-radius:8px;padding:12px 14px;font:13px/1.5 ui-monospace,Menlo,monospace;word-break:break-all;user-select:all}
@@ -40,7 +41,8 @@ button.ghost{background:transparent;color:#8A4B34;border:1px solid #D9C9BC;margi
 ol{margin:0;padding-left:20px;color:#4A3C33}li{margin-bottom:4px}.mute{color:#8C7D72;font-size:13px}
 </style></head><body><main>
 <img class="logo" src="/logo.png" alt="Maya Ajans">
-<h1>Maya Ekip · Mac uygulaması</h1>
+${phoneCards(apk, ua)}
+<h1 id="mac">Maya Ekip · Mac uygulaması</h1>
 <p class="sub">Bilgisayar açılınca kendiliğinden başlar, üst çubukta durur, bildirimleri Mac bildirimi olarak gösterir ve kendini günceller.${version ? ' Güncel sürüm: ' + version + '.' : ''}</p>
 ${version ? `
 <div class="card"><h2>Kolay kurulum (önerilen)</h2>
@@ -58,13 +60,30 @@ ${version ? `
 ` : `<div class="card"><h2>Hazırlanıyor</h2><p>Mac uygulaması birazdan burada olacak. Bu sırada programı tarayıcıdan kullanabilirsiniz: <a href="/">${SITE.replace('https://', '')}</a></p></div>`}
 </main></body></html>`;
 
+function phoneCards(apk: boolean, ua: string) {
+  const android = `<div class="card" id="android"><h2>Android (Samsung, Galaxy Z Fold …)</h2>
+${apk ? `<p>Maya Ekip uygulamasını indirip kurun. Program tam ekran açılır, bildirimler "Maya Ekip" adıyla gelir, katlanır telefonlarda açık ve kapalı ekrana uyar.</p>
+<p><a class="btn" href="/indir/MayaEkip.apk">Android için indir (.apk)</a></p>
+<ol><li>İnen dosyaya dokunun. Telefon "bilinmeyen uygulama" derse <b>Ayarlar</b>'a girip <b>Bu kaynağa izin ver</b>'i açın, geri dönüp <b>Yükle</b>'ye basın.</li>
+<li>Uygulamayı açın, e-posta ve şifrenizle bir kez giriş yapın.</li>
+<li>Bildirim izni sorulursa <b>İzin ver</b>'e basın; sonra profilinizden telefon bildirimlerini açın.</li></ol>`
+    : `<p>Android uygulaması hazırlanıyor. Bu sırada Chrome'da siteyi açıp ⋮ menüsünden <b>Uygulamayı yükle</b>'ye basabilirsiniz.</p>`}
+<p class="mute">Telefonda Chrome yüklü olmalı (Samsung'larda hazır gelir).</p></div>`;
+  const iphone = `<div class="card" id="iphone"><h2>iPhone</h2>
+<p>Safari'de <b>${SITE.replace('https://', '')}</b> adresini açın → alttaki <b>Paylaş</b> düğmesi → <b>Ana Ekrana Ekle</b>. Ana ekrandaki Maya simgesinden açın ve profilinizden bildirimleri açın.</p>
+<p class="mute">Bildirimler yalnızca ana ekrana eklenen uygulamada çalışır (iOS 16.4 ve üzeri).</p></div>`;
+  const isIos = /iPhone|iPad|iPod/.test(ua);
+  return `<h1>Maya Ekip · Telefon</h1><p class="sub">Programı telefonunuzda uygulama gibi kullanın.</p>` + (isIos ? iphone + android : android + iphone);
+}
+
 export const indir = new Hono<{ Bindings: Env }>();
 
 indir.get('/', async (c) => {
   let version: string | null = null;
   const obj = await c.env.FILES.get('desktop/latest.json');
   if (obj) { try { version = (await obj.json<{ version: string }>()).version; } catch { /* */ } }
-  return c.html(page(version), 200, { 'Cache-Control': 'no-cache', 'X-Frame-Options': 'DENY' });
+  const apk = !!(await c.env.FILES.head('desktop/MayaEkip.apk'));
+  return c.html(page(version, apk, c.req.header('User-Agent') || ''), 200, { 'Cache-Control': 'no-cache', 'X-Frame-Options': 'DENY' });
 });
 
 indir.get('/kur.sh', (c) => c.body(KUR_SH, 200, { 'Content-Type': 'text/x-shellscript; charset=utf-8', 'Cache-Control': 'no-cache' }));
