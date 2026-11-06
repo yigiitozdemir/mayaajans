@@ -219,14 +219,78 @@ fn on_app_title(app: &AppHandle, which: &str, title: &str) {
         return;
     }
     page_emit(app, &format!("{{ action: 'app-unread', app: '{which}', count: {n} }}"));
-    if n > prev && which == "whatsapp" {
-        let focused = main_window(app).and_then(|w| w.is_focused().ok()).unwrap_or(false);
-        let showing = VISIBLE_APP.lock().map(|v| v.as_str() == "whatsapp").unwrap_or(false);
-        if !(focused && showing) {
-            let _ = app.notification().builder().title("WhatsApp").body(format!("{n} okunmamış mesaj")).show();
+    if n > prev && which == "whatsapp" && !whatsapp_in_view(app) {
+        // WhatsApp'ın kendi (ayrıntılı) bildirimi az önce geldiyse tekrarlama; gelmediyse sayıyla bildir
+        let recent = LAST_WA_NOTIFY.lock().ok().and_then(|t| *t).map(|t| t.elapsed() < Duration::from_secs(20)).unwrap_or(false);
+        if !recent {
+            let _ = app.notification().builder().title("WhatsApp").body(format!("{n} okunmamış mesaj")).sound("default").show();
         }
     }
 }
+
+/// WhatsApp Web'in kendi bildirimi (gönderen + mesaj) geldiğinde zaman
+static LAST_WA_NOTIFY: std::sync::Mutex<Option<std::time::Instant>> = std::sync::Mutex::new(None);
+
+/// WhatsApp ekranına o an bakılıyor mu? (bakılıyorsa bildirim gösterme)
+fn whatsapp_in_view(app: &AppHandle) -> bool {
+    let focused = main_window(app).and_then(|w| w.is_focused().ok()).unwrap_or(false);
+    let showing = VISIBLE_APP.lock().map(|v| v.as_str() == "whatsapp").unwrap_or(false);
+    focused && showing
+}
+
+/// WhatsApp Web sayfasındaki köprü çağırır: "Ahmet: Yarın görüşelim" → sesli Mac bildirimi.
+/// Yalnızca WhatsApp görünümüne (web.whatsapp.com) izin verilir; başka hiçbir komuta erişimi yoktur.
+#[tauri::command]
+fn wa_notify(app: AppHandle, title: String, body: String) {
+    if let Ok(mut t) = LAST_WA_NOTIFY.lock() { *t = Some(std::time::Instant::now()); }
+    if whatsapp_in_view(&app) {
+        return;
+    }
+    let title: String = title.chars().take(120).collect();
+    let body: String = body.chars().take(400).collect();
+    let _ = app
+        .notification()
+        .builder()
+        .title(if title.trim().is_empty() { "WhatsApp".to_string() } else { format!("{title} · WhatsApp") })
+        .body(body)
+        .sound("default")
+        .show();
+}
+
+/// WhatsApp sayfasına eklenen köprü: tarayıcı bildirim özelliği varmış gibi davranır, bildirimleri Mac'e iletir.
+const WA_BRIDGE: &str = r#"(function () {
+  if (location.hostname !== 'web.whatsapp.com') return;
+  var send = function (t, o) {
+    try {
+      var body = (o && o.body) ? String(o.body) : '';
+      window.__TAURI_INTERNALS__.invoke('wa_notify', { title: String(t || 'WhatsApp'), body: body });
+    } catch (e) {}
+  };
+  function N(t, o) { this.title = t; this.body = o && o.body; this.tag = o && o.tag; this.onclick = null; this.onshow = null; this.onclose = null; this.onerror = null; send(t, o); }
+  N.prototype.close = function () {};
+  N.prototype.addEventListener = function () {};
+  N.prototype.removeEventListener = function () {};
+  N.prototype.dispatchEvent = function () { return true; };
+  Object.defineProperty(N, 'permission', { get: function () { return 'granted'; } });
+  N.requestPermission = function (cb) { if (typeof cb === 'function') cb('granted'); return Promise.resolve('granted'); };
+  N.maxActions = 0;
+  try { Object.defineProperty(window, 'Notification', { value: N, configurable: true, writable: true }); } catch (e) { window.Notification = N; }
+  try {
+    if (window.ServiceWorkerRegistration && ServiceWorkerRegistration.prototype) {
+      ServiceWorkerRegistration.prototype.showNotification = function (t, o) { send(t, o); return Promise.resolve(); };
+      ServiceWorkerRegistration.prototype.getNotifications = function () { return Promise.resolve([]); };
+    }
+  } catch (e) {}
+  try {
+    if (navigator.permissions && navigator.permissions.query) {
+      var q = navigator.permissions.query.bind(navigator.permissions);
+      navigator.permissions.query = function (d) {
+        if (d && d.name === 'notifications') return Promise.resolve({ state: 'granted', status: 'granted', onchange: null, addEventListener: function () {}, removeEventListener: function () {} });
+        return q(d);
+      };
+    }
+  } catch (e) {}
+})();"#;
 
 /// Uygulama görünümünü oluşturur (gizli ya da görünür).
 fn create_app_view(app: &AppHandle, which: &str, label: &str, url: &str, pos: tauri::LogicalPosition<f64>, size: tauri::LogicalSize<f64>, bg: tauri::window::Color) -> Result<tauri::Webview, String> {
@@ -248,6 +312,7 @@ fn create_app_view(app: &AppHandle, which: &str, label: &str, url: &str, pos: ta
         })
         .on_download(move |_webview, event| handle_download(&dl, event))
         .on_document_title_changed(move |_w, title| on_app_title(&tt, &which_s, &title));
+    let builder = if which == "whatsapp" { builder.initialization_script(WA_BRIDGE) } else { builder };
     window.add_child(builder, pos, size).map_err(|e| e.to_string())
 }
 
@@ -615,7 +680,7 @@ pub fn run() {
             set_unread, notify, app_info, set_theme, open_ai, ai_show, ai_hide,
             ekran::shots_status, ekran::shots_enable, ekran::shots_list, ekran::shots_thumb, ekran::shots_read,
             ekran::shots_copy, ekran::shots_reveal, ekran::shots_open, ekran::shots_trash, ekran::shots_save_as,
-            ekran::shots_set_cleanup
+            ekran::shots_set_cleanup, wa_notify
         ])
         .setup(|app| {
             let handle = app.handle().clone();

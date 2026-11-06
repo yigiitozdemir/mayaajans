@@ -1,6 +1,9 @@
 # Maya Ekip — sürüm notları
 # Her sürüm için "## <sürüm>" başlığı altına kısa maddeler yaz. Güncelleme penceresinde ekibe aynen gösterilir.
 
+## 1.0.6
+• WhatsApp mesajları artık Mac bildirimi olarak geliyor: gönderen ve mesajla birlikte, sesli. WhatsApp ekranına bakarken bildirim çıkmaz.
+
 ## 1.0.5
 • ChatGPT, Claude ve WhatsApp artık tam yerine oturuyor: başlık çubuğu kadar yukarı kayma ve üstteki çubuğun üstüne binme düzeltildi.
 • Uygulamalar köşeleri yuvarlatılmış, şık bir kartın içinde açılıyor; üstte uygulama adı, ayrı pencere ve bildirim düğmeleri.
