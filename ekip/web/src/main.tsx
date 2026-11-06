@@ -11,6 +11,13 @@ import { Login, Invite } from './pages/Auth';
 import { Bugun } from './pages/Bugun';
 import { IsPlani } from './pages/IsPlani';
 import { Ekip } from './pages/Ekip';
+import { OzelGunler } from './pages/OzelGunler';
+import { Cekim } from './pages/Cekim';
+import { Musteriler } from './pages/Musteriler';
+import { Sohbet } from './pages/Sohbet';
+import { Durt } from './pages/Durt';
+import { NudgeReceiver } from './components/NudgeReceiver';
+import { ChatUnread } from './components/ChatUnread';
 
 function App() {
   const s = useStore();
@@ -52,6 +59,11 @@ function App() {
   let page;
   if (path === '/isler') page = <IsPlani openTask={openTask} />;
   else if (path === '/ekip') page = <Ekip />;
+  else if (path === '/ozel-gunler') page = <OzelGunler openTask={openTask} />;
+  else if (path === '/cekim') page = <Cekim openTask={openTask} />;
+  else if (path === '/musteriler') page = <Musteriler openTask={openTask} />;
+  else if (path === '/sohbet') page = <Sohbet openTask={openTask} />;
+  else if (path === '/durt') page = <Durt openTask={openTask} />;
   else page = <Bugun openTask={openTask} />;
 
   return (
@@ -61,6 +73,8 @@ function App() {
       {taskId && <TaskDrawer taskId={taskId} onClose={() => setTaskId(null)} />}
       {newTask && <NewTaskModal onClose={() => setNewTask(false)} />}
       <Toasts onOpenTask={openTask} />
+      <NudgeReceiver />
+      <ChatUnread />
       {s.snack && <div class="snack" role="status">{s.snack}</div>}
     </>
   );

@@ -15,7 +15,7 @@ export interface Task {
 }
 export interface Notification {
   id: string; kind: string; taskId: string | null; actorId: string | null; title: string; body: string;
-  createdAt?: string; readAt: string | null; reminders: number;
+  createdAt?: string; readAt: string | null; reminders: number; link?: string | null; meta?: string;
 }
 export interface Client { id: string; name: string; slack_channel: string | null }
 
@@ -45,11 +45,12 @@ export interface State {
   notifications: Notification[];
   clients: Client[];
   online: boolean;
-  toasts: { id: string; heading: string; title: string; meta: string; taskId: string | null; actorId: string | null }[];
+  toasts: { id: string; heading: string; title: string; meta: string; taskId: string | null; actorId: string | null; link?: string | null }[];
+  chatUnread: number; // Sohbet: okunmamış mesaj sayısı (menüde)
   snack: string | null;
 }
 type Listener = () => void;
-let state: State = { ready: false, me: null, team: [], tasks: [], notifications: [], clients: [], online: true, toasts: [], snack: null };
+let state: State = { ready: false, me: null, team: [], tasks: [], notifications: [], clients: [], online: true, toasts: [], snack: null, chatUnread: 0 };
 const listeners = new Set<Listener>();
 export const store = {
   get: () => state,
@@ -96,6 +97,13 @@ export function systemNotify(title: string, body: string) {
 }
 
 // ---------- canlı bağlantı ----------
+/** Canlı olay dinleyicisi. type '*' bağlantı yeniden kurulunca gelir (her şeyi yeniden yükle). */
+export function onLive(types: string[], fn: (msg: any) => void): () => void {
+  const h = (e: Event) => { const m = (e as CustomEvent).detail; if (m.type === '*' || types.includes(m.type)) fn(m); };
+  window.addEventListener('maya-live', h);
+  return () => window.removeEventListener('maya-live', h);
+}
+
 let ws: WebSocket | null = null;
 let retry = 0;
 let pingTimer: any;
@@ -110,20 +118,21 @@ export function connectLive() {
     retry = 0; store.set({ online: true });
     clearInterval(pingTimer);
     pingTimer = setInterval(() => { try { ws?.send('ping'); } catch { /* */ } }, 25_000);
-    if (wasOffline) loadAll().catch(() => {}); // kopukken olan değişiklikleri al
+    if (wasOffline) { loadAll().catch(() => {}); window.dispatchEvent(new CustomEvent('maya-live', { detail: { type: '*' } })); } // kopukken olan değişiklikleri al
   };
   ws.onmessage = (e) => {
     if (e.data === 'pong') return;
     let msg: any; try { msg = JSON.parse(e.data); } catch { return; }
+    window.dispatchEvent(new CustomEvent('maya-live', { detail: msg }));
     if (msg.type === 'tasks') reloadTasks().catch(() => {});
     else if (msg.type === 'team') { reloadTeam().catch(() => {}); loadMe().catch(() => {}); }
     else if (msg.type === 'notify' || msg.type === 'remind') {
       reloadNotifications().catch(() => {});
       const n = msg.notification;
       const actor = store.get().team.find((m) => m.id === n.actorId);
-      const meta = [n.task?.client, n.task?.dueDate ? 'Teslim: ' + fmtDate(n.task.dueDate) : '', msg.type === 'remind' ? n.reminders + '. hatırlatma' : actor ? 'Atayan: ' + actor.name : ''].filter(Boolean).join(' · ');
-      pushToast({ id: n.id + ':' + Date.now(), heading: n.title, title: n.body, meta, taskId: n.taskId, actorId: n.actorId });
-      systemNotify(n.title, n.body);
+      const meta = n.meta || [n.task?.client, n.task?.dueDate ? 'Teslim: ' + fmtDate(n.task.dueDate) : '', msg.type === 'remind' ? n.reminders + '. hatırlatma' : actor ? 'Atayan: ' + actor.name : ''].filter(Boolean).join(' · ');
+      if (n.kind !== 'nudge' && n.kind !== 'chat') pushToast({ id: n.id + ':' + Date.now(), heading: n.title, title: n.body, meta, taskId: n.taskId, actorId: n.actorId, link: n.link });
+      if (n.kind !== 'nudge') systemNotify(n.title, n.body);
     } else if (msg.type === 'session-revoked') {
       stopped = true; store.set({ me: null });
     }

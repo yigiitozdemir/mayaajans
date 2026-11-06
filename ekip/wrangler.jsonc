@@ -26,8 +26,8 @@
   },
   "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Hub"] }],
 
-  // Saatlik okunmamış atama hatırlatması
-  "triggers": { "crons": ["5 * * * *"] },
+  // Saatlik: okunmamış atama hatırlatması + sabah özeti · 13:30 UTC = 16:30 İstanbul: yarın çekim var
+  "triggers": { "crons": ["5 * * * *", "30 13 * * *"] },
 
   "routes": [{ "pattern": "ekip.mayaajans.net", "custom_domain": true }],
 

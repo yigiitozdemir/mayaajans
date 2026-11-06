@@ -1,0 +1,96 @@
+-- Aşama 2 başlangıç verisi: özel gün takvimi (atamasız) ve Slack çekim programı
+INSERT INTO special_days (id, name, date, star, tone, note, range_label) VALUES ('d_k0', 'Akciğer ve Pankreas Kanseri Farkındalık Ayı · Movember', '2026-11-01', 0, 'bilgi', 'Ay içinde herhangi bir gün bilgilendirici post.', 'Kasım boyunca');
+INSERT INTO special_days (id, name, date, star, tone, note, range_label) VALUES ('d_e04a', 'Organ Bağışı ve Nakli Haftası', '2026-11-09', 0, 'bilgi', '', '3–9 Kasım');
+INSERT INTO special_days (id, name, date, star, tone, note, range_label) VALUES ('d_e04b', 'Lösemili Çocuklar Haftası', '2026-11-08', 0, 'bilgi', '', '2–8 Kasım');
+INSERT INTO special_days (id, name, date, star, tone, note, range_label) VALUES ('d_e08a', 'Dünya Şehircilik Günü', '2026-11-08', 0, 'kutlama', '', NULL);
+INSERT INTO special_days (id, name, date, star, tone, note, range_label) VALUES ('d_e08b', 'Dünya Radyoloji Günü', '2026-11-08', 0, 'bilgi', '', NULL);
+INSERT INTO special_days (id, name, date, star, tone, note, range_label) VALUES ('d_e10', 'Atatürk''ü Anma Günü (09.05)', '2026-11-10', 1, 'anma', 'Siyah-beyaz story. Furkan Biçer için resmî ayrı metin.', NULL);
+INSERT INTO special_days (id, name, date, star, tone, note, range_label) VALUES ('d_e11a', 'Millî Ağaçlandırma Günü', '2026-11-11', 0, 'kutlama', '', NULL);
+INSERT INTO special_days (id, name, date, star, tone, note, range_label) VALUES ('d_e11b', '11.11 Alışveriş Günü', '2026-11-11', 0, 'kampanya', '', NULL);
+INSERT INTO special_days (id, name, date, star, tone, note, range_label) VALUES ('d_e12a', 'Dünya Zatürre Günü', '2026-11-12', 0, 'bilgi', '', NULL);
+INSERT INTO special_days (id, name, date, star, tone, note, range_label) VALUES ('d_e12b', 'Düzce Depremi yıl dönümü / Afet Eğitimi Hazırlık Günü', '2026-11-12', 0, 'anma', 'Sena Yapı isteğe bağlı.', NULL);
+INSERT INTO special_days (id, name, date, star, tone, note, range_label) VALUES ('d_e12c', 'Dünya Kalite Günü', '2026-11-12', 0, 'kutlama', '', NULL);
+INSERT INTO special_days (id, name, date, star, tone, note, range_label) VALUES ('d_e13a', 'Tekirdağ''ın Kurtuluşu (13 Kasım 1922)', '2026-11-13', 1, 'kutlama', '', NULL);
+INSERT INTO special_days (id, name, date, star, tone, note, range_label) VALUES ('d_e13b', 'Dünya İyilik Günü', '2026-11-13', 0, 'kutlama', '', NULL);
+INSERT INTO special_days (id, name, date, star, tone, note, range_label) VALUES ('d_e14a', 'Dünya Diyabet Günü', '2026-11-14', 1, 'bilgi', 'Diş kliniklerinde konu: diyabet ve diş eti sağlığı.', NULL);
+INSERT INTO special_days (id, name, date, star, tone, note, range_label) VALUES ('d_e14b', 'Malkara ve Hayrabolu''nun Kurtuluşu', '2026-11-14', 0, 'kutlama', '', NULL);
+INSERT INTO special_days (id, name, date, star, tone, note, range_label) VALUES ('d_e15', 'Trafik Kazası Mağdurlarını Anma Günü', '2026-11-15', 0, 'anma', '', NULL);
+INSERT INTO special_days (id, name, date, star, tone, note, range_label) VALUES ('d_e16a', 'Uluslararası Hoşgörü Günü', '2026-11-16', 0, 'kutlama', '', NULL);
+INSERT INTO special_days (id, name, date, star, tone, note, range_label) VALUES ('d_e16b', 'Küresel Girişimcilik Haftası', '2026-11-16', 0, 'kutlama', 'Selçuk Morkan ve Zeta farklı konseptle paylaşmalı.', '16–22 Kasım');
+INSERT INTO special_days (id, name, date, star, tone, note, range_label) VALUES ('d_e17a', 'Dünya Prematüre Günü', '2026-11-17', 0, 'bilgi', '', NULL);
+INSERT INTO special_days (id, name, date, star, tone, note, range_label) VALUES ('d_e17b', 'Rahim Ağzı Kanserinin Eliminasyonu Günü', '2026-11-17', 0, 'bilgi', '', NULL);
+INSERT INTO special_days (id, name, date, star, tone, note, range_label) VALUES ('d_e17c', 'Uluslararası Öğrenciler Günü', '2026-11-17', 1, 'kutlama', 'Selçuk Morkan ve Zeta farklı konseptle paylaşmalı.', NULL);
+INSERT INTO special_days (id, name, date, star, tone, note, range_label) VALUES ('d_e17d', 'Şarköy''ün Kurtuluşu', '2026-11-17', 0, 'kutlama', '', NULL);
+INSERT INTO special_days (id, name, date, star, tone, note, range_label) VALUES ('d_e18a', 'Dünya KOAH Günü', '2026-11-18', 0, 'bilgi', '', NULL);
+INSERT INTO special_days (id, name, date, star, tone, note, range_label) VALUES ('d_e18b', 'Antibiyotik Farkındalık Haftası', '2026-11-18', 0, 'bilgi', '', '18–24 Kasım');
+INSERT INTO special_days (id, name, date, star, tone, note, range_label) VALUES ('d_e19a', 'Uluslararası Erkekler Günü', '2026-11-19', 0, 'bilgi', '', NULL);
+INSERT INTO special_days (id, name, date, star, tone, note, range_label) VALUES ('d_e19b', 'Dünya Felsefe Günü', '2026-11-19', 0, 'kutlama', 'Selçuk Morkan ve Zeta farklı konseptle paylaşmalı.', NULL);
+INSERT INTO special_days (id, name, date, star, tone, note, range_label) VALUES ('d_e19c', 'Dünya Pankreas Kanseri Günü', '2026-11-19', 0, 'bilgi', '', NULL);
+INSERT INTO special_days (id, name, date, star, tone, note, range_label) VALUES ('d_e19d', 'Dünya Tuvalet Günü', '2026-11-19', 0, 'bilgi', 'Konu: hijyen.', NULL);
+INSERT INTO special_days (id, name, date, star, tone, note, range_label) VALUES ('d_e20', 'Dünya Çocuk Hakları Günü', '2026-11-20', 0, 'kutlama', '', NULL);
+INSERT INTO special_days (id, name, date, star, tone, note, range_label) VALUES ('d_e21', 'Ağız ve Diş Sağlığı Haftası', '2026-11-21', 1, 'bilgi', '', '21–27 Kasım');
+INSERT INTO special_days (id, name, date, star, tone, note, range_label) VALUES ('d_e22', 'Diş Hekimleri Günü', '2026-11-22', 1, 'kutlama', 'Hekim / ekip tanıtımı ve teşekkür. Bazı kliniklere video hazırlanabilir (Pelin''in notu).', NULL);
+INSERT INTO special_days (id, name, date, star, tone, note, range_label) VALUES ('d_e24', 'Öğretmenler Günü', '2026-11-24', 1, 'kutlama', 'Selçuk Morkan ve Zeta farklı konseptle paylaşmalı. Diğer müşteriler isteğe bağlı story.', NULL);
+INSERT INTO special_days (id, name, date, star, tone, note, range_label) VALUES ('d_e25a', 'Kadına Yönelik Şiddete Karşı Uluslararası Mücadele Günü', '2026-11-25', 0, 'anma', 'Takvim notu: ticari müşterilerde paylaşılmaz.', NULL);
+INSERT INTO special_days (id, name, date, star, tone, note, range_label) VALUES ('d_e25b', 'Edirne''nin Kurtuluşu (25 Kasım 1922)', '2026-11-25', 0, 'kutlama', '', NULL);
+INSERT INTO special_days (id, name, date, star, tone, note, range_label) VALUES ('d_e27', 'Efsane Cuma / Black Friday', '2026-11-27', 0, 'kampanya', '', NULL);
+INSERT INTO special_days (id, name, date, star, tone, note, range_label) VALUES ('d_e29', 'Tıbbi Sekreterler Günü', '2026-11-29', 0, 'kutlama', 'Ekibe teşekkür.', NULL);
+INSERT INTO special_days (id, name, date, star, tone, note, range_label) VALUES ('d_e30', 'Cyber Monday', '2026-11-30', 0, 'kampanya', '', NULL);
+INSERT INTO special_days (id, name, date, star, tone, note, range_label) VALUES ('d_d01', 'Dünya AIDS Günü', '2026-12-01', 0, 'bilgi', '', NULL);
+INSERT INTO special_days (id, name, date, star, tone, note, range_label) VALUES ('d_d03', 'Dünya Engelliler Günü', '2026-12-03', 1, 'bilgi', 'Diğer müşteriler isteğe bağlı story.', NULL);
+INSERT INTO special_days (id, name, date, star, tone, note, range_label) VALUES ('d_d04', 'Dünya Madenciler Günü', '2026-12-04', 1, 'anma', 'Bu yılki maden kazaları nedeniyle anma ve saygı odaklı; kutlama dili kullanılmaz. Tüm müşteriler için sade siyah-beyaz story isteğe bağlı.', NULL);
+INSERT INTO special_days (id, name, date, star, tone, note, range_label) VALUES ('d_d05a', 'Dünya Kadın Hakları Günü', '2026-12-05', 1, 'kutlama', 'Türk kadınına seçme ve seçilme hakkı (1934).', NULL);
+INSERT INTO special_days (id, name, date, star, tone, note, range_label) VALUES ('d_d05b', 'Dünya Türk Kahvesi Günü', '2026-12-05', 0, 'kutlama', '', NULL);
+INSERT INTO special_days (id, name, date, star, tone, note, range_label) VALUES ('d_d05c', 'Uluslararası Gönüllüler Günü', '2026-12-05', 0, 'kutlama', '', NULL);
+INSERT INTO special_days (id, name, date, star, tone, note, range_label) VALUES ('d_d05d', 'Dünya Toprak Günü', '2026-12-05', 0, 'kutlama', 'İsteğe bağlı.', NULL);
+INSERT INTO special_days (id, name, date, star, tone, note, range_label) VALUES ('d_d07', 'Mevlana Haftası · İnsan Hakları ve Demokrasi Haftası', '2026-12-07', 0, 'kutlama', '', '7–17 Aralık');
+INSERT INTO special_days (id, name, date, star, tone, note, range_label) VALUES ('d_d09', 'Uluslararası Yolsuzlukla Mücadele Günü', '2026-12-09', 0, 'bilgi', '', NULL);
+INSERT INTO special_days (id, name, date, star, tone, note, range_label) VALUES ('d_d10a', 'Regaip Kandili ve Üç Ayların başlangıcı', '2026-12-10', 1, 'kutlama', 'Diyanet: 10 Aralık Perşembe akşamı.', NULL);
+INSERT INTO special_days (id, name, date, star, tone, note, range_label) VALUES ('d_d10b', 'Dünya İnsan Hakları Günü', '2026-12-10', 0, 'bilgi', '', NULL);
+INSERT INTO special_days (id, name, date, star, tone, note, range_label) VALUES ('d_d12a', 'Yerli Malı Haftası', '2026-12-12', 1, 'kutlama', 'Büyüksoy: yerli üretim, fabrika kareleri.', '12–18 Aralık');
+INSERT INTO special_days (id, name, date, star, tone, note, range_label) VALUES ('d_d12b', 'Evrensel Sağlık Kapsayıcılığı Günü', '2026-12-12', 0, 'bilgi', '', NULL);
+INSERT INTO special_days (id, name, date, star, tone, note, range_label) VALUES ('d_d17', 'Şeb-i Arus', '2026-12-17', 0, 'anma', 'Mevlana''nın vuslat yıl dönümü.', NULL);
+INSERT INTO special_days (id, name, date, star, tone, note, range_label) VALUES ('d_d20', 'Uluslararası İnsani Dayanışma Günü', '2026-12-20', 0, 'kutlama', '', NULL);
+INSERT INTO special_days (id, name, date, star, tone, note, range_label) VALUES ('d_d21', 'Yılın En Uzun Gecesi / Kış Gündönümü', '2026-12-21', 0, 'kutlama', '', NULL);
+INSERT INTO special_days (id, name, date, star, tone, note, range_label) VALUES ('d_d25', 'Christmas', '2026-12-25', 0, 'kutlama', '', NULL);
+INSERT INTO special_days (id, name, date, star, tone, note, range_label) VALUES ('d_d26', 'Boxing Day (İngiltere)', '2026-12-26', 0, 'kutlama', '', NULL);
+INSERT INTO special_days (id, name, date, star, tone, note, range_label) VALUES ('d_d27', 'Mehmet Akif Ersoy''u Anma · Atatürk''ün Ankara''ya Gelişi', '2026-12-27', 0, 'anma', 'Selçuk Morkan ve Zeta farklı konseptle paylaşmalı.', NULL);
+INSERT INTO special_days (id, name, date, star, tone, note, range_label) VALUES ('d_d31', 'Yılbaşı', '2026-12-31', 1, 'kutlama', 'Sağlık müşterilerinde yeni yıl sağlık hatırlatması (bilgilendirici).', NULL);
+INSERT INTO shoots (id, title, client, date, time, location, status, note, source, completed_at) VALUES ('s_001', 'Kapaklı Programı', 'Furkan Biçer', '2026-11-05', '10:00', 'Kapaklı', 0, '', 'slack', NULL);
+INSERT INTO shoots (id, title, client, date, time, location, status, note, source, completed_at) VALUES ('s_002', 'Nevvital Davet', 'Nevvital', '2026-11-08', 'Sabah', '', 0, '', 'slack', NULL);
+INSERT INTO shoots (id, title, client, date, time, location, status, note, source, completed_at) VALUES ('s_003', 'Hasta Memnuniyet Çekimi', 'Çavuşdent', '2026-11-14', '10:00–11:00', 'Çavuşdent', 0, '', 'slack', NULL);
+INSERT INTO shoots (id, title, client, date, time, location, status, note, source, completed_at) VALUES ('s_004', 'Gizem abla Devlet Hastanesi Aromaterapi', 'Gizem Eczane', '2026-11-26', '', '', 0, '', 'slack', NULL);
+INSERT INTO shoots (id, title, client, date, time, location, status, note, source, completed_at) VALUES ('s_005', 'Nevvital Uzman Günü', 'Nevvital', '2026-11-27', 'Öğleden sonra', 'Nevvital', 0, '', 'slack', NULL);
+INSERT INTO shoots (id, title, client, date, time, location, status, note, source, completed_at) VALUES ('s_006', 'Drone – mağaza çekimi', 'Sermika Time', '2026-10-29', '09:00', 'Tekirdağ Yolu', 2, '', 'slack', NULL);
+INSERT INTO shoots (id, title, client, date, time, location, status, note, source, completed_at) VALUES ('s_007', 'Gizem Eczane çekimi', 'Gizem Eczane', '2026-10-27', '', 'Ofis', 1, '', 'slack', '2026-10-27 18:00:00');
+INSERT INTO shoots (id, title, client, date, time, location, status, note, source, completed_at) VALUES ('s_008', 'Nevvital çekimi', 'Nevvital', '2026-10-24', '', 'Önerler', 1, '', 'slack', '2026-10-24 18:00:00');
+INSERT INTO shoots (id, title, client, date, time, location, status, note, source, completed_at) VALUES ('s_009', 'Rain Green Pilates çekimi', 'Rain Green Pilates', '2026-10-23', '12:00', 'Esentepe', 1, '', 'slack', '2026-10-23 18:00:00');
+INSERT INTO shoots (id, title, client, date, time, location, status, note, source, completed_at) VALUES ('s_010', 'Müzeyyen Hoca çekimi', 'Arslandent', '2026-10-22', '12:00', 'Havuzlar', 1, '', 'slack', '2026-10-22 18:00:00');
+INSERT INTO shoots (id, title, client, date, time, location, status, note, source, completed_at) VALUES ('s_011', 'Nest Kozmetik tırnak çekimi', 'Nest Kozmetik / Arcade', '2026-10-17', 'Sabah', 'Ofis', 2, 'Ruslana haber bekliyor.', 'slack', NULL);
+INSERT INTO shoots (id, title, client, date, time, location, status, note, source, completed_at) VALUES ('s_012', 'Özikiz dükkan çekimi', 'Özikiz', '2026-10-16', '12:00', 'Muhittin şube', 1, '', 'slack', '2026-10-16 18:00:00');
+INSERT INTO shoots (id, title, client, date, time, location, status, note, source, completed_at) VALUES ('s_013', 'Hayrabolu Aydınlar köyü cenaze merasimi', 'Furkan Biçer', '2026-10-15', '', 'Hayrabolu', 2, '', 'slack', NULL);
+INSERT INTO shoots (id, title, client, date, time, location, status, note, source, completed_at) VALUES ('s_014', 'Murat Hoca röportaj', 'Çavuşdent', '2026-10-13', '15:00', 'Klinik', 1, '', 'slack', '2026-10-13 18:00:00');
+INSERT INTO shoots (id, title, client, date, time, location, status, note, source, completed_at) VALUES ('s_015', 'Çorlu genel program', 'Furkan Biçer', '2026-10-13', 'Tam gün', 'Çorlu', 1, '', 'slack', '2026-10-13 18:00:00');
+INSERT INTO shoots (id, title, client, date, time, location, status, note, source, completed_at) VALUES ('s_016', 'Çorlu kahvaltı programı (kadınlarla)', 'Furkan Biçer', '2026-10-10', 'Sabah', 'Çorlu', 1, '', 'slack', '2026-10-10 18:00:00');
+INSERT INTO shoots (id, title, client, date, time, location, status, note, source, completed_at) VALUES ('s_017', 'Muhittin Şube Özikiz', 'Özikiz', '2026-10-09', '11:00', 'Muhittin şube', 2, '', 'slack', NULL);
+INSERT INTO shoots (id, title, client, date, time, location, status, note, source, completed_at) VALUES ('s_018', 'Yağmur çekim', 'Rain Green Pilates', '2026-10-09', '13:00', 'Stüdyo', 1, '', 'slack', '2026-10-09 18:00:00');
+INSERT INTO shoots (id, title, client, date, time, location, status, note, source, completed_at) VALUES ('s_019', 'Süleymanpaşa program', 'Furkan Biçer', '2026-10-08', 'Tam gün', 'Süleymanpaşa', 1, '', 'slack', '2026-10-08 18:00:00');
+INSERT INTO shoots (id, title, client, date, time, location, status, note, source, completed_at) VALUES ('s_020', 'Drone konum çekimi', 'Nevvital', '2026-10-06', 'Sabah', 'Önerler', 2, '', 'slack', NULL);
+INSERT INTO shoots (id, title, client, date, time, location, status, note, source, completed_at) VALUES ('s_021', 'Gizem abla çekim', 'Gizem Eczane', '2026-10-01', 'Sabah', 'Ofis', 1, '', 'slack', '2026-10-01 18:00:00');
+INSERT INTO shoots (id, title, client, date, time, location, status, note, source, completed_at) VALUES ('s_022', 'Aromaterapi Workshop', 'Gizem Eczane', '2026-09-22', '19:00', 'Mey Davet Evi', 1, '', 'slack', '2026-09-22 18:00:00');
+INSERT INTO shoots (id, title, client, date, time, location, status, note, source, completed_at) VALUES ('s_023', 'Gizem abla çekim', 'Gizem Eczane', '2026-09-17', '11:30', 'Ofis', 2, '', 'slack', NULL);
+INSERT INTO shoots (id, title, client, date, time, location, status, note, source, completed_at) VALUES ('s_024', 'Müzeyyen Hoca (doktor çekimi)', 'Arslandent', '2026-09-16', '12:00', 'Arslandent', 1, '', 'slack', '2026-09-16 18:00:00');
+INSERT INTO shoots (id, title, client, date, time, location, status, note, source, completed_at) VALUES ('s_025', 'Hasta çekimi', 'Miradent', '2026-09-11', '10:00', 'Miradent klinik', 2, 'Hasta konuşmayı sevmiyor. Sabriye Hanım konuşacak. Hasta ile sempatik görüntüler ve tedavi ediliyormuş gibi görüntüler toplanıp konuşmaya eklenecek.', 'slack', NULL);
+INSERT INTO shoots (id, title, client, date, time, location, status, note, source, completed_at) VALUES ('s_026', 'Gizem abla çekim', 'Gizem Eczane', '2026-09-01', '16:30', 'Ofis', 2, '', 'slack', NULL);
+INSERT INTO shoots (id, title, client, date, time, location, status, note, source, completed_at) VALUES ('s_027', 'Şarköy gezi', 'Furkan Biçer', '2026-08-31', '14:30', 'Şarköy', 1, '', 'slack', '2026-08-31 18:00:00');
+INSERT INTO shoots (id, title, client, date, time, location, status, note, source, completed_at) VALUES ('s_028', 'Tırnak çekim', 'Nest Kozmetik / Arcade', '2026-08-29', '10:00', 'Fabrika', 1, '', 'slack', '2026-08-29 18:00:00');
+INSERT INTO shoots (id, title, client, date, time, location, status, note, source, completed_at) VALUES ('s_029', 'Başarı öğrenci videosu', 'Selçuk Morkan Akademi', '2026-08-28', '14:00', 'Lise binası', 1, '', 'slack', '2026-08-28 18:00:00');
+
+-- Sohbet kanalları (Slack'teki genel kanallar + her müşteri kanalı)
+INSERT INTO channels (id, name, kind, topic) VALUES
+  ('ch_genel', 'genel', 'general', 'Ofis duyuruları ve genel konuşmalar'),
+  ('ch_onay', 'onay-bekleyenler', 'general', 'Müşteri onayı beklenen işler'),
+  ('ch_cekim', 'çekim-planı', 'general', 'Çekim duyuruları ve hazırlıklar'),
+  ('ch_ozel', 'özel-günler', 'general', 'Özel gün planlaması');
+INSERT INTO channels (id, name, kind, topic, client_id)
+  SELECT 'ch_' || id, COALESCE(slack_channel, lower(name)), 'client', name, id FROM clients WHERE archived = 0;

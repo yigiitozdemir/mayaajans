@@ -1,4 +1,4 @@
-// Maya Ajans ekip programı — API (Aşama 1)
+// Maya Ajans ekip programı — API
 import { Hono } from 'hono';
 import type { Context } from 'hono';
 import type { Env, UserRow, Vars } from './types';
@@ -7,6 +7,12 @@ import { Hub, broadcast } from './hub';
 import { clean, isDate, isEmail, istanbulHour, newId } from './util';
 import { serveStatic } from './static';
 import { indir } from './indir';
+import { r as musteriler } from './routes/musteriler';
+import { r as ozelgunler } from './routes/ozelgunler';
+import { r as cekim, cekimHatirlatma } from './routes/cekim';
+import { r as sohbet } from './routes/sohbet';
+import { r as durt } from './routes/durt';
+import { sabahOzeti } from './sabah';
 
 export { Hub };
 
@@ -203,11 +209,12 @@ admin.delete('/users/:id/sessions', async (c) => {
 
 api.route('/admin', admin);
 
-// ---------- müşteriler (Aşama 1: liste) ----------
-api.get('/clients', async (c) => {
-  const { results } = await c.env.DB.prepare('SELECT id, name, slack_channel FROM clients WHERE archived = 0 ORDER BY name').all();
-  return c.json(results);
-});
+// ---------- Aşama 2–3 bölümleri (src/routes/…) ----------
+api.route('/clients', musteriler);
+api.route('/days', ozelgunler);
+api.route('/shoots', cekim);
+api.route('/chat', sohbet);
+api.route('/nudge', durt);
 
 // ---------- işler ----------
 api.get('/tasks', async (c) => {
@@ -353,5 +360,8 @@ async function hourlyReminders(env: Env) {
 
 export default {
   fetch: app.fetch,
-  scheduled: async (_e: ScheduledController, env: Env, ctx: ExecutionContext) => { ctx.waitUntil(hourlyReminders(env)); },
+  scheduled: async (e: ScheduledController, env: Env, ctx: ExecutionContext) => {
+    if (e.cron === '30 13 * * *') ctx.waitUntil(cekimHatirlatma(env)); // 16:30 İstanbul
+    else ctx.waitUntil(Promise.all([hourlyReminders(env), sabahOzeti(env)]));
+  },
 } satisfies ExportedHandler<Env>;

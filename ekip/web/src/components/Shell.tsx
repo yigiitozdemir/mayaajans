@@ -6,13 +6,11 @@ import { Avatar, Icon, Link, Modal, Switch, meAsMember, navigate, useStore } fro
 const NAV = [
   { href: '/', label: 'Bugün', icon: 'sun' },
   { href: '/isler', label: 'İş Planı', icon: 'board' },
-];
-const SOON = [
-  { label: 'Özel Günler', icon: 'cal' },
-  { label: 'Çekim Planı', icon: 'cam' },
-  { label: 'Dürtme', icon: 'hand' },
-  { label: 'Sohbet', icon: 'chat' },
-  { label: 'Müşteriler', icon: 'clients' },
+  { href: '/ozel-gunler', label: 'Özel Günler', icon: 'cal' },
+  { href: '/cekim', label: 'Çekim Planı', icon: 'cam' },
+  { href: '/musteriler', label: 'Müşteriler', icon: 'clients' },
+  { href: '/sohbet', label: 'Sohbet', icon: 'chat' },
+  { href: '/durt', label: 'Dürtme', icon: 'hand' },
 ];
 
 export function Shell({ path, children }: { path: string; children: ComponentChildren }) {
@@ -27,10 +25,9 @@ export function Shell({ path, children }: { path: string; children: ComponentChi
         <nav class="nav" aria-label="Ana menü">
           {NAV.map((n) => (
             <Link href={n.href} class={path === n.href ? 'on' : ''} aria-current={path === n.href ? 'page' : undefined}>
-              <Icon n={n.icon} />{n.label}{n.href === '/isler' && <span class="count">{open}</span>}
+              <Icon n={n.icon} />{n.label}{n.href === '/isler' && <span class="count">{open}</span>}{n.href === '/sohbet' && s.chatUnread > 0 && <span class="count" style="background:var(--badge);color:#fff">{s.chatUnread}</span>}
             </Link>
           ))}
-          {SOON.map((n) => <span class="soon"><Icon n={n.icon} />{n.label}<span class="pill-soon">Yakında</span></span>)}
           {me.role === 'admin' && (
             <>
               <div class="navh">Yönetim</div>

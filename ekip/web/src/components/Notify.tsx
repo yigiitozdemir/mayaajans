@@ -1,6 +1,6 @@
 import { useState } from 'preact/hooks';
 import { api, closeToast, reloadNotifications, store, memberName } from '../api';
-import { Avatar, Icon, useStore } from '../ui';
+import { Avatar, Icon, navigate, useStore } from '../ui';
 
 // Okunmamış atamayı okundu say (işi açınca çağrılır)
 export async function markTaskRead(taskId: string) {
@@ -33,13 +33,19 @@ export function Bell({ onOpenTask }: { onOpenTask: (id: string) => void }) {
           {s.notifications.map((n) => {
             const task = s.tasks.find((t) => t.id === n.taskId);
             return (
-              <button type="button" class={'nitem' + (n.readAt ? '' : ' unread')} onClick={() => { if (n.taskId) { onOpenTask(n.taskId); setOpen(false); } }}>
+              <button type="button" class={'nitem' + (n.readAt ? '' : ' unread')} onClick={() => {
+                if (n.taskId) { onOpenTask(n.taskId); setOpen(false); }
+                else if (n.link) {
+                  setOpen(false); navigate(n.link);
+                  if (!n.readAt) { store.set({ notifications: store.get().notifications.map((x) => (x.id === n.id ? { ...x, readAt: new Date().toISOString() } : x)) }); api('POST', '/notifications/read', { id: n.id }).catch(() => {}); }
+                }
+              }}>
                 <Avatar m={s.team.find((m) => m.id === n.actorId)} size={34} />
                 <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px">
                   <span style={'font-size:13px;' + (n.readAt ? 'color:var(--mute)' : 'font-weight:700')}>{n.title}</span>
                   <span style="font-size:13px;color:var(--ink2);line-height:1.4">{task ? task.title + ' · ' + (task.client || '—') : n.body}</span>
                   <span style={'font-size:11px;font-weight:600;color:' + (n.readAt ? 'var(--mute2)' : 'var(--red)')}>
-                    {n.readAt ? 'Okundu' : remindOn ? 'Okunmadı · işi açana kadar saatte bir hatırlatılır' + (n.reminders ? ' · ' + n.reminders + '. hatırlatma' : '') : 'Okunmadı'}
+                    {n.readAt ? 'Okundu' : n.kind !== 'assign' ? 'Okunmadı' : remindOn ? 'Okunmadı · işi açana kadar saatte bir hatırlatılır' + (n.reminders ? ' · ' + n.reminders + '. hatırlatma' : '') : 'Okunmadı'}
                     {n.actorId ? ' · ' + memberName(s.team, n.actorId) : ''}
                   </span>
                 </span>
@@ -72,6 +78,7 @@ export function Toasts({ onOpenTask }: { onOpenTask: (id: string) => void }) {
           </span>
           <span class="row" style="gap:8px">
             {t.taskId && <button type="button" class="btn primary sm" style="flex:1" onClick={() => { closeToast(t.id); onOpenTask(t.taskId!); }}>İşi aç</button>}
+            {!t.taskId && t.link && <button type="button" class="btn primary sm" style="flex:1" onClick={() => { closeToast(t.id); navigate(t.link!); }}>Aç</button>}
             <button type="button" class="btn sm" style="flex:1" onClick={() => closeToast(t.id)}>Kapat</button>
           </span>
         </div>

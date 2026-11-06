@@ -8,7 +8,8 @@ export type HubMessage =
   | { type: 'team' }                                    // ekip / profil değişti
   | { type: 'notify'; notification: unknown }           // kişiye özel bildirim
   | { type: 'remind'; notification: unknown }           // okunmamış atama hatırlatması
-  | { type: 'session-revoked' };                        // oturum kapatıldı
+  | { type: 'session-revoked' }                         // oturum kapatıldı
+  | { type: string; [k: string]: unknown };             // bölüm değişti: clients, days, shoots, chat, nudge…
 
 export class Hub extends DurableObject {
   async fetch(req: Request): Promise<Response> {
