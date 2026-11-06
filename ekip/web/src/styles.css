@@ -111,13 +111,46 @@ input::placeholder, textarea::placeholder { color: var(--ph); }
 .pill-soon { margin-left: auto; font-size: 11px; border: 1px solid var(--line2); border-radius: 99px; padding: 2px 8px; color: var(--mute2); }
 .navh { margin: 20px 10px 6px; font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--mute2); }
 /* geniş ekranda sol menü sabit: sayfa kayarken yerinde kalır, menü uzunsa kendi içinde kayar */
-@media (min-width: 881px) {
+@media (min-width: 761px) {
   .side { position: sticky; top: 0; align-self: flex-start; height: 100vh; height: 100dvh; overflow-y: auto; overscroll-behavior: contain; }
 }
-@media (max-width: 880px) {
-  .side { border-right: 0; border-bottom: 1px solid var(--line); }
-  .nav { display: flex; flex-wrap: wrap; gap: 4px; }
+/* telefon üst başlığı / alt sekmeler yalnızca dar ekranda */
+.mtop, .mtabs, .side-close, .mscrim { display: none; }
+@media (max-width: 760px) {
+  html.noscroll, html.noscroll body { overflow: hidden; }
+  .shell { display: block; min-height: 100dvh; }
+  .main { padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px)); }
+  .mtop { position: sticky; top: 0; z-index: 25; display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    padding: calc(6px + env(safe-area-inset-top, 0px)) calc(8px + env(safe-area-inset-right, 0px)) 6px calc(8px + env(safe-area-inset-left, 0px));
+    background: color-mix(in srgb, var(--bg) 88%, transparent); -webkit-backdrop-filter: saturate(1.6) blur(14px); backdrop-filter: saturate(1.6) blur(14px); border-bottom: 1px solid var(--line); }
+  .mtop-btn { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border: 0; border-radius: 12px; background: transparent; color: var(--ink); cursor: pointer; }
+  .mtop-btn:active { background: var(--chip); }
+  .mtop-logo img { display: block; height: 30px; width: auto; }
+  :root[data-theme="dark"] .mtop-logo img { content: url(/logo-koyu.png); }
+  .mtabs { position: fixed; left: 0; right: 0; bottom: 0; z-index: 25; display: flex; justify-content: space-around;
+    padding: 6px calc(6px + env(safe-area-inset-right, 0px)) calc(6px + env(safe-area-inset-bottom, 0px)) calc(6px + env(safe-area-inset-left, 0px));
+    background: color-mix(in srgb, var(--panel) 92%, transparent); -webkit-backdrop-filter: saturate(1.6) blur(14px); backdrop-filter: saturate(1.6) blur(14px); border-top: 1px solid var(--line); }
+  .mtabs > a, .mtabs > button { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 5px 2px 3px; border: 0; border-radius: 12px; background: transparent; color: var(--mute); font: inherit; font-size: 11px; font-weight: 600; text-decoration: none; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+  .mtabs .on { color: var(--accent); }
+  .mtabs .on .mtab-ic { background: var(--accent-soft); }
+  .mtab-ic { position: relative; display: inline-flex; align-items: center; justify-content: center; width: 52px; height: 30px; border-radius: 99px; transition: background .15s; }
+  .mtab-l { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .mtab-badge { position: absolute; top: -3px; right: 6px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 99px; background: var(--badge); color: #fff; font-size: 10px; font-weight: 700; line-height: 18px; text-align: center; }
+  /* menü: soldan açılan çekmece */
+  .side { position: fixed; top: 0; bottom: 0; left: 0; z-index: 45; width: min(330px, 88vw); max-width: none; height: 100dvh; overflow-y: auto; overscroll-behavior: contain;
+    padding: calc(14px + env(safe-area-inset-top, 0px)) 14px calc(20px + env(safe-area-inset-bottom, 0px)) calc(14px + env(safe-area-inset-left, 0px));
+    border-right: 1px solid var(--line); box-shadow: 18px 0 50px rgba(var(--shadow-rgb), .22); transform: translateX(-105%); visibility: hidden; transition: transform .25s cubic-bezier(.2, .8, .2, 1), visibility 0s linear .25s; }
+  .menu-open .side { transform: none; visibility: visible; transition: transform .25s cubic-bezier(.2, .8, .2, 1); }
+  .mscrim { display: block; position: fixed; inset: 0; z-index: 44; background: rgba(var(--shadow-rgb), .38); animation: m-fade .2s ease-out; }
+  .side-close { display: inline-flex; position: absolute; top: calc(12px + env(safe-area-inset-top, 0px)); right: 10px; align-items: center; justify-content: center; width: 40px; height: 40px; border: 0; border-radius: 12px; background: var(--chip); color: var(--ink); cursor: pointer; }
+  .side .searchbtn { display: none; }
+  .nav a { min-height: 46px; font-size: 15px; }
+  .ap-fab { display: none !important; }
+  .snack { bottom: calc(80px + env(safe-area-inset-bottom, 0px)); }
+  .bellpanel { left: 12px; right: 12px; width: auto; top: calc(64px + env(safe-area-inset-top, 0px)); max-height: calc(100dvh - 160px); }
 }
+@keyframes m-fade { from { opacity: 0; } to { opacity: 1; } }
+@media (min-width: 761px) and (max-width: 880px) { .ap-fab { display: none !important; } }
 
 /* ---------- ortak ---------- */
 .page { padding: 26px 28px 48px; display: flex; flex-direction: column; gap: 20px; }
@@ -365,3 +398,13 @@ textarea.input { height: auto; padding: 10px 12px; line-height: 1.5; resize: ver
 .mac-overlay .shell.rail .side { padding-top: 40px; }
 .mac-overlay .page { padding-top: 38px; }
 .mac-overlay .ai-embed { padding-top: 30px; }
+
+/* telefon: alt sekmelerin ve çentik/ana ekran çubuğunun altında kalmasın */
+@media (max-width: 760px) {
+  .chat { height: calc(100dvh - 57px - 64px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)); }
+  .chat.m-conv { height: auto; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+  .drawer { padding-top: calc(20px + env(safe-area-inset-top, 0px)); padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px)); }
+  .push-banner { bottom: calc(80px + env(safe-area-inset-bottom, 0px)); }
+  .durt-balloons { bottom: calc(80px + env(safe-area-inset-bottom, 0px)); }
+  .toasts { top: calc(64px + env(safe-area-inset-top, 0px)); }
+}

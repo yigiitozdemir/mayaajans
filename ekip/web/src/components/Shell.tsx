@@ -85,18 +85,43 @@ const NAV = [
   { href: '/durt', label: 'Dürtme', icon: 'hand' },
 ];
 
+// Telefonda alttaki sekmeler (geri kalanı "Menü"de)
+const TABS = [
+  { href: '/', label: 'Bugün', icon: 'sun' },
+  { href: '/isler', label: 'İş Planı', icon: 'board' },
+  { href: '/sohbet', label: 'Sohbet', icon: 'chat' },
+  { href: '/ajanda', label: 'Ajandam', icon: 'note' },
+];
+
 export function Shell({ path, children }: { path: string; children: ComponentChildren }) {
   const s = useStore();
   const [, navTick] = useState(0); // aynı sayfada ?ai= / ?yardim değişince şeridi güncelle
   useEffect(() => { const f = () => navTick((n) => n + 1); window.addEventListener('maya-nav', f); window.addEventListener('popstate', f); window.addEventListener('maya-ai-broken', f); return () => { window.removeEventListener('maya-nav', f); window.removeEventListener('popstate', f); window.removeEventListener('maya-ai-broken', f); }; }, []);
   const me = s.me!;
+  const [menuOpen, setMenuOpen] = useState(false);
+  useEffect(() => { setMenuOpen(false); }, [path]); // bir bölüme geçince menü kapanır
+  useEffect(() => {
+    if (!menuOpen) return;
+    const k = (e: KeyboardEvent) => { if (e.key === 'Escape') setMenuOpen(false); };
+    document.documentElement.classList.add('noscroll'); window.addEventListener('keydown', k);
+    return () => { document.documentElement.classList.remove('noscroll'); window.removeEventListener('keydown', k); };
+  }, [menuOpen]);
   const open = s.tasks.filter((t) => t.status !== 2).length;
   // Mac'te ChatGPT/Claude/WhatsApp panelin içinde açıkken sol menü ince simge şeridine döner (uygulamaya yer kalır)
   const rail = isDesktop && path === '/yapay-zeka' && !new URLSearchParams(location.search).has('yardim') && !document.documentElement.classList.contains('ai-broken');
+  const search = () => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true, metaKey: /Mac/.test(navigator.platform) }));
   return (
-    <div class={'shell' + (rail ? ' rail' : '')}>
+    <div class={'shell' + (rail ? ' rail' : '') + (menuOpen ? ' menu-open' : '')}>
       {macOverlay && <div class="dragbar" data-tauri-drag-region />}
-      <aside class="side">
+      {/* Telefon / katlanır telefonun kapalı ekranı: üst başlık + alt sekmeler, menü soldan açılır */}
+      <header class="mtop">
+        <button type="button" class="mtop-btn" aria-label="Menü" aria-expanded={menuOpen} onClick={() => setMenuOpen(true)}><Icon n="menu" size={22} /></button>
+        <Link href="/" class="mtop-logo" title="Bugün"><img src="/logo.png" alt="Maya Ajans" /></Link>
+        <button type="button" class="mtop-btn" aria-label="Ara" onClick={search}><Icon n="search" size={20} /></button>
+      </header>
+      {menuOpen && <div class="mscrim" aria-hidden="true" onClick={() => setMenuOpen(false)} />}
+      <aside class="side" aria-label="Menü">
+        <button type="button" class="side-close" aria-label="Menüyü kapat" onClick={() => setMenuOpen(false)}><Icon n="x" size={20} /></button>
         <Link href="/" class="brand"><img src="/logo.png" alt="Maya Ajans" /><span>Ekip alanı</span></Link>
         <button type="button" class="searchbtn" onClick={() => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true, metaKey: /Mac/.test(navigator.platform) }))}>
           <Icon n="search" size={15} /><span>Ara</span><kbd>⌘K</kbd>
@@ -120,6 +145,19 @@ export function Shell({ path, children }: { path: string; children: ComponentChi
         <ThemePicker />
       </aside>
       <div class="main">{children}</div>
+      <nav class="mtabs" aria-label="Hızlı geçiş">
+        {TABS.map((t) => (
+          <Link href={t.href} class={path === t.href ? 'on' : ''} aria-current={path === t.href ? 'page' : undefined}>
+            <span class="mtab-ic"><Icon n={t.icon} size={21} />
+              {t.href === '/sohbet' && s.chatUnread > 0 && <span class="mtab-badge">{s.chatUnread > 99 ? '99+' : s.chatUnread}</span>}
+            </span>
+            <span class="mtab-l">{t.label}</span>
+          </Link>
+        ))}
+        <button type="button" class={menuOpen || !TABS.some((t) => t.href === path) ? 'on' : ''} onClick={() => setMenuOpen(true)} aria-label="Diğer bölümler">
+          <span class="mtab-ic"><Icon n="menu" size={21} /></span><span class="mtab-l">Menü</span>
+        </button>
+      </nav>
     </div>
   );
 }
