@@ -26,6 +26,8 @@ import { PushBanner } from './components/PushToggle';
 import { SurumIzleyici } from './components/SurumIzleyici';
 import { NudgeReceiver } from './components/NudgeReceiver';
 import { ChatUnread } from './components/ChatUnread';
+import { Portal } from './pages/Portal';
+import { Misafir } from './pages/Misafir';
 
 function App() {
   const s = useStore();
@@ -66,6 +68,8 @@ function App() {
     else if (e.action === 'go') navigate(e.path);
   }), []);
 
+  // müşteri yetkilisinin (misafir) onay sayfası — ekip programından tamamen ayrı
+  if (path === '/misafir') return <><Misafir />{s.snack && <div class="snack" role="status">{s.snack}</div>}</>;
   const invite = /^\/davet\/([A-Za-z0-9_-]+)$/.exec(path);
   if (invite) return <Invite token={invite[1]} />;
   if (!s.ready) return null;
@@ -84,6 +88,7 @@ function App() {
   else if (path === '/ajanda') page = <Ajanda openTask={openTask} />;
   else if (path === '/yapay-zeka') page = <YapayZeka openTask={openTask} />;
   else if (path === '/ekran') page = <EkranGoruntuleri openTask={openTask} />;
+  else if (path === '/vatan' && s.me.portals?.includes('vatan')) page = <Portal client="vatan" openTask={openTask} />;
   else if (path === '/yonetici' && s.me.role === 'admin') page = <YoneticiOzeti openTask={openTask} />;
   else if (path === '/yonetici') { history.replaceState({}, '', '/'); page = <Bugun openTask={openTask} />; }
   else page = <Bugun openTask={openTask} />;

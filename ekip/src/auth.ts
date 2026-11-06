@@ -4,6 +4,7 @@ import { getCookie, setCookie, deleteCookie } from 'hono/cookie';
 import type { MiddlewareHandler } from 'hono';
 import type { Env, SessionUser, UserRow, Vars } from './types';
 import { broadcast } from './hub';
+import { acceptGuestInvite, createGuestSession, guestInviteInfo, guestLogin } from './portal';
 import { DAY, clean, hashPassword, isEmail, randomToken, sha256, sqlNow, timingSafeEqual } from './util';
 
 export const COOKIE = 'maya_s';
@@ -107,6 +108,13 @@ authRoutes.post('/login', async (c) => {
     await hashPassword(password); // zamanlama farkıyla hesap varlığı anlaşılmasın
   }
   if (!ok || !u) {
+    // müşteri portalı misafiri mi? (ekip üyesi değil; ayrı oturum)
+    const g = !u ? await guestLogin(c.env, email, password) : null;
+    if (g) {
+      await c.env.DB.prepare('DELETE FROM login_attempts WHERE email = ?').bind(email).run();
+      await createGuestSession(c, g.id);
+      return c.json({ ok: true, guest: true });
+    }
     await c.env.DB.prepare('INSERT INTO login_attempts (email) VALUES (?)').bind(email).run();
     return c.json({ error: 'E-posta ya da şifre hatalı' }, 401);
   }
@@ -129,7 +137,11 @@ authRoutes.get('/invite/:token', async (c) => {
     `SELECT i.kind, u.email, u.first_name, u.last_name FROM invites i JOIN users u ON u.id = i.user_id
      WHERE i.id = ? AND i.used_at IS NULL AND i.expires_at > datetime('now') AND u.status != 'removed'`,
   ).bind(id).first<{ kind: string; email: string; first_name: string; last_name: string }>();
-  if (!row) return c.json({ error: 'Bu bağlantı geçersiz ya da süresi dolmuş. Yöneticiden yeni bağlantı iste.' }, 404);
+  if (!row) {
+    const g = await guestInviteInfo(c.env, c.req.param('token'));
+    if (g) return c.json({ kind: g.status === 'active' ? 'guest-reset' : 'guest', email: g.email, firstName: g.first_name, lastName: g.last_name });
+    return c.json({ error: 'Bu bağlantı geçersiz ya da süresi dolmuş. Yöneticiden yeni bağlantı iste.' }, 404);
+  }
   return c.json({ kind: row.kind, email: row.email, firstName: row.first_name, lastName: row.last_name });
 });
 
@@ -146,7 +158,10 @@ authRoutes.post('/accept', async (c) => {
   const inv = await c.env.DB.prepare(
     "SELECT * FROM invites WHERE id = ? AND used_at IS NULL AND expires_at > datetime('now')",
   ).bind(id).first<{ user_id: string }>();
-  if (!inv) return c.json({ error: 'Bu bağlantı geçersiz ya da süresi dolmuş' }, 404);
+  if (!inv) {
+    if (await acceptGuestInvite(c, token, password, firstName, lastName)) return c.json({ ok: true, guest: true });
+    return c.json({ error: 'Bu bağlantı geçersiz ya da süresi dolmuş' }, 404);
+  }
   const u = await c.env.DB.prepare('SELECT * FROM users WHERE id = ?').bind(inv.user_id).first<UserRow>();
   if (!u || u.status === 'removed') return c.json({ error: 'Bu hesap kullanılamıyor' }, 403);
   const { hash, salt } = await hashPassword(password);

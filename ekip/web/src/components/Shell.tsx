@@ -133,6 +133,9 @@ export function Shell({ path, children }: { path: string; children: ComponentChi
               <Icon n={n.icon} />{n.label}{n.href === '/isler' && <span class="count">{open}</span>}{n.href === '/sohbet' && s.chatUnread > 0 && <span class="count" style="background:var(--badge);color:#fff">{s.chatUnread}</span>}
             </Link>
           ))}
+          {me.portals?.includes('vatan') && (
+            <Link href="/vatan" class={'nav-portal' + (path === '/vatan' ? ' on' : '')} aria-current={path === '/vatan' ? 'page' : undefined} title="Vatan Onay"><Icon n="check" />Vatan Onay<span class="nav-lock" title="Yalnızca sana özel"><Icon n="lock" size={12} /></span></Link>
+          )}
           {me.role === 'admin' && (
             <>
               <div class="navh">Yönetim</div>

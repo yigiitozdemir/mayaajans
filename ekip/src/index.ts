@@ -21,6 +21,7 @@ import { r as pushRoutes } from './routes/push';
 import { haftalikYedek } from './yedek';
 import { sendPush } from './push';
 import { onayHatirlatma } from './onay';
+import { guest as portalGuest, portalsOf, team as portalTeam } from './portal';
 
 export { Hub };
 
@@ -40,6 +41,9 @@ app.get('/.well-known/assetlinks.json', (c) => c.json([{
   target: { namespace: 'android_app', package_name: 'net.mayaajans.ekip', sha256_cert_fingerprints: [ANDROID_SHA256] },
 }], 200, { 'Cache-Control': 'public, max-age=3600' }));
 app.get('/api/version', (c) => c.json({ build: BUILD_ID }, 200, { 'Cache-Control': 'no-store' }));
+
+// müşteri portalı misafirleri (ayrı oturum; ekip API'sine erişemez)
+app.route('/api/misafir', portalGuest);
 
 const api = new Hono<{ Bindings: Env; Variables: Vars }>();
 api.use('*', requireUser);
@@ -101,7 +105,7 @@ const tasksChanged = (c: C) => c.executionCtx.waitUntil(broadcast(c.env, { type:
 const teamChanged = (c: C) => c.executionCtx.waitUntil(broadcast(c.env, { type: 'team' }));
 
 // ---------- profil ----------
-api.get('/me', (c) => c.json(c.get('user')));
+api.get('/me', async (c) => c.json({ ...c.get('user'), portals: await portalsOf(c.env, c.get('user')) }));
 
 api.patch('/me', async (c) => {
   const u = c.get('user');
@@ -249,6 +253,7 @@ api.route('/agenda', ajanda);
 api.route('/search', arama);
 api.route('/admin-summary', yonetim);
 api.route('/push', pushRoutes);
+api.route('/portal', portalTeam);
 
 // ---------- işler ----------
 api.get('/tasks', async (c) => {

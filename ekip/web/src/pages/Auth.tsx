@@ -21,15 +21,21 @@ export function Login() {
   const [err, setErr] = useState('');
   const [forgot, setForgot] = useState(false);
   const [busy, setBusy] = useState(false);
+  // müşteri yetkilisi zaten giriş yaptıysa doğrudan onay sayfasına
+  useEffect(() => { fetch('/api/misafir/me', { credentials: 'same-origin' }).then((r) => { if (r.ok) location.replace('/misafir'); }).catch(() => {}); }, []);
   async function submit(e: Event) {
     e.preventDefault(); setErr('');
     if (!email.trim() || !pw) { setErr('E-posta ve şifreni yaz.'); return; }
     setBusy(true);
-    try { await api('POST', '/auth/login', { email, password: pw, remember }); await loadMe(); navigate('/'); }
+    try {
+      const r = await api<{ guest?: boolean }>('POST', '/auth/login', { email, password: pw, remember });
+      if (r?.guest) { location.replace('/misafir'); return; } // müşteri yetkilisi → onay sayfası
+      await loadMe(); navigate('/');
+    }
     catch (e: any) { setErr(e.message); } finally { setBusy(false); }
   }
   return (
-    <AuthFrame title="Ekip alanı" sub="Ekip hesabınla giriş yap">
+    <AuthFrame title="Giriş" sub="Maya Ajans hesabınla giriş yap">
       <form onSubmit={submit}>
         <label class="field">E-posta<input class="input" type="email" autocomplete="username" value={email} placeholder="ad@mayaajans.net" onInput={(e) => setEmail((e.target as HTMLInputElement).value)} /></label>
         <label class="field">Şifre
@@ -72,14 +78,20 @@ export function Invite({ token }: { token: string }) {
     if (pw.length < 8) { setErr('Şifre en az 8 karakter olmalı.'); return; }
     if (pw !== pw2) { setErr('Şifreler aynı değil.'); return; }
     setBusy(true);
-    try { await api('POST', '/auth/accept', { token, firstName: first, lastName: last, password: pw }); await loadMe(); history.replaceState({}, '', '/'); navigate('/'); }
+    try {
+      const r = await api<{ guest?: boolean }>('POST', '/auth/accept', { token, firstName: first, lastName: last, password: pw });
+      if (r?.guest) { location.replace('/misafir'); return; }
+      await loadMe(); history.replaceState({}, '', '/'); navigate('/');
+    }
     catch (e: any) { setErr(e.message); } finally { setBusy(false); }
   }
   if (bad) return <AuthFrame title="Bağlantı geçersiz" sub={bad}><a class="btn" href="/giris">Giriş ekranına git</a></AuthFrame>;
   if (!info) return <AuthFrame title="Yükleniyor…" sub=" "><span /></AuthFrame>;
-  const reset = info.kind === 'reset';
+  const reset = info.kind === 'reset' || info.kind === 'guest-reset';
+  const guest = info.kind === 'guest' || info.kind === 'guest-reset';
   return (
-    <AuthFrame title={reset ? 'Yeni şifreni belirle' : 'Ekibe hoş geldin'} sub={info.email}>
+    <AuthFrame title={reset ? (guest ? 'Yeni şifrenizi belirleyin' : 'Yeni şifreni belirle') : guest ? 'İçerik onay sayfanız' : 'Ekibe hoş geldin'}
+      sub={guest && !reset ? info.email + ' · şifrenizi belirleyin, içerikleri buradan onaylayın' : info.email}>
       <form onSubmit={submit}>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
           <label class="field">Ad *<input class="input" value={first} autocomplete="given-name" onInput={(e) => setFirst((e.target as HTMLInputElement).value)} /></label>
@@ -89,7 +101,7 @@ export function Invite({ token }: { token: string }) {
         <label class="field">Şifre (en az 8 karakter)<input class="input" type="password" autocomplete="new-password" value={pw} onInput={(e) => setPw((e.target as HTMLInputElement).value)} /></label>
         <label class="field">Şifre tekrar<input class="input" type="password" autocomplete="new-password" value={pw2} onInput={(e) => setPw2((e.target as HTMLInputElement).value)} /></label>
         {err && <span class="errtext" role="alert">{err}</span>}
-        <button type="submit" class="btn primary" style="min-height:48px;font-size:15px" disabled={busy}>{reset ? 'Şifremi kaydet' : 'Hesabımı aç'}</button>
+        <button type="submit" class="btn primary" style="min-height:48px;font-size:15px" disabled={busy}>{reset ? 'Şifremi kaydet' : guest ? 'Giriş yap' : 'Hesabımı aç'}</button>
         <span class="sub" style="text-align:center;line-height:1.5">Bu bilgisayarda oturumun açık kalır; bir daha şifre sorulmaz.</span>
       </form>
     </AuthFrame>

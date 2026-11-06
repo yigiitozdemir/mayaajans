@@ -3,6 +3,7 @@ import { desktopInvoke, isDesktop } from './desktop';
 export interface Me {
   id: string; email: string; firstName: string; lastName: string; photo: string | null; color: string;
   role: 'admin' | 'member'; canEditClients: boolean; settings: Record<string, unknown>; sessionId: string;
+  portals?: string[]; // görebildiği müşteri portalları (ör. 'vatan')
 }
 export interface Member {
   id: string; firstName: string; lastName: string; name: string; color: string; photo: string | null;
