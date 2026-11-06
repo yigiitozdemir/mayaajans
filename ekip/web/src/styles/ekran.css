@@ -1,0 +1,37 @@
+.shot-set { padding: 8px 16px 14px; display: flex; flex-direction: column; gap: 6px; }
+.shot-set.off { border-color: var(--accent); background: var(--accent-soft); }
+.shot-set kbd, .shot-empty kbd { font: 600 11px var(--font); padding: 1px 6px; border-radius: 5px; border: 1px solid var(--line2); background: var(--card); color: var(--ink); }
+.shot-search { position: relative; flex: 0 1 320px; }
+.shot-search svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--mute2); }
+.shot-search .input { padding-left: 36px; height: 40px; }
+.shot-empty { padding: 36px 20px; display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; }
+.shot-empty h2 { margin: 0; font-size: 18px; font-weight: 800; }
+.shot-empty p { margin: 0; max-width: 520px; }
+.shot-hero { width: 56px; height: 56px; border-radius: 16px; display: inline-flex; align-items: center; justify-content: center; background: var(--accent-soft); color: var(--accent-ink); }
+.shot-day { display: flex; flex-direction: column; gap: 10px; }
+.shot-dayh { margin: 0; font-size: 13px; font-weight: 700; color: var(--mute); text-transform: uppercase; letter-spacing: .06em; }
+.shot-dayh span { font-weight: 500; color: var(--mute2); }
+.shot-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 12px; }
+.shot { display: flex; flex-direction: column; gap: 6px; padding: 6px; border-radius: 13px; border: 1px solid var(--line); background: var(--card); text-align: left; transition: border-color .12s, box-shadow .12s, transform .12s; }
+.shot:hover { border-color: var(--line2); box-shadow: var(--shadow); transform: translateY(-1px); }
+.shot-img { position: relative; aspect-ratio: 16 / 10; border-radius: 9px; overflow: hidden; background: var(--chip); display: flex; align-items: center; justify-content: center; color: var(--mute2); }
+.shot-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.shot-badge { position: absolute; left: 6px; bottom: 6px; display: inline-flex; align-items: center; gap: 4px; padding: 2px 7px; border-radius: 99px; background: rgba(0, 0, 0, .65); color: #fff; font-size: 11px; font-weight: 600; }
+.shot-meta { display: flex; justify-content: space-between; font-size: 12px; color: var(--mute); padding: 0 4px 2px; }
+.shot-viewer { padding: 24px; }
+.shot-viewer .scrim { background: rgba(var(--shadow-rgb), .55); }
+.shot-panel { position: relative; width: min(1200px, 100%); height: min(860px, 100%); display: flex; flex-direction: column; border-radius: 18px; overflow: hidden; background: var(--card); border: 1px solid var(--line); box-shadow: 0 30px 70px rgba(var(--shadow-rgb), .35); }
+.shot-top { display: flex; align-items: center; gap: 12px; padding: 12px 14px 12px 18px; border-bottom: 1px solid var(--line); }
+.shot-top > div { display: flex; flex-direction: column; gap: 2px; }
+.shot-name { font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.shot-stage { position: relative; flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; background: var(--chip); padding: 16px 56px; }
+.shot-stage img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 6px; box-shadow: 0 6px 24px rgba(var(--shadow-rgb), .25); }
+.shot-nav { position: absolute; top: 50%; transform: translateY(-50%); width: 40px; height: 56px; border-radius: 12px; border: 1px solid var(--line); background: var(--card); color: var(--ink); font-size: 28px; line-height: 1; }
+.shot-nav:disabled { opacity: .3; }
+.shot-nav.l { left: 10px; } .shot-nav.r { right: 10px; }
+.shot-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 12px 14px; border-top: 1px solid var(--line); }
+.shot-pick { max-height: 280px; overflow-y: auto; display: flex; flex-direction: column; gap: 2px; border: 1px solid var(--line); border-radius: 10px; padding: 4px; }
+.shot-pick button { text-align: left; padding: 8px 10px; border: 0; border-radius: 8px; background: transparent; color: var(--ink); font-size: 13px; }
+.shot-pick button.on { background: var(--sel); font-weight: 600; }
+@media (prefers-reduced-motion: reduce) { .shot { transition: none; } .shot:hover { transform: none; } }
+@media (max-width: 640px) { .shot-grid { grid-template-columns: repeat(2, 1fr); } .shot-stage { padding: 10px 44px; } .shot-viewer { padding: 8px; } }

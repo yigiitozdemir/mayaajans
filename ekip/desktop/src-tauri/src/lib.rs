@@ -3,6 +3,8 @@
 // Bu kabuk: üst çubuk simgesi, bilgisayar açılınca başlama, arka planda çalışma,
 // Mac bildirimi, Dock sayısı ve kendi kendini güncelleme işlerini yapar.
 
+mod ekran;
+
 use std::{fs, path::PathBuf, time::Duration};
 
 use tauri::{
@@ -23,17 +25,17 @@ const AUTOSTART_ARG: &str = "--acilista";
 
 // ---------- yardımcılar ----------
 
-fn config_dir(app: &AppHandle) -> Option<PathBuf> {
+pub(crate) fn config_dir(app: &AppHandle) -> Option<PathBuf> {
     let dir = app.path().app_config_dir().ok()?;
     let _ = fs::create_dir_all(&dir);
     Some(dir)
 }
 
-fn flag(app: &AppHandle, name: &str) -> bool {
+pub(crate) fn flag(app: &AppHandle, name: &str) -> bool {
     config_dir(app).map(|d| d.join(name).exists()).unwrap_or(false)
 }
 
-fn set_flag(app: &AppHandle, name: &str, on: bool) {
+pub(crate) fn set_flag(app: &AppHandle, name: &str, on: bool) {
     if let Some(d) = config_dir(app) {
         let p = d.join(name);
         if on {
@@ -49,6 +51,14 @@ fn show_main(app: &AppHandle) {
         let _ = w.unminimize();
         let _ = w.show();
         let _ = w.set_focus();
+    }
+}
+
+/// Sayfaya pencereyi öne getirmeden olay gönderir (ör. yeni ekran görüntüsü).
+pub(crate) fn page_emit(app: &AppHandle, detail: &str) {
+    if let Some(w) = app.get_webview_window("main") {
+        let js = format!("window.dispatchEvent(new CustomEvent('maya-desktop', {{ detail: {detail} }}))");
+        let _ = w.eval(&js);
     }
 }
 
@@ -453,7 +463,12 @@ pub fn run() {
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
-        .invoke_handler(tauri::generate_handler![set_unread, notify, app_info, set_theme, open_ai, ai_show, ai_hide])
+        .invoke_handler(tauri::generate_handler![
+            set_unread, notify, app_info, set_theme, open_ai, ai_show, ai_hide,
+            ekran::shots_status, ekran::shots_enable, ekran::shots_list, ekran::shots_thumb, ekran::shots_read,
+            ekran::shots_copy, ekran::shots_reveal, ekran::shots_open, ekran::shots_trash, ekran::shots_save_as,
+            ekran::shots_set_cleanup
+        ])
         .setup(|app| {
             let handle = app.handle().clone();
 
@@ -503,6 +518,7 @@ pub fn run() {
             });
 
             build_tray(&handle)?;
+            ekran::start_watcher(handle.clone());
 
             // açılışta ve 6 saatte bir güncelleme denetimi
             let up = handle.clone();

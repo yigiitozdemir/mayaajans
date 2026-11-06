@@ -84,7 +84,7 @@ export function Shell({ path, children }: { path: string; children: ComponentChi
         <Link href="/" class="brand"><img src="/logo.png" alt="Maya Ajans" /><span>Ekip alanı</span></Link>
         <ProfileCard />
         <nav class="nav" aria-label="Ana menü">
-          {NAV.map((n) => (
+          {(isDesktop ? [...NAV.slice(0, 2), { href: '/ekran', label: 'Ekran Görüntüleri', icon: 'image' }, ...NAV.slice(2)] : NAV).map((n) => (
             <Link href={n.href} class={path === n.href ? 'on' : ''} aria-current={path === n.href ? 'page' : undefined}>
               <Icon n={n.icon} />{n.label}{n.href === '/isler' && <span class="count">{open}</span>}{n.href === '/sohbet' && s.chatUnread > 0 && <span class="count" style="background:var(--badge);color:#fff">{s.chatUnread}</span>}
             </Link>

@@ -3,6 +3,7 @@
 import type { Env } from './types';
 import { notify } from './notify';
 import { istanbulHour } from './util';
+import { ajandaBugun } from './routes/ajanda';
 
 /** İstanbul'a göre bugünün tarihi (YYYY-MM-DD) ve haftanın günü (0 Pazar). */
 export function istanbulToday(d = new Date()) {
@@ -37,11 +38,14 @@ export async function sabahOzeti(env: Env, now = new Date()): Promise<void> {
         WHERE r.assignee_id = ? AND r.status != 2 AND d.date BETWEEN ? AND date(?, '+3 days')`).bind(u.id, today, today).first<{ n: number }>(),
     ]);
 
+    const ajanda = await ajandaBugun(env, u.id, today).catch(() => ({ todos: 0, events: 0 }));
     const parts: string[] = [];
     if (due?.n) parts.push(`${due.n} iş bugün teslim`);
     if (late?.n) parts.push(`${late.n} geciken iş`);
     if (shoots.results.length) parts.push(`${shoots.results.length} çekim (${shoots.results.map((x) => (x.time ? x.time + ' ' : '') + x.title).join(', ')})`);
     if (days?.n) parts.push(`${days.n} özel gün paylaşımı yaklaşıyor`);
+    if (ajanda.todos) parts.push(`Ajandanda ${ajanda.todos} yapılacak`);
+    if (ajanda.events) parts.push(`${ajanda.events} etkinlik`);
     const body = parts.length ? parts.join(' · ') : 'Bugün sana atanmış teslim yok. Kolay gelsin!';
 
     await notify(env, { userId: u.id, kind: 'morning', title: `Günaydın ${u.first_name || ''}`.trim() + ' ☀️', body, link: '/' });
