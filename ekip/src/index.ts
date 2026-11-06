@@ -4,7 +4,7 @@ import type { Context } from 'hono';
 import type { Env, UserRow, Vars } from './types';
 import { authRoutes, createInviteLink, publicOrigin, requireAdmin, requireUser, sameOrigin } from './auth';
 import { Hub, broadcast } from './hub';
-import { clean, isDate, isEmail, istanbulHour, newId } from './util';
+import { activeMood, clean, isDate, isEmail, istanbulHour, newId } from './util';
 import { serveStatic } from './static';
 import { indir } from './indir';
 import { r as musteriler } from './routes/musteriler';
@@ -46,6 +46,7 @@ function teamView(u: UserRow, admin: boolean) {
     color: u.color, photo: u.photo, role: u.role, status: u.status,
     canEditClients: u.role === 'admin' || !!u.can_edit_clients,
     email: u.email,
+    mood: activeMood(u.settings),
     ...(admin ? {} : {}),
   };
 }
@@ -54,6 +55,7 @@ interface TaskRow {
   id: string; title: string; client: string; assignee_id: string | null; due_date: string | null; status: number;
   note: string; items: string; link: string; done_link: string; source: string; created_by: string | null;
   created_at: string; updated_at: string; completed_at: string | null;
+  approval: string; approval_at: string | null; sent_at: string | null; revisions: number;
 }
 function taskView(t: TaskRow) {
   let items: string[] = [];
@@ -62,6 +64,7 @@ function taskView(t: TaskRow) {
     id: t.id, title: t.title, client: t.client, assigneeId: t.assignee_id, dueDate: t.due_date, status: t.status,
     note: t.note, items, link: t.link, doneLink: t.done_link || '', source: t.source, createdBy: t.created_by,
     createdAt: t.created_at, updatedAt: t.updated_at, completedAt: t.completed_at,
+    approval: t.approval || '', approvalAt: t.approval_at ?? null, sentAt: t.sent_at ?? null, revisions: t.revisions || 0,
   };
 }
 
@@ -111,6 +114,15 @@ api.patch('/me', async (c) => {
     const next: Record<string, unknown> = { ...u.settings };
     for (const k of SETTING_BOOLS) if (typeof b.settings[k] === 'boolean') next[k] = b.settings[k];
     if (['system', 'light', 'dark'].includes(b.settings.theme)) next.theme = b.settings.theme;
+    if ('mood' in b.settings) {
+      const m = b.settings.mood;
+      if (m === null) delete next.mood;
+      else if (m && typeof m === 'object') {
+        const until = typeof m.until === 'string' && !Number.isNaN(Date.parse(m.until)) ? new Date(Date.parse(m.until)).toISOString() : null;
+        const emoji = clean(m.emoji, 16), text = clean(m.text, 60);
+        if (!emoji && !text) delete next.mood; else next.mood = { emoji, text, until, focus: m.focus === true };
+      }
+    }
     if (typeof b.settings.morningTime === 'string' && /^([01]\d|2[0-3]):[0-5]\d$/.test(b.settings.morningTime)) next.morningTime = b.settings.morningTime;
     sets.push('settings = ?'); vals.push(JSON.stringify(next));
   }
@@ -302,6 +314,74 @@ api.patch('/tasks/:id', async (c) => {
   await c.env.DB.prepare(`UPDATE tasks SET ${sets.join(', ')}, updated_at = datetime('now') WHERE id = ?`).bind(...vals, id).run();
   const row = (await c.env.DB.prepare('SELECT * FROM tasks WHERE id = ?').bind(id).first<TaskRow>())!;
   if (assigneeChanged) await notifyAssign(c, row);
+  tasksChanged(c);
+  return c.json(taskView(row));
+});
+
+// ---------- içerik onay takibi ----------
+// Hazırlanıyor ('') → Onaya gönderildi ('sent') → Revize istendi ('revision') → Onaylandı ('approved') → Paylaşıldı ('published')
+// status ile ilişki: sent/revision → 1 (devam ediyor; tamamlanmışsa yeniden açılır) · approved → status değişmez
+// · published → 2 (tamamlandı) + completed_at · '' (takipten çıkar) → status değişmez. Her adım task_revisions'a yazılır; "Geri al" son adımı geri yükler.
+const APPROVAL = ['', 'sent', 'revision', 'approved', 'published'];
+interface ApprovalLogRow { id: string; task_id: string; step: string; note: string; by_user: string | null; at: string; prev: string }
+
+api.get('/tasks/:id/approval', async (c) => {
+  const id = c.req.param('id');
+  const t = await c.env.DB.prepare('SELECT id FROM tasks WHERE id = ?').bind(id).first();
+  if (!t) return c.json({ error: 'İş bulunamadı' }, 404);
+  const { results } = await c.env.DB.prepare('SELECT * FROM task_revisions WHERE task_id = ? ORDER BY at DESC, rowid DESC LIMIT 100').bind(id).all<ApprovalLogRow>();
+  return c.json(results.map((r) => ({ id: r.id, step: r.step, note: r.note, by: r.by_user, at: r.at })));
+});
+
+api.post('/tasks/:id/approval', async (c) => {
+  const u = c.get('user');
+  const id = c.req.param('id');
+  const before = await c.env.DB.prepare('SELECT * FROM tasks WHERE id = ?').bind(id).first<TaskRow & { approval_reminded_at: string | null }>();
+  if (!before) return c.json({ error: 'İş bulunamadı' }, 404);
+  const b = await c.req.json().catch(() => ({}));
+  const step = b.approval === null ? '' : b.approval;
+  if (typeof step !== 'string' || !APPROVAL.includes(step)) return c.json({ error: 'Geçersiz onay adımı' }, 400);
+  if (b.note !== undefined && typeof b.note !== 'string') return c.json({ error: 'Not yazı olmalı' }, 400);
+  if (typeof b.note === 'string' && b.note.trim().length > 2000) return c.json({ error: 'Revize notu en fazla 2000 karakter olabilir' }, 400);
+  const note = step === 'revision' ? clean(b.note, 2000) : '';
+  if (step === (before.approval || '')) return c.json({ error: 'İş zaten bu adımda' }, 409);
+  const prev = JSON.stringify({
+    approval: before.approval || '', approval_at: before.approval_at, sent_at: before.sent_at, revisions: before.revisions || 0,
+    approval_reminded_at: before.approval_reminded_at ?? null, status: before.status, completed_at: before.completed_at,
+  });
+  const sets = ['approval = ?', "approval_at = datetime('now')"]; const vals: unknown[] = [step];
+  if (step === 'sent') sets.push("sent_at = datetime('now')", 'approval_reminded_at = NULL');
+  if (step === 'revision') sets.push('revisions = revisions + 1');
+  if (step === 'sent' || step === 'revision') sets.push('status = 1', 'completed_at = NULL');
+  if (step === 'published') sets.push('status = 2', "completed_at = COALESCE(completed_at, datetime('now'))");
+  await c.env.DB.batch([
+    c.env.DB.prepare(`UPDATE tasks SET ${sets.join(', ')}, updated_at = datetime('now') WHERE id = ?`).bind(...vals, id),
+    c.env.DB.prepare('INSERT INTO task_revisions (id, task_id, step, note, by_user, prev) VALUES (?, ?, ?, ?, ?, ?)').bind(newId('ap'), id, step, note, u.id, prev),
+  ]);
+  const row = (await c.env.DB.prepare('SELECT * FROM tasks WHERE id = ?').bind(id).first<TaskRow>())!;
+  tasksChanged(c);
+  return c.json(taskView(row));
+});
+
+// Yanlış tık: son onay adımını geri alır (işin önceki durumu, revize sayısı ve notu dahil)
+api.post('/tasks/:id/approval/undo', async (c) => {
+  const id = c.req.param('id');
+  const last = await c.env.DB.prepare('SELECT * FROM task_revisions WHERE task_id = ? ORDER BY at DESC, rowid DESC LIMIT 1').bind(id).first<ApprovalLogRow>();
+  if (!last) {
+    const t = await c.env.DB.prepare('SELECT id FROM tasks WHERE id = ?').bind(id).first();
+    return c.json({ error: t ? 'Geri alınacak onay adımı yok' : 'İş bulunamadı' }, t ? 409 : 404);
+  }
+  let p: Record<string, unknown> = {};
+  try { p = JSON.parse(last.prev || '{}'); } catch { /* */ }
+  const ap = typeof p.approval === 'string' && APPROVAL.includes(p.approval) ? p.approval : '';
+  const st = [0, 1, 2].includes(p.status as number) ? (p.status as number) : 0;
+  const str = (v: unknown) => (typeof v === 'string' ? v : null);
+  await c.env.DB.batch([
+    c.env.DB.prepare(`UPDATE tasks SET approval = ?, approval_at = ?, sent_at = ?, revisions = ?, approval_reminded_at = ?, status = ?, completed_at = ?, updated_at = datetime('now') WHERE id = ?`)
+      .bind(ap, str(p.approval_at), str(p.sent_at), Math.max(0, Number(p.revisions) || 0), str(p.approval_reminded_at), st, st === 2 ? str(p.completed_at) ?? new Date().toISOString().replace('T', ' ').slice(0, 19) : null, id),
+    c.env.DB.prepare('DELETE FROM task_revisions WHERE id = ?').bind(last.id),
+  ]);
+  const row = (await c.env.DB.prepare('SELECT * FROM tasks WHERE id = ?').bind(id).first<TaskRow>())!;
   tasksChanged(c);
   return c.json(taskView(row));
 });

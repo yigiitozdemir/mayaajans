@@ -1,0 +1,26 @@
+/* iPhone / tarayıcı bildirimleri: Profilim anahtarı + öneri bandı */
+.push-toggle { display: flex; flex-direction: column; }
+.push-row { display: flex; gap: 8px; padding: 0 0 8px; }
+.push-help { margin: 0 0 8px; font-size: 12px; line-height: 1.45; color: var(--mute); }
+.push-note { display: flex; gap: 10px; align-items: flex-start; margin: 6px 0; padding: 10px 12px; border-radius: 12px; background: var(--chip); color: var(--mute); font-size: 12px; line-height: 1.45; }
+.push-note > svg { flex: none; margin-top: 1px; color: var(--accent-ink); }
+.push-note > div { display: flex; flex-direction: column; gap: 2px; }
+.push-note strong { font-size: 13px; color: var(--ink); }
+.push-note b { color: var(--ink); font-weight: 600; }
+
+.push-banner {
+  position: fixed; z-index: 75; left: 50%; transform: translateX(-50%);
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  width: 420px; max-width: calc(100% - 32px);
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 10px 10px 14px; border-radius: 14px;
+  background: var(--card); color: var(--ink); border: 1px solid var(--line2);
+  box-shadow: 0 14px 34px rgba(var(--shadow-rgb), .2);
+  animation: push-in .22s ease-out both;
+}
+.push-banner > svg { flex: none; color: var(--accent-ink); }
+.push-banner-t { flex: 1; font-size: 13px; font-weight: 600; }
+.push-x { flex: none; width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center; border: 0; border-radius: 10px; background: transparent; color: var(--mute); }
+.push-x:hover { background: rgba(var(--ink-rgb), .08); }
+@keyframes push-in { from { opacity: 0; transform: translate(-50%, 8px); } to { opacity: 1; transform: translate(-50%, 0); } }
+@media (prefers-reduced-motion: reduce) { .push-banner { animation: none; } }

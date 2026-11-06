@@ -175,7 +175,7 @@ await t('okunmamış atama 1 saat sonra hatırlatılır', async () => {
   const r = await admin.post('/api/tasks', { title: 'Hatırlatma testi', assigneeId: 'u_pelin', dueDate: '2026-11-21' });
   sql(`UPDATE notifications SET created_at = datetime('now', '-2 hours') WHERE task_id = '${r.data.id}'`);
   const live = openLive(pelin); await live.ready;
-  const s = await fetch(BASE + '/cdn-cgi/local/explorer/api/local/scheduled?worker=maya-ekip', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ cron: '5 * * * *' }) });
+  const s = await fetch(BASE + '/__scheduled?cron=' + encodeURIComponent('5 * * * *'));
   ok(s.ok, 'zamanlanmış görev tetiklenemedi: ' + s.status + ' ' + (await s.text()).slice(0, 200));
   ok(await until(() => live.msgs.some((m) => m.type === 'remind' && m.notification.taskId === r.data.id)), 'hatırlatma gelmedi');
   const n = (await pelin.get('/api/notifications')).data.find((x) => x.taskId === r.data.id); eq(n.reminders, 1);

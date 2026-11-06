@@ -1,0 +1,42 @@
+/* ⌘K hızlı arama ve komut paleti */
+.ap-root { z-index: 85; align-items: flex-start; padding-top: min(12vh, 110px); }
+.ap { position: relative; width: 640px; max-width: 100%; max-height: min(620px, calc(100vh - 140px)); max-height: min(620px, calc(100dvh - 140px)); display: flex; flex-direction: column; border-radius: 18px; background: var(--card); border: 1px solid var(--line); box-shadow: 0 30px 70px rgba(var(--shadow-rgb), .28); overflow: hidden; }
+.ap-in { display: flex; align-items: center; gap: 10px; padding: 0 12px 0 16px; min-height: 56px; border-bottom: 1px solid var(--line); color: var(--mute); }
+.ap-in input { flex: 1; min-width: 0; height: 54px; border: 0; outline: none; background: transparent; color: var(--ink); font-size: 16px; font-family: inherit; }
+.ap-in input::placeholder { color: var(--ph); }
+.ap-esc { flex: none; min-height: 28px; padding: 0 8px; border-radius: 7px; border: 1px solid var(--line2); background: var(--chip); color: var(--mute); font-size: 11px; font-weight: 700; }
+.ap-spin { flex: none; width: 14px; height: 14px; border-radius: 99px; border: 2px solid var(--line2); border-top-color: var(--accent); animation: ap-spin .7s linear infinite; }
+@keyframes ap-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .ap-spin { animation: none; } }
+
+.ap-list { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 6px 8px 10px; }
+.ap-g + .ap-g { margin-top: 4px; }
+.ap-gh { padding: 10px 10px 4px; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--mute2); }
+.ap-it { display: flex; align-items: center; gap: 12px; min-height: 46px; padding: 6px 10px; border-radius: 10px; cursor: pointer; color: var(--ink); }
+.ap-it.on { background: var(--sel); box-shadow: inset 3px 0 0 var(--accent); }
+.ap-ic { flex: none; width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; background: var(--chip); color: var(--mute); }
+.ap-it.on .ap-ic { color: var(--accent-ink); }
+.ap-ic .av { color: #fff; }
+.ap-tx { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.ap-t { font-size: 14px; font-weight: 600; line-height: 1.35; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ap-s { font-size: 12px; color: var(--mute2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ap-it.done .ap-t { color: var(--mute); font-weight: 500; text-decoration: line-through; text-decoration-color: rgba(var(--ink-rgb), .3); }
+.ap-it.done .ap-ic { background: transparent; }
+.ap-tag { flex: none; padding: 2px 8px; border-radius: 99px; border: 1px solid var(--line2); color: var(--mute); font-size: 11px; font-weight: 600; }
+.ap-enter { flex: none; color: var(--mute2); font-size: 13px; }
+.ap mark { background: var(--accent-soft2); color: inherit; border-radius: 3px; padding: 0 1px; font-weight: 700; }
+.ap-empty { padding: 26px 12px; text-align: center; color: var(--mute); font-size: 14px; }
+
+.ap-foot { display: flex; align-items: center; gap: 14px; padding: 9px 16px; border-top: 1px solid var(--line); background: var(--panel); color: var(--mute2); font-size: 12px; }
+.ap-foot kbd { display: inline-flex; align-items: center; justify-content: center; min-width: 20px; height: 20px; margin-right: 3px; padding: 0 5px; border-radius: 5px; border: 1px solid var(--line2); background: var(--card); color: var(--mute); font: 600 11px/1 inherit; font-family: inherit; }
+
+/* dar ekranda: sağ altta küçük arama düğmesi */
+.ap-fab { display: none; }
+@media (max-width: 880px) {
+  .ap-fab { position: fixed; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 30; display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 16px 0 14px; border-radius: 99px; border: 1px solid var(--line2); background: var(--card); color: var(--ink); font-weight: 700; font-size: 13px; box-shadow: 0 10px 26px rgba(var(--shadow-rgb), .22); }
+  .ap-root { padding: 10px; padding-top: calc(10px + env(safe-area-inset-top, 0px)); }
+  .ap { max-height: calc(100vh - 20px); max-height: calc(100dvh - 20px); border-radius: 16px; }
+  .ap-foot { display: none; }
+  .ap-it { min-height: 50px; }
+}
+@media print { .ap-fab { display: none; } }

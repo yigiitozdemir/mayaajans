@@ -6,6 +6,7 @@ import { Bell } from '../components/Notify';
 import { Konusma } from '../components/SohbetKonusma';
 import { badgeCount, channelsLoaded, chatView, reloadChannels, upsertChannel, useChannels, type ChatChannel } from '../components/SohbetData';
 import '../styles/sohbet.css';
+import { ClientMark } from '../components/ClientMark';
 
 const LAST_KEY = 'maya.chat.last';
 const lowerTr = (s: string) => (s || '').toLocaleLowerCase('tr');
@@ -108,7 +109,7 @@ export function Sohbet({ openTask }: { openTask: (id: string) => void }) {
         {clients.length > 0 && (
           <div class="ch-group">
             <h2>Müşteri kanalları <span>{clients.length}</span></h2>
-            {clients.map((c) => row(c, c.name, hash))}
+            {clients.map((c) => row(c, c.name, <ClientMark name={c.topic} size={18} title={false} />))}
           </div>
         )}
         {people.length > 0 && (

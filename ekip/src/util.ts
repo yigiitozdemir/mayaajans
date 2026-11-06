@@ -69,3 +69,14 @@ export function clean(s: unknown, max = 500): string {
 export function istanbulHour(d = new Date()): number {
   return (d.getUTCHours() + 3) % 24;
 }
+
+/** Kişi durumu (Slack'teki gibi): { emoji, text, until(ISO|null), focus } — süresi dolduysa null. */
+export interface Mood { emoji: string; text: string; until: string | null; focus: boolean }
+export function activeMood(settings: unknown, now = Date.now()): Mood | null {
+  let s: Record<string, unknown> = {};
+  if (typeof settings === 'string') { try { s = JSON.parse(settings || '{}'); } catch { /* */ } } else if (settings && typeof settings === 'object') s = settings as Record<string, unknown>;
+  const m = s.mood as Mood | undefined;
+  if (!m || typeof m !== 'object' || (!m.emoji && !m.text)) return null;
+  if (m.until && Date.parse(m.until) <= now) return null;
+  return { emoji: String(m.emoji || ''), text: String(m.text || ''), until: m.until || null, focus: !!m.focus };
+}

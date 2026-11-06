@@ -2,7 +2,9 @@ import { useMemo, useState } from 'preact/hooks';
 import { api, reloadTasks, snack, type Task, todayIso, dayDiff, memberName } from '../api';
 import { Avatar, Icon, useStore } from '../ui';
 import { Bell } from '../components/Notify';
+import { ClientMark, findClient } from '../components/ClientMark';
 import { NewTaskModal, STATUS, dueTag } from '../components/TaskPanels';
+import { ApprovalBadge, approvalTag, bySentAsc, waitingApproval } from '../components/Onay';
 
 const byDateAsc = (a: Task, b: Task) => (a.dueDate || '9999') < (b.dueDate || '9999') ? -1 : (a.dueDate || '9999') > (b.dueDate || '9999') ? 1 : 0;
 const byDateDesc = (a: Task, b: Task) => (a.dueDate || '0000') > (b.dueDate || '0000') ? -1 : (a.dueDate || '0000') < (b.dueDate || '0000') ? 1 : 0;
@@ -23,13 +25,14 @@ export function IsPlani({ openTask }: { openTask: (id: string) => void }) {
   const [draftErr, setDraftErr] = useState(false);
   const [form, setForm] = useState<Partial<Task> | null>(null);
 
-  const unreadTaskIds = new Set(s.notifications.filter((n) => !n.readAt && n.taskId).map((n) => n.taskId));
+  const unreadTaskIds = new Set(s.notifications.filter((n) => !n.readAt && n.taskId && n.kind === 'assign').map((n) => n.taskId));
   const quickTest: Record<string, (t: Task) => boolean> = {
     late: (t) => t.status !== 2 && !!t.dueDate && dayDiff(t.dueDate) < 0,
     today: (t) => t.status !== 2 && !!t.dueDate && dayDiff(t.dueDate) === 0,
     week: (t) => t.status !== 2 && !!t.dueDate && dayDiff(t.dueDate) > 0 && dayDiff(t.dueDate) <= 7,
     doing: (t) => t.status === 1,
     nodate: (t) => t.status !== 2 && !t.dueDate,
+    approval: waitingApproval,
   };
   const scoped = useMemo(() => s.tasks.filter((t) =>
     (person === 'all' || t.assigneeId === person) &&
@@ -50,18 +53,20 @@ export function IsPlani({ openTask }: { openTask: (id: string) => void }) {
     } catch (e: any) { snack(e.message); }
   }
 
+  const clientColor = (name: string) => findClient(s.clients, name)?.color || null;
   const card = (t: Task) => {
     const due = dueTag(t);
     const m = s.team.find((x) => x.id === t.assigneeId);
     return (
-      <button type="button" class={'tcard' + (t.status === 2 ? ' done' : '')} onClick={() => openTask(t.id)}>
+      <button type="button" class={'tcard' + (t.status === 2 ? ' done' : '') + (clientColor(t.client) ? ' stripe' : '')} style={clientColor(t.client) ? { '--stripe': clientColor(t.client) } : undefined} onClick={() => openTask(t.id)}>
         <span class="row" style="gap:6px;flex-wrap:nowrap;font-size:12px;color:var(--mute)">
-          <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{t.client || '—'}</span>
+          <span class="cline"><ClientMark name={t.client} size={18} /><span>{t.client || '—'}</span></span>
           {unreadTaskIds.has(t.id) && t.assigneeId === me.id && <span class="newtag">Yeni · sana atandı</span>}
           {t.link && <span style="margin-left:auto;flex:none;color:var(--mute2)"><Icon n="link" size={14} /></span>}
         </span>
         <span class="title">{t.title}</span>
         {t.items.length > 0 && <span class="chip" style="align-self:flex-start;font-size:11px">{t.items.length} firma / kalem</span>}
+        {t.approval && <span style="align-self:flex-start"><ApprovalBadge t={t} /></span>}
         {t.status === 2 && t.doneLink && <span class="chip donechip" style="align-self:flex-start;font-size:11px"><Icon n="link" size={12} />Teslim linki var</span>}
         <span class="row" style="justify-content:space-between;flex-wrap:nowrap">
           <span class={'tag ' + due.cls}>{due.label}</span>
@@ -75,6 +80,7 @@ export function IsPlani({ openTask }: { openTask: (id: string) => void }) {
     { k: 'late', label: 'Geciken', dot: '#f28482' }, { k: 'today', label: 'Bugün teslim', dot: 'var(--accent)' },
     { k: 'week', label: 'Önümüzdeki 7 gün', dot: 'var(--blue)' }, { k: 'doing', label: 'Devam eden', dot: 'var(--accent)' },
     { k: 'nodate', label: 'Tarihi olmayan', dot: 'var(--wait)' },
+    { k: 'approval', label: 'Onay bekleyen', dot: 'var(--amber)' },
   ];
   const doneList = visible.filter((t) => t.status === 2).sort(byDateDesc);
 
@@ -145,7 +151,7 @@ export function IsPlani({ openTask }: { openTask: (id: string) => void }) {
         <div class="board">
           {[0, 1, 2].map((st) => {
             let list = visible.filter((t) => t.status === st);
-            list = st === 2 ? list.sort(byDateDesc) : list.sort(byDateAsc);
+            list = st === 2 ? list.sort(byDateDesc) : list.sort(quick === 'approval' ? bySentAsc : byDateAsc);
             const shown = st === 2 && !showAllDone ? list.slice(0, 6) : list;
             return (
               <section class="col" aria-label={STATUS[st].label}>
@@ -159,7 +165,7 @@ export function IsPlani({ openTask }: { openTask: (id: string) => void }) {
         </div>
       ) : (
         <>
-          <ListTable rows={visible.filter((t) => t.status !== 2).sort(byDateAsc)} openTask={openTask} empty="Bu filtrede bekleyen iş yok." />
+          <ListTable rows={visible.filter((t) => t.status !== 2).sort(quick === 'approval' ? bySentAsc : byDateAsc)} openTask={openTask} empty="Bu filtrede bekleyen iş yok." />
           {doneList.length > 0 && (
             <section style="display:flex;flex-direction:column;gap:10px">
               <div class="row" style="border-top:1px solid var(--line);padding-top:12px">
@@ -182,16 +188,17 @@ function ListTable({ rows, openTask, empty, muted }: { rows: Task[]; openTask: (
   return (
     <div class="card" style={'overflow-x:auto;' + (muted ? 'opacity:.85' : '')}>
       <table class="table">
-        <thead><tr><th scope="col">İş</th><th scope="col">Firma</th><th scope="col">Sorumlu</th><th scope="col">Teslim</th><th scope="col">Durum</th></tr></thead>
+        <thead><tr><th scope="col">İş</th><th scope="col">Firma</th><th scope="col">Sorumlu</th><th scope="col">Teslim</th><th scope="col">Onay</th><th scope="col">Durum</th></tr></thead>
         <tbody>
           {rows.map((t) => {
             const due = dueTag(t);
             return (
               <tr>
                 <td style="max-width:380px"><button type="button" class="linkbtn" onClick={() => openTask(t.id)}>{t.title}</button></td>
-                <td style="color:var(--mute);white-space:nowrap">{t.client || '—'}</td>
+                <td style="color:var(--mute);white-space:nowrap"><span class="cline"><ClientMark name={t.client} size={18} /><span>{t.client || '—'}</span></span></td>
                 <td style="color:var(--mute);white-space:nowrap">{memberName(s.team, t.assigneeId)}</td>
                 <td style="white-space:nowrap"><span class={'tag ' + due.cls}>{due.label}</span></td>
+                <td class="onay-cell">{approvalTag(t) ? <ApprovalBadge t={t} /> : <span class="onay-none" aria-label="Onay takibinde değil">—</span>}</td>
                 <td style="white-space:nowrap;color:var(--mute)"><span class="dot" style={{ background: STATUS[t.status].dot, display: 'inline-block', marginRight: '6px' }} />{STATUS[t.status].label}
                   {t.status === 2 && t.doneLink && (
                     <button type="button" class="btn sm" style="margin-left:10px" aria-label={'Teslim linkini kopyala: ' + t.title}

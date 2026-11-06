@@ -2,7 +2,9 @@ import { useState } from 'preact/hooks';
 import { type Task, dayDiff, fmtDate, DAY, LDAY, LMON, memberName, parseD, todayIso } from '../api';
 import { Icon, Link, useStore } from '../ui';
 import { Bell } from '../components/Notify';
+import { ClientMark } from '../components/ClientMark';
 import { dueTag } from '../components/TaskPanels';
+import { bySentAsc, daysLabel, sentAge, waitingApproval } from '../components/Onay';
 
 export function Bugun({ openTask }: { openTask: (id: string) => void }) {
   const s = useStore();
@@ -16,18 +18,23 @@ export function Bugun({ openTask }: { openTask: (id: string) => void }) {
   const late = mine.filter((t) => t.dueDate && dayDiff(t.dueDate) < 0).sort(byD);
   const next = mine.filter((t) => t.dueDate && dayDiff(t.dueDate) > 0 && dayDiff(t.dueDate) <= 3).sort(byD);
   const noDate = mine.filter((t) => !t.dueDate);
-  const unread = s.notifications.filter((n) => !n.readAt && n.taskId);
+  const unread = s.notifications.filter((n) => !n.readAt && n.taskId && n.kind === 'assign');
+  // müşteri onayı bekleyenler: en eski gönderilen üstte, 3 günü geçen kırmızı
+  const waiting = s.tasks.filter((t) => waitingApproval(t) && (team || t.assigneeId === me.id || (!t.assigneeId && t.createdBy === me.id))).sort(bySentAsc);
+  const waitingLate = waiting.filter((t) => sentAge(t).late);
   const who = (t: Task) => (team ? memberName(s.team, t.assigneeId) + ' · ' : '');
   const status = (t: Task) => (t.status === 1 ? 'devam ediyor' : 'beklemede');
 
   const blocks = [
-    { title: 'Bugün teslim', dot: 'var(--accent)', items: todayT.map((t) => ({ id: t.id, title: t.title, sub: who(t) + (t.client || '—') + ' · ' + status(t), tag: 'Bugün', cls: 'today' })), empty: 'Bugün teslim edilecek işin yok.' },
-    { title: 'Geciken', dot: '#f28482', warn: late.length > 0, items: late.map((t) => ({ id: t.id, title: t.title, sub: who(t) + (t.client || '—'), tag: 'Gecikti · ' + fmtDate(t.dueDate!), cls: 'late' })), empty: 'Geciken işin yok.' },
-    { title: 'Önümüzdeki 3 gün', dot: 'var(--blue)', items: next.map((t) => ({ id: t.id, title: t.title, sub: who(t) + (t.client || '—'), tag: DAY[parseD(t.dueDate!).getDay()] + ' · ' + fmtDate(t.dueDate!), cls: 'soon' })), empty: 'Yakın teslim yok.' },
-    ...(!team ? [{ title: 'Okunmamış atamalar', dot: 'var(--badge)', items: unread.map((n) => { const t = s.tasks.find((x) => x.id === n.taskId); return { id: n.taskId!, title: t?.title || n.body, sub: (t?.client || '—') + (n.actorId ? ' · ' + memberName(s.team, n.actorId) : ''), tag: 'Okunmadı', cls: 'late' }; }), empty: 'Okunmamış atama yok.' }] : []),
+    { title: 'Bugün teslim', dot: 'var(--accent)', items: todayT.map((t) => ({ id: t.id, client: t.client, title: t.title, sub: who(t) + (t.client || '—') + ' · ' + status(t), tag: 'Bugün', cls: 'today' })), empty: 'Bugün teslim edilecek işin yok.' },
+    { title: 'Geciken', dot: '#f28482', warn: late.length > 0, items: late.map((t) => ({ id: t.id, client: t.client, title: t.title, sub: who(t) + (t.client || '—'), tag: 'Gecikti · ' + fmtDate(t.dueDate!), cls: 'late' })), empty: 'Geciken işin yok.' },
+    { title: 'Önümüzdeki 3 gün', dot: 'var(--blue)', items: next.map((t) => ({ id: t.id, client: t.client, title: t.title, sub: who(t) + (t.client || '—'), tag: DAY[parseD(t.dueDate!).getDay()] + ' · ' + fmtDate(t.dueDate!), cls: 'soon' })), empty: 'Yakın teslim yok.' },
+    { title: 'Onay bekleyenler', dot: 'var(--amber)', warn: waitingLate.length > 0, items: waiting.map((t) => ({ id: t.id, client: t.client, title: t.title, sub: who(t) + (t.client || '—') + (t.revisions ? ' · revize ×' + t.revisions : ''), tag: 'Onayda · ' + daysLabel(t), cls: sentAge(t).late ? 'late' : 'soon' })), empty: team ? 'Ekipte müşteri onayı bekleyen iş yok.' : 'Müşteri onayı bekleyen işin yok.' },
+    ...(!team ? [{ title: 'Okunmamış atamalar', dot: 'var(--badge)', items: unread.map((n) => { const t = s.tasks.find((x) => x.id === n.taskId); return { id: n.taskId!, client: t?.client || '', title: t?.title || n.body, sub: (t?.client || '—') + (n.actorId ? ' · ' + memberName(s.team, n.actorId) : ''), tag: 'Okunmadı', cls: 'late' }; }), empty: 'Okunmamış atama yok.' }] : []),
   ];
   const parts = [todayT.length ? todayT.length + ' teslim' : 'bugün teslim yok'];
   if (late.length) parts.push(late.length + ' geciken iş');
+  if (waiting.length) parts.push(waiting.length + ' iş onay bekliyor' + (waitingLate.length ? ' (' + waitingLate.length + ' tanesi 3 günü geçti)' : ''));
   if (!team && unread.length) parts.push(unread.length + ' okunmamış atama');
   const d = parseD(todayIso());
   // bana atanan bütün açık işler: tarihe göre, tarihsizler en sonda
@@ -57,6 +64,7 @@ export function Bugun({ openTask }: { openTask: (id: string) => void }) {
             <div class="row" style="gap:8px"><span class="dot" style={{ background: b.dot }} /><h2 style="margin:0;font-size:14px;font-weight:800;flex:1">{b.title} <span style="font-weight:500;color:var(--mute2)">{b.items.length}</span></h2><Link href="/isler" class="sub">İş Planı</Link></div>
             {b.items.map((it) => (
               <button type="button" onClick={() => openTask(it.id)} style="display:flex;align-items:center;gap:10px;min-height:44px;padding:6px 0;border:0;border-top:1px solid var(--line);background:transparent;text-align:left">
+                <ClientMark name={(it as any).client} size={26} />
                 <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><span style="font-size:13px;font-weight:600;line-height:1.35">{it.title}</span><span class="sub" style="font-size:12px">{it.sub}</span></span>
                 <span class={'tag ' + it.cls} style="font-size:11px">{it.tag}</span>
               </button>
@@ -84,6 +92,7 @@ export function Bugun({ openTask }: { openTask: (id: string) => void }) {
               return (
                 <button type="button" class="allmine-it" onClick={() => openTask(t.id)}>
                   <span class="dot" style={{ background: t.status === 1 ? 'var(--accent)' : 'var(--wait)' }} title={status(t)} />
+                  <ClientMark name={t.client} size={26} />
                   <span class="t">
                     <span class="tt">{t.title}</span>
                     <span class="sub" style="font-size:12px">{(t.client || '—') + ' · ' + status(t)}</span>

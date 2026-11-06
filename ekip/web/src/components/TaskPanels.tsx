@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from 'preact/hooks';
 import { api, reloadTasks, snack, store, type Task, fmtDate, dayDiff, DAY as SDAY, memberName } from '../api';
 import { Avatar, Icon, Modal, useStore } from '../ui';
 import { markTaskRead } from './Notify';
+import { ClientMark } from './ClientMark';
+import { ApprovalStrip } from './Onay';
 
 export const STATUS = [
   { label: 'Beklemede', dot: 'var(--wait)' },
@@ -131,7 +133,7 @@ export function TaskDrawer({ taskId, onClose }: { taskId: string; onClose: () =>
       <button type="button" class="scrim" aria-label="Detayı kapat" onClick={onClose} />
       <aside class="drawer" role="dialog" aria-label="İş detayı">
         <div class="row">
-          <span class="chip">{t.client || 'Firma yok'}</span>
+          <span class="chip"><ClientMark name={t.client} size={18} />{t.client || 'Firma yok'}</span>
           {t.source === 'slack' && <span class="chip">Slack'ten aktarıldı</span>}
           <span class="spacer" />
           <button type="button" class="iconbtn" aria-label="Kapat" onClick={onClose}><Icon n="x" size={16} /></button>
@@ -172,6 +174,7 @@ export function TaskDrawer({ taskId, onClose }: { taskId: string; onClose: () =>
             )}
           </div>
         )}
+        <ApprovalStrip t={t} onStep={(k) => { if (k === 'published' && !t.doneLink) { setDoneDraft(''); setAskLink(true); } else if (k !== 'published') setAskLink(false); }} />
         <dl style="margin:0;display:grid;grid-template-columns:110px 1fr;gap:12px;align-items:center;font-size:13px">
           <dt style="color:var(--mute2)">Sorumlu</dt>
           <dd style="margin:0" class="row"><Avatar m={s.team.find((m) => m.id === t.assigneeId)} size={24} />

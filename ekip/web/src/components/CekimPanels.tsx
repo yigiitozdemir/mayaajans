@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'preact/hooks';
 import { api, snack, store, todayIso, parseD, LMON, LDAY, DAY, dayDiff, memberName, type Member } from '../api';
 import { Avatar, Icon, Modal, useStore } from '../ui';
+import { ClientMark } from './ClientMark';
 
 export interface Check { text: string; done: boolean }
 export interface Shoot {
@@ -224,7 +225,7 @@ export function ShootDrawer({ shoot: x, onClose, onEdit, onChanged }: { shoot: S
       <button type="button" class="scrim" aria-label="Detayı kapat" onClick={onClose} />
       <aside class="drawer" role="dialog" aria-label="Çekim detayı">
         <div class="row">
-          <span class="chip">{x.client || 'Firma yok'}</span>
+          <span class="chip"><ClientMark name={x.client} size={18} />{x.client || 'Firma yok'}</span>
           {x.source === 'slack' && <span class="chip">Slack'ten aktarıldı</span>}
           <span class="spacer" />
           <button type="button" class="iconbtn" aria-label="Kapat" onClick={onClose}><Icon n="x" size={16} /></button>
@@ -248,7 +249,7 @@ export function ShootDrawer({ shoot: x, onClose, onEdit, onChanged }: { shoot: S
           <dt>Tarih</dt><dd><strong>{longDate(x.date)}</strong> <span class="sub">· {whenLabel(x.date)}</span></dd>
           <dt>Saat</dt><dd>{x.time || <span class="sub">—</span>}</dd>
           <dt>Lokasyon</dt><dd>{x.location || <span class="sub">—</span>}</dd>
-          <dt>Firma</dt><dd>{x.client || <span class="sub">—</span>}</dd>
+          <dt>Firma</dt><dd>{x.client ? <span class="cline"><ClientMark name={x.client} size={18} /><span>{x.client}</span></span> : <span class="sub">—</span>}</dd>
           <dt>Ekleyen</dt><dd>{x.createdBy ? memberName(s.team, x.createdBy) : 'Slack listesi'}</dd>
           {x.completedAt && <><dt>Tamamlandı</dt><dd class="sub">{x.completedAt.slice(0, 10).split('-').reverse().join('.')}</dd></>}
         </dl>

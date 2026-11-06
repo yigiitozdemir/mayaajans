@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from 'preact/hooks';
 import { api, onLive, snack, todayIso, parseD, LMON, LDAY, DAY } from '../api';
 import { Icon, useStore } from '../ui';
 import { Bell } from '../components/Notify';
+import { ClientMark, findClient } from '../components/ClientMark';
 import {
   type Shoot, STATUS, REMIND_INFO, ShootForm, ShootDrawer, MonthCal, CrewStack,
   lower, longDate, isLate, byWhenAsc, byWhenDesc,
@@ -92,7 +93,7 @@ export function Cekim({ openTask }: { openTask: (id: string) => void }) {
     const doneN = x.checks.filter((c) => c.done).length;
     const d = parseD(x.date);
     return (
-      <div class={'ck-card' + (late ? ' late' : '') + (x.status === 2 ? ' cancel' : '')}>
+      <div class={'ck-card' + (late ? ' late' : '') + (x.status === 2 ? ' cancel' : '') + (findClient(s.clients, x.client)?.color ? ' stripe' : '')} style={findClient(s.clients, x.client)?.color ? { '--stripe': findClient(s.clients, x.client)!.color } : undefined}>
         <span class="ck-when"><b>{x.time || '—'}</b><span>{DAY[d.getDay()]} · {d.getDate()} {LMON[d.getMonth()].slice(0, 3)}</span></span>
         <button type="button" class="ck-body" onClick={() => openShoot(x.id)} aria-label={x.title + ' çekiminin detayını aç'}>
           <span class="ck-top">
@@ -100,7 +101,7 @@ export function Cekim({ openTask }: { openTask: (id: string) => void }) {
             {late ? <span class="ck-st late">Geçti, durumu güncelle</span> : <span class={'ck-st ' + STATUS[x.status].cls}>{STATUS[x.status].label}</span>}
           </span>
           <span class="ck-meta">
-            <span><Icon n="clients" size={12} />{x.client || '—'}</span>
+            <span class="cline"><ClientMark name={x.client} size={16} /><span>{x.client || '—'}</span></span>
             {x.location && <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z" /><circle cx="12" cy="10" r="2.5" /></svg>{x.location}</span>}
             {x.checks.length > 0 && <span style={doneN === x.checks.length ? 'color:var(--green)' : ''}><Icon n="check" size={12} />Hazırlık {doneN}/{x.checks.length}</span>}
           </span>

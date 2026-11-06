@@ -1,0 +1,82 @@
+/* ---------- yönetici özeti ---------- */
+.yo-stats { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
+.yo-stats .stat { min-width: 0; }
+.yo-stats button.stat:hover { border-color: var(--line2); box-shadow: var(--shadow); }
+.yo-statsub { font-size: 12px; color: var(--mute2); }
+.yo-warn { color: var(--red); }
+.yo-grid { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+@media (max-width: 1180px) { .yo-grid { grid-template-columns: minmax(0, 1fr); } }
+.yo-col { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.yo-card { display: flex; flex-direction: column; gap: 12px; min-width: 0; background: var(--card); }
+.yo-h { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.yo-h h2 { margin: 0; font-size: 15px; font-weight: 700; }
+.yo-scroll { overflow-x: auto; margin: 0 -16px; padding: 0 16px; -webkit-overflow-scrolling: touch; }
+.yo-table { width: 100%; border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums; }
+.yo-people { min-width: 620px; }
+.yo-clients { min-width: 420px; }
+.yo-table th { text-align: left; color: var(--mute2); font-size: 12px; font-weight: 600; padding: 8px 8px; white-space: nowrap; }
+.yo-table td { padding: 9px 8px; border-top: 1px solid var(--line); white-space: nowrap; }
+.yo-table th:first-child, .yo-table td:first-child { padding-left: 0; }
+.yo-table .n { text-align: right; }
+.yo-table .bar { width: 26%; min-width: 110px; padding-left: 14px; }
+.yo-name { font-weight: 600; overflow: hidden; text-overflow: ellipsis; max-width: 200px; }
+.yo-red { color: var(--red); font-weight: 600; }
+.yo-green { color: var(--green); font-weight: 600; }
+.yo-zero { color: var(--mute2); }
+.yo-tr { cursor: pointer; }
+.yo-tr:hover td, .yo-tr:focus-visible td { background: var(--sel); }
+.yo-tr:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.yo-bar { display: flex; gap: 2px; height: 8px; border-radius: 99px; background: rgba(var(--ink-rgb), .06); overflow: hidden; }
+.yo-bar > span { display: block; height: 100%; border-radius: 99px; min-width: 0; }
+.yo-bar-late { background: var(--red); }
+.yo-bar-open { background: var(--accent); }
+.yo-legend { display: flex; gap: 14px; font-size: 12px; color: var(--mute2); }
+.yo-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.yo-sw { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+.yo-sw.open { background: var(--accent); }
+.yo-sw.late { background: var(--red); }
+
+/* grafik */
+.yo-trend svg { width: 100%; height: auto; display: block; overflow: visible; }
+.yo-trend .yo-grid { stroke: var(--line); stroke-width: 1; }
+.yo-trend .yo-axis { stroke: var(--line2); stroke-width: 1; }
+.yo-trend .yo-tick { fill: var(--mute2); font-size: 11px; }
+.yo-trend .yo-val { fill: var(--ink2); font-size: 12px; font-weight: 600; }
+.yo-trend .yo-barm { fill: var(--accent); }
+.yo-trend .yo-barm.cur { fill: rgba(var(--accent-rgb), .55); }
+.yo-trend .yo-col-g.on .yo-barm { fill: var(--accent-ink); }
+
+/* dikkat listesi */
+.yo-attg { display: flex; flex-direction: column; gap: 6px; }
+.yo-attg + .yo-attg { padding-top: 10px; border-top: 1px solid var(--line); }
+.yo-attg h3 { margin: 0; font-size: 12px; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; color: var(--mute); display: flex; align-items: center; gap: 6px; }
+.yo-attg h3 span { font-weight: 600; color: var(--mute2); letter-spacing: 0; }
+.yo-attl { display: flex; flex-direction: column; max-height: 300px; overflow-y: auto; }
+.yo-att { display: flex; align-items: center; gap: 10px; min-height: 46px; padding: 6px 4px; border: 0; border-top: 1px solid var(--line); background: transparent; text-align: left; width: 100%; border-radius: 0; }
+.yo-att:first-child { border-top: 0; }
+.yo-att:hover .tt { color: var(--accent-ink); }
+.yo-att .t, .yo-bklist .t { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.yo-att .tt, .yo-bklist .tt { font-size: 13px; font-weight: 600; line-height: 1.35; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.yo-att .ts, .yo-bklist .ts { font-size: 12px; color: var(--mute2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.yo-att .tag { flex: none; }
+.yo-ok { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--green); padding: 4px 0; }
+
+/* yedek */
+.yo-bk { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.yo-bk > div { display: flex; flex-direction: column; gap: 3px; padding: 10px 12px; border-radius: 12px; background: var(--panel); border: 1px solid var(--line); min-width: 0; }
+.yo-bk b { font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.yo-k { font-size: 12px; color: var(--mute2); }
+.yo-card > .btn.primary { align-self: flex-start; }
+.yo-bklist { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; max-height: 320px; overflow-y: auto; }
+.yo-bklist li { display: flex; align-items: center; gap: 10px; min-height: 48px; border-top: 1px solid var(--line); }
+.yo-bklist .btn { text-decoration: none; flex: none; }
+.yo-note { margin: 0; font-size: 12px; line-height: 1.5; color: var(--mute2); }
+
+@media (max-width: 640px) {
+  .yo-donem { width: 100%; overflow-x: auto; }
+  .yo-donem button { flex: 1 0 auto; padding: 0 10px; }
+  .yo-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .yo-stats .stat { padding: 12px; }
+  .yo-bk { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .yo-bk > div:first-child { grid-column: 1 / -1; }
+}

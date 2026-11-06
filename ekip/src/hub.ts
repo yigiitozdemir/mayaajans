@@ -20,6 +20,7 @@ export class Hub extends DurableObject {
       const pair = new WebSocketPair();
       // etiketler: kişiye ve oturuma özel gönderim için
       this.ctx.acceptWebSocket(pair[1], ['u:' + uid, 's:' + sid]);
+      this.presence(); // herkese: kim çevrimiçi
       return new Response(null, { status: 101, webSocket: pair[0] });
     }
     if (url.pathname === '/broadcast' && req.method === 'POST') {
@@ -31,11 +32,7 @@ export class Hub extends DurableObject {
       if (msg.type === 'session-revoked') for (const ws of sockets) { try { ws.close(4001, 'oturum kapatıldı'); } catch { /* */ } }
       return new Response(JSON.stringify({ sent: sockets.length }));
     }
-    if (url.pathname === '/online') {
-      const ids = new Set<string>();
-      for (const ws of this.ctx.getWebSockets()) for (const t of this.ctx.getTags(ws)) if (t.startsWith('u:')) ids.add(t.slice(2));
-      return new Response(JSON.stringify([...ids]));
-    }
+    if (url.pathname === '/online') return new Response(JSON.stringify(this.onlineIds()));
     return new Response('not found', { status: 404 });
   }
 
@@ -45,6 +42,24 @@ export class Hub extends DurableObject {
 
   async webSocketClose(ws: WebSocket, code: number) {
     try { ws.close(code, 'kapandı'); } catch { /* */ }
+    this.presence(ws);
+  }
+
+  async webSocketError(ws: WebSocket) { this.presence(ws); }
+
+  private onlineIds(except?: WebSocket): string[] {
+    const ids = new Set<string>();
+    for (const ws of this.ctx.getWebSockets()) {
+      if (ws === except || ws.readyState === WebSocket.CLOSED || ws.readyState === WebSocket.CLOSING) continue;
+      for (const t of this.ctx.getTags(ws)) if (t.startsWith('u:')) ids.add(t.slice(2));
+    }
+    return [...ids];
+  }
+
+  /** Çevrimiçi listesi değişince herkese bildir (avatarlardaki yeşil nokta). */
+  private presence(except?: WebSocket) {
+    const data = JSON.stringify({ type: 'presence', online: this.onlineIds(except) });
+    for (const ws of this.ctx.getWebSockets()) { if (ws === except) continue; try { ws.send(data); } catch { /* */ } }
   }
 }
 

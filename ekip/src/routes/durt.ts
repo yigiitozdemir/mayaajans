@@ -1,5 +1,6 @@
 // Dürtme: ekipten birinin dikkatini çekmek (ses + ekran titremesi + Mac bildirimi, alıcı tarafta).
 import { Hono } from 'hono';
+import { activeMood } from '../util';
 import type { Env, Vars } from '../types';
 import { broadcast } from '../hub';
 import { notify } from '../notify';
@@ -46,7 +47,7 @@ r.post('/', async (c) => {
 
   let settings: Record<string, unknown> = {};
   try { settings = JSON.parse(target.settings || '{}'); } catch { /* */ }
-  const dnd = settings.dnd === true;
+  const dnd = settings.dnd === true || !!activeMood(settings)?.focus; // "Odaklanıyorum" durumu da sessize alır
 
   const id = newId('nd');
   await c.env.DB.prepare('INSERT INTO nudges (id, from_id, to_id, message) VALUES (?, ?, ?, ?)').bind(id, me.id, to, message).run();

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'preact/hooks';
 import type { ComponentChildren } from 'preact';
-import { store, type State, type Member, type Me, initials } from './api';
+import { store, type State, type Member, type Me, initials, moodOf } from './api';
 
 export function useStore(): State {
   const [, force] = useState(0);
@@ -72,11 +72,24 @@ export function Icon({ n, size = 18, stroke = 'currentColor', w = 2 }: { n: keyo
   return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={stroke} stroke-width={w} stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" dangerouslySetInnerHTML={{ __html: P[n] || '' }} />;
 }
 
-export function Avatar({ m, size = 26, radius }: { m: Pick<Member, 'firstName' | 'lastName' | 'color' | 'photo'> | null | undefined; size?: number; radius?: number }) {
+type AvatarMember = Pick<Member, 'firstName' | 'lastName' | 'color' | 'photo'> & { id?: string | null; mood?: Member['mood'] };
+/** Avatar: büyüklüğü 20px ve üstündeyse çevrimiçi noktası, 24px ve üstündeyse durum emojisi gösterir. */
+export function Avatar({ m, size = 26, radius, presence = true }: { m: AvatarMember | null | undefined; size?: number; radius?: number; presence?: boolean }) {
+  const s = useStore();
   const r = radius ?? Math.round(size * 0.3);
   const style = { width: size + 'px', height: size + 'px', borderRadius: r + 'px', background: m ? m.color : '#8C8074', fontSize: Math.round(size * 0.4) + 'px' };
-  if (m?.photo) return <span class="av" style={style}><img src={m.photo} alt="" /></span>;
-  return <span class="av" style={style}>{m ? initials(m.firstName, m.lastName) : '–'}</span>;
+  const inner = m?.photo ? <span class="av" style={style}><img src={m.photo} alt="" /></span> : <span class="av" style={style}>{m ? initials(m.firstName, m.lastName) : '–'}</span>;
+  const online = presence && size >= 20 && !!m?.id && s.presence.includes(m.id);
+  const mood = size >= 24 ? m?.mood : null;
+  if (!online && !mood?.emoji) return inner;
+  const dot = Math.max(8, Math.round(size * 0.28));
+  return (
+    <span class="avw" style={{ width: size + 'px', height: size + 'px' }} title={mood ? (mood.emoji + ' ' + mood.text).trim() : undefined}>
+      {inner}
+      {online && <i class="av-dot" style={{ width: dot + 'px', height: dot + 'px' }} aria-label="Çevrimiçi" />}
+      {mood?.emoji && <i class="av-mood" style={{ fontSize: Math.max(10, Math.round(size * 0.36)) + 'px' }} aria-hidden="true">{mood.emoji}</i>}
+    </span>
+  );
 }
 
 export function Switch({ on, label, hint, onToggle }: { on: boolean; label: string; hint?: string; onToggle: () => void }) {
@@ -107,6 +120,6 @@ export function Modal({ title, onClose, children, width }: { title: string; onCl
   );
 }
 
-export function meAsMember(me: Me): Pick<Member, 'firstName' | 'lastName' | 'color' | 'photo'> {
-  return { firstName: me.firstName, lastName: me.lastName, color: me.color, photo: me.photo };
+export function meAsMember(me: Me): AvatarMember {
+  return { id: me.id, firstName: me.firstName, lastName: me.lastName, color: me.color, photo: me.photo, mood: moodOf(me.settings) };
 }

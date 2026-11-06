@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'preact/hooks';
 import type { ComponentChildren } from 'preact';
-import { api, loadMe, snack, shrinkImage, disconnectLive, store, initials } from '../api';
+import { api, loadMe, snack, shrinkImage, disconnectLive, store, initials, moodOf, type Mood } from '../api';
 import { Avatar, Icon, Link, Modal, Switch, meAsMember, navigate, useStore } from '../ui';
 import { applyTheme, useThemePref, type ThemePref } from '../theme';
 import { PushToggle } from './PushToggle';
@@ -110,6 +110,86 @@ export function Shell({ path, children }: { path: string; children: ComponentChi
   );
 }
 
+// Kişi durumu: 🎬 Çekimde · 🎧 Odaklanıyorum … (Slack'teki gibi; süresi dolunca kendiliğinden kalkar)
+const MOODS: { emoji: string; text: string; focus?: boolean }[] = [
+  { emoji: '🎬', text: 'Çekimde' },
+  { emoji: '🎧', text: 'Odaklanıyorum', focus: true },
+  { emoji: '🤝', text: 'Toplantıda' },
+  { emoji: '🍽', text: 'Öğle arası' },
+  { emoji: '🏠', text: 'Evden çalışıyorum' },
+  { emoji: '🚗', text: 'Yoldayım' },
+  { emoji: '🤒', text: 'İzinli' },
+];
+const DURATIONS: { label: string; until: () => string | null }[] = [
+  { label: '30 dk', until: () => new Date(Date.now() + 30 * 6e4).toISOString() },
+  { label: '1 saat', until: () => new Date(Date.now() + 60 * 6e4).toISOString() },
+  { label: '2 saat', until: () => new Date(Date.now() + 120 * 6e4).toISOString() },
+  { label: '4 saat', until: () => new Date(Date.now() + 240 * 6e4).toISOString() },
+  { label: 'Bugün', until: () => { const d = new Date(); d.setHours(23, 59, 0, 0); return d.toISOString(); } },
+  { label: 'Süresiz', until: () => null },
+];
+const hm = (iso: string) => { const d = new Date(iso); return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); };
+
+function MoodButton() {
+  const s = useStore();
+  const mood = moodOf(s.me!.settings);
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <button type="button" class={'moodbtn' + (mood ? ' on' : '')} onClick={() => setOpen(true)} aria-label={mood ? 'Durum: ' + mood.text + ' — değiştir' : 'Durum ekle'}>
+        <span class="mood-e" aria-hidden="true">{mood?.emoji || '🙂'}</span>
+        <span class="mood-t">{mood ? mood.text || 'Durum' : 'Durum ekle'}</span>
+        {mood?.until && <span class="mood-u" title={'Bitiş: ' + hm(mood.until)}>⏱ {hm(mood.until)}</span>}
+      </button>
+      {open && <MoodModal current={mood} onClose={() => setOpen(false)} />}
+    </>
+  );
+}
+
+function MoodModal({ current, onClose }: { current: Mood | null; onClose: () => void }) {
+  const [emoji, setEmoji] = useState(current?.emoji || '🎬');
+  const [text, setText] = useState(current?.text || '');
+  const [focus, setFocus] = useState(!!current?.focus);
+  const [dur, setDur] = useState(current ? (current.until ? -1 : 5) : 1);
+  const [busy, setBusy] = useState(false);
+  async function save(clear = false) {
+    setBusy(true);
+    try {
+      const until = dur === -1 ? current?.until ?? null : DURATIONS[dur].until();
+      await api('PATCH', '/me', { settings: { mood: clear ? null : { emoji, text, until, focus } } });
+      await loadMe(); snack(clear ? 'Durum kaldırıldı' : 'Durumun güncellendi'); onClose();
+    } catch (e: any) { snack(e.message); } finally { setBusy(false); }
+  }
+  return (
+    <Modal title="Durumun" onClose={onClose} width={460}>
+      <div class="mood-presets">
+        {MOODS.map((m) => (
+          <button type="button" class={emoji === m.emoji && text === m.text ? 'on' : ''} onClick={() => { setEmoji(m.emoji); setText(m.text); setFocus(!!m.focus); }}>
+            <span aria-hidden="true">{m.emoji}</span>{m.text}
+          </button>
+        ))}
+      </div>
+      <div class="row" style="gap:8px;flex-wrap:nowrap">
+        <input class="input" style="width:64px;text-align:center;font-size:20px" maxLength={4} value={emoji} aria-label="Emoji" onInput={(e) => setEmoji((e.target as HTMLInputElement).value)} />
+        <input class="input" maxLength={60} placeholder="Ne yapıyorsun?" value={text} aria-label="Durum metni" onInput={(e) => setText((e.target as HTMLInputElement).value)} onKeyDown={(e) => { if (e.key === 'Enter') save(); }} />
+      </div>
+      <div class="field">Ne kadar süre?
+        <div class="seg" role="group" aria-label="Süre" style="flex-wrap:wrap">
+          {current?.until && <button type="button" class={dur === -1 ? 'on' : ''} onClick={() => setDur(-1)}>Şu anki (bitiş {hm(current.until)})</button>}
+          {DURATIONS.map((d, i) => <button type="button" class={dur === i ? 'on' : ''} onClick={() => setDur(i)}>{d.label}</button>)}
+        </div>
+      </div>
+      <Switch on={focus} label="Dürtmeleri sessize al" hint="Bu durum sürdükçe ses, titreme ve bildirim gelmez; dürtmeler zilde birikir" onToggle={() => setFocus(!focus)} />
+      <div class="row">
+        {current && <button type="button" class="btn ghost" style="color:var(--red);border:0;padding:0 4px" disabled={busy} onClick={() => save(true)}>Durumu kaldır</button>}
+        <span class="spacer" />
+        <button type="button" class="btn" onClick={onClose}>Vazgeç</button>
+        <button type="button" class="btn primary" disabled={busy || (!emoji.trim() && !text.trim())} onClick={() => save()}>Kaydet</button>
+      </div>
+    </Modal>
+  );
+}
+
 // Tek profil: bütün ekranlarda aynı kart ve aynı pencere
 function ProfileCard() {
   const s = useStore();
@@ -124,6 +204,7 @@ function ProfileCard() {
           <span style="font-size:11px;color:var(--mute2)">{me.role === 'admin' ? 'Yönetici' : 'Üye'}</span>
         </span>
       </div>
+      <MoodButton />
       <button type="button" class="btn sm" onClick={() => setEdit(true)}><Icon n="user" size={14} />Profilimi düzenle</button>
       {edit && <ProfileModal onClose={() => setEdit(false)} />}
     </div>

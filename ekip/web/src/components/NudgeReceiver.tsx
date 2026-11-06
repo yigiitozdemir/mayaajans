@@ -1,6 +1,6 @@
 // Gelen dürtmeleri her ekranda karşılar: ses, ekran titremesi, Mac bildirimi (hiçbir şeyi engellemez).
 import { useEffect, useState } from 'preact/hooks';
-import { api, ApiError, onLive, snack, store } from '../api';
+import { api, ApiError, onLive, snack, store, moodOf } from '../api';
 import { desktopInvoke, isDesktop } from '../desktop';
 import { Avatar, navigate, useStore } from '../ui';
 import '../styles/durt.css';
@@ -134,7 +134,7 @@ export function NudgeReceiver() {
     const me = store.get().me;
     if (!me || n.fromId === me.id) return;
     const st = me.settings || {};
-    if (st.dnd === true) return; // rahatsız etme: sessiz, zil kaydı yeter
+    if (st.dnd === true || moodOf(st)?.focus) return; // rahatsız etme / Odaklanıyorum: sessiz, zil kaydı yeter
     const from = store.get().team.find((m) => m.id === n.fromId);
     const first = from?.firstName || 'Ekipten biri';
     if (st.nudgeSound !== false) beep();

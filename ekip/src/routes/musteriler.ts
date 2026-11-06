@@ -101,6 +101,7 @@ function listView(row: ClientRow, files: FileRow[]) {
     archived: !!row.archived,
     sector: kit.sector, owner: kit.owner || null,
     logoFileId: logo?.id || null, logoVariant: logo?.variant || null,
+    color: kit.colors[0]?.hex || null, // marka ana rengi (kartlardaki renk şeridi)
     fileCount: files.length, colorCount: kit.colors.length,
     incomplete: !kit.sector && kit.colors.length === 0 && files.length === 0,
     updatedAt: row.updated_at,

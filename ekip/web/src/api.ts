@@ -7,17 +7,28 @@ export interface Me {
 export interface Member {
   id: string; firstName: string; lastName: string; name: string; color: string; photo: string | null;
   role: 'admin' | 'member'; status: 'pending' | 'active'; canEditClients: boolean; email: string;
+  mood?: Mood | null; // kişi durumu: 🎬 Çekimde …
+}
+export interface Mood { emoji: string; text: string; until: string | null; focus: boolean }
+/** Ayarlardaki kişi durumu; süresi dolduysa null. */
+export function moodOf(settings: Record<string, unknown> | undefined | null): Mood | null {
+  const m = settings?.mood as Mood | undefined;
+  if (!m || (!m.emoji && !m.text)) return null;
+  if (m.until && Date.parse(m.until) <= Date.now()) return null;
+  return m;
 }
 export interface Task {
   id: string; title: string; client: string; assigneeId: string | null; dueDate: string | null; status: 0 | 1 | 2;
   note: string; items: string[]; link: string; doneLink: string; source: string; createdBy: string | null;
   createdAt: string; updatedAt: string; completedAt: string | null;
+  /** İçerik onayı: '' Hazırlanıyor/takipte değil · sent Onaya gönderildi · revision Revize istendi · approved Onaylandı · published Paylaşıldı */
+  approval: '' | 'sent' | 'revision' | 'approved' | 'published'; approvalAt: string | null; sentAt: string | null; revisions: number;
 }
 export interface Notification {
   id: string; kind: string; taskId: string | null; actorId: string | null; title: string; body: string;
   createdAt?: string; readAt: string | null; reminders: number; link?: string | null; meta?: string;
 }
-export interface Client { id: string; name: string; slack_channel: string | null }
+export interface Client { id: string; name: string; slack_channel: string | null; logoFileId?: string | null; logoVariant?: string | null; color?: string | null }
 
 export class ApiError extends Error { constructor(public status: number, message: string) { super(message); } }
 
@@ -47,10 +58,11 @@ export interface State {
   online: boolean;
   toasts: { id: string; heading: string; title: string; meta: string; taskId: string | null; actorId: string | null; link?: string | null }[];
   chatUnread: number; // Sohbet: okunmamış mesaj sayısı (menüde)
+  presence: string[]; // çevrimiçi kişiler (avatarlardaki yeşil nokta)
   snack: string | null;
 }
 type Listener = () => void;
-let state: State = { ready: false, me: null, team: [], tasks: [], notifications: [], clients: [], online: true, toasts: [], snack: null, chatUnread: 0 };
+let state: State = { ready: false, me: null, team: [], tasks: [], notifications: [], clients: [], online: true, toasts: [], snack: null, chatUnread: 0, presence: [] };
 const listeners = new Set<Listener>();
 export const store = {
   get: () => state,
@@ -116,6 +128,7 @@ export function connectLive() {
   ws.onopen = () => {
     const wasOffline = !store.get().online;
     retry = 0; store.set({ online: true });
+    api<string[]>('GET', '/online').then((ids) => Array.isArray(ids) && store.set({ presence: ids })).catch(() => {});
     clearInterval(pingTimer);
     pingTimer = setInterval(() => { try { ws?.send('ping'); } catch { /* */ } }, 25_000);
     if (wasOffline) { loadAll().catch(() => {}); window.dispatchEvent(new CustomEvent('maya-live', { detail: { type: '*' } })); } // kopukken olan değişiklikleri al
@@ -124,6 +137,7 @@ export function connectLive() {
     if (e.data === 'pong') return;
     let msg: any; try { msg = JSON.parse(e.data); } catch { return; }
     window.dispatchEvent(new CustomEvent('maya-live', { detail: msg }));
+    if (msg.type === 'presence' && Array.isArray(msg.online)) { store.set({ presence: msg.online }); return; }
     if (msg.type === 'tasks') reloadTasks().catch(() => {});
     else if (msg.type === 'team') { reloadTeam().catch(() => {}); loadMe().catch(() => {}); }
     else if (msg.type === 'notify' || msg.type === 'remind') {

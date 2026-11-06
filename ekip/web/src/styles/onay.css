@@ -1,0 +1,52 @@
+/* İçerik onay takibi (iş detayı şeridi, rozetler, Bugün bloğu) */
+.onay-badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 99px; font-size: 11px; font-weight: 700; white-space: nowrap; line-height: 1.5; }
+.onay-badge.sent { background: rgba(201, 138, 27, .14); color: var(--amber-ink); }
+.onay-badge.late { background: var(--red-soft); color: var(--red); }
+.onay-badge.rev { background: var(--accent-soft2); color: var(--accent-ink); }
+.onay-badge.ok { background: var(--green-soft); color: var(--green); }
+.onay-badge.pub { background: var(--chip); color: var(--mute); }
+
+.onay { display: flex; flex-direction: column; gap: 12px; padding: 14px; border-radius: 12px; background: var(--panel); border: 1px solid var(--line); }
+.onay-h { margin: 0; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--mute2); }
+.onay-cap { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--mute2); }
+
+.onay-steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; counter-reset: s; }
+.onay-steps li { position: relative; display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; font-size: 11px; line-height: 1.25; color: var(--mute2); }
+.onay-steps li::before { content: ''; position: absolute; top: 11px; right: 50%; width: 100%; height: 2px; background: var(--line2); z-index: 0; }
+.onay-steps li:first-child::before { display: none; }
+.onay-steps li.done::before, .onay-steps li.cur::before { background: var(--accent); }
+.onay-steps .b { position: relative; z-index: 1; width: 24px; height: 24px; border-radius: 99px; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; background: var(--card); border: 2px solid var(--line2); color: var(--mute2); }
+.onay-steps li.done .b { background: var(--accent-soft2); border-color: var(--accent); color: var(--accent-ink); }
+.onay-steps li.cur .b { background: var(--accent-fill); border-color: var(--accent-fill); color: #fff; box-shadow: 0 0 0 4px var(--accent-soft); }
+.onay-steps li.cur .l { color: var(--ink); font-weight: 700; }
+.onay-steps li.done .l { color: var(--mute); }
+
+.onay-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+.onay-actions .btn { flex: 1 1 auto; }
+.onay-actions .btn.on, .onay-actions .btn.on:disabled { opacity: 1; background: var(--sel); border-color: var(--accent); color: var(--ink); }
+
+.onay-rev { display: flex; flex-direction: column; gap: 8px; padding: 12px; border-radius: 10px; background: var(--card); border: 1px solid var(--accent); }
+
+.onay-log { display: flex; flex-direction: column; gap: 6px; }
+.onay-log ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.onay-log li { display: flex; align-items: flex-start; gap: 10px; padding: 7px 0; border-top: 1px solid var(--line); font-size: 12.5px; line-height: 1.4; color: var(--ink2); }
+.onay-log li:first-child { border-top: 0; }
+.onay-log .t { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.onay-log time { flex: none; font-size: 12px; white-space: nowrap; }
+.onay-log .dot { flex: none; margin-top: 5px; width: 8px; height: 8px; border-radius: 99px; background: var(--wait); }
+.onay-log .dot.sent { background: var(--amber); }
+.onay-log .dot.revision { background: var(--accent); }
+.onay-log .dot.approved { background: var(--green-dot); }
+.onay-log .dot.published { background: var(--green); }
+.onay-note { display: block; quotes: none; padding: 6px 10px; border-radius: 8px; background: var(--note-bg); border-left: 3px solid var(--accent); color: var(--ink); font-size: 12.5px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.onay-note::before, .onay-note::after { content: none; }
+.linkbtn.sm { font-size: 12px; color: var(--accent-ink); align-self: flex-start; }
+
+/* İş Planı listesi */
+.onay-cell { white-space: nowrap; }
+.onay-none { color: var(--mute2); }
+
+@media (max-width: 640px) {
+  .onay-steps .l { font-size: 10px; }
+  .onay-actions .btn { flex: 1 1 calc(50% - 6px); }
+}

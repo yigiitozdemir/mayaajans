@@ -63,6 +63,11 @@ export function openLive(client) {
 
 /** Zamanlanmış görevi tetikler: cron '5 * * * *' (saatlik) ya da '30 13 * * *' (16:30). */
 export async function runCron(cron) {
+  // --test-scheduled ile gelen uç (en güvenilir); olmazsa yerel gezgin ucu
+  try {
+    const r = await fetch(`${BASE}/__scheduled?cron=${encodeURIComponent(cron)}`);
+    if (r.ok) { await r.text(); await new Promise((res) => setTimeout(res, 300)); return 200; }
+  } catch { /* */ }
   const r = await fetch(`${BASE}/cdn-cgi/local/explorer/api/local/scheduled?worker=maya-ekip`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ cron }) });
   return r.status;
 }

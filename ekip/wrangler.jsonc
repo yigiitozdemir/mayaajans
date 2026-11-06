@@ -25,7 +25,7 @@
   ],
 
   // iPhone / tarayıcı bildirimleri (Web Push) — açık anahtar burada, gizli anahtar `wrangler secret` ile
-  "vars": { "VAPID_PUBLIC": "" },
+  "vars": { "VAPID_PUBLIC": "BLdQv-GrxVIgGmf2PPlpl_aXjglry0mDCVxV0guC53ab6juNzuemPI8FOPxGSKYpqowYneJ_nVQLP3xvCaYsfko" },
 
   // Canlı güncelleme merkezi (WebSocket). Ücretsiz planda SQLite tabanlı Durable Object.
   "durable_objects": {

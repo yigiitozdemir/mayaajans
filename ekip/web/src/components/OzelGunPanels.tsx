@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useState } from 'preact/hooks';
 import { api, reloadTasks, snack, store, memberName, todayIso, fmtDate, parseD, LMON, LDAY, MON, type Member } from '../api';
 import { Avatar, Icon, Modal, useStore } from '../ui';
+import { ClientMark } from './ClientMark';
 
 export interface SRow {
   client: string; format: string; lang: string; assigneeId: string | null; status: 0 | 1 | 2;
@@ -289,6 +290,7 @@ function RowItem({ day, r, meId, onChange, openTask }: { day: SDay; r: SRow; meI
   return (
     <div class={'og-row' + (r.status === 2 ? ' done' : '')}>
       <div class="top">
+        <ClientMark name={r.client} size={22} />
         <span class="firm" title={r.client}>{r.client}</span>
         <span class="og-st"><span class="dot" style={{ background: st.c }} />{st.l}</span>
         {!confirmRm
