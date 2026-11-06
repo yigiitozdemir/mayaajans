@@ -223,7 +223,7 @@ textarea.input { height: auto; padding: 10px 12px; line-height: 1.5; resize: ver
 .donechip { display: inline-flex; align-items: center; gap: 4px; color: var(--green); }
 
 /* ---------- görünüm seçici (menünün altı) ---------- */
-.themepick { margin-top: auto; padding-top: 18px; display: flex; flex-direction: column; gap: 0; }
+.themepick { padding-top: 14px; display: flex; flex-direction: column; gap: 0; }
 .themepick .navh { margin: 0 10px 8px; }
 .themepick .seg { padding: 3px; gap: 2px; }
 .themepick .seg button { flex: 1; min-height: 30px; padding: 0 6px; font-size: 12px; display: inline-flex; align-items: center; justify-content: center; gap: 5px; }
@@ -239,3 +239,22 @@ textarea.input { height: auto; padding: 10px 12px; line-height: 1.5; resize: ver
 .allmine-it .tt { font-size: 13px; font-weight: 600; line-height: 1.35; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
 .allmine-it:hover .tt { color: var(--accent-ink); }
 @media (max-width: 640px) { .allmine .seg { width: 100%; } .allmine .seg button { flex: 1; } }
+
+/* ---------- menünün altı: Yapay Zekâ kısayolları ---------- */
+.aiquick { margin-top: auto; padding-top: 18px; display: flex; flex-direction: column; }
+.aiquick-h { display: flex; align-items: center; justify-content: space-between; margin: 0 4px 8px 10px; }
+.aiquick-h .navh { margin: 0; }
+.aiquick-help { display: inline-flex; width: 24px; height: 24px; align-items: center; justify-content: center; border-radius: 7px; color: var(--mute2); }
+.aiquick-help:hover, .aiquick-help.on { background: var(--sel); color: var(--ink); }
+.aiquick-row { display: flex; flex-direction: column; gap: 6px; }
+.aiq { min-width: 0; display: flex; align-items: center; gap: 10px; min-height: 40px; padding: 0 10px 0 6px; border-radius: 11px; border: 1px solid var(--line); background: var(--card); color: var(--ink); font-size: 13px; font-weight: 600; text-align: left; transition: transform .12s ease, border-color .12s ease, box-shadow .12s ease; }
+.aiq:hover { border-color: var(--line2); box-shadow: var(--shadow); transform: translateY(-1px); }
+.aiq:active { transform: none; }
+.aiq-ic { flex: none; width: 26px; height: 26px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; }
+.aiq.gpt .aiq-ic { background: #10A37F; }
+.aiq.cld .aiq-ic { background: #D97757; }
+.aiq-n { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.aiq-go { flex: none; color: var(--mute2); display: inline-flex; }
+.aiq:hover .aiq-go { color: var(--ink); }
+@media (prefers-reduced-motion: reduce) { .aiq { transition: none; } .aiq:hover { transform: none; } }
+@media (max-width: 880px) { .aiquick { margin-top: 10px; max-width: 360px; } }

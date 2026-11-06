@@ -3,6 +3,34 @@ import type { ComponentChildren } from 'preact';
 import { api, loadMe, snack, shrinkImage, disconnectLive, store, initials } from '../api';
 import { Avatar, Icon, Link, Modal, Switch, meAsMember, navigate, useStore } from '../ui';
 import { applyTheme, useThemePref, type ThemePref } from '../theme';
+import { desktopOr } from '../desktop';
+
+// Menünün altında: ChatGPT ve Claude kısayolları (kişinin kendi hesabıyla; Mac'te programın içinde açılır)
+const AI = [
+  { id: 'chatgpt', name: 'ChatGPT', url: 'https://chatgpt.com/', icon: 'chat', cls: 'gpt' },
+  { id: 'claude', name: 'Claude', url: 'https://claude.ai/new', icon: 'asterisk', cls: 'cld' },
+];
+function AiQuick({ path }: { path: string }) {
+  return (
+    <div class="aiquick">
+      <div class="aiquick-h">
+        <span class="navh" id="maya-yz">Yapay Zekâ</span>
+        <a href="/yapay-zeka" class={'aiquick-help' + (path === '/yapay-zeka' ? ' on' : '')} aria-label="Yapay Zekâ: nasıl kullanılır" title="Nasıl kullanılır?"
+          onClick={(e) => { e.preventDefault(); navigate('/yapay-zeka'); }}><Icon n="help" size={14} /></a>
+      </div>
+      <div class="aiquick-row" role="group" aria-labelledby="maya-yz">
+        {AI.map((a) => (
+          <button type="button" class={'aiq ' + a.cls} title={a.name + "'ı aç (kendi hesabınla)"}
+            onClick={() => desktopOr('open_ai', { which: a.id }, () => window.open(a.url, '_blank', 'noopener'))}>
+            <span class="aiq-ic" aria-hidden="true"><Icon n={a.icon} size={15} stroke="#fff" w={2.2} /></span>
+            <span class="aiq-n">{a.name}</span>
+            <span class="aiq-go" aria-hidden="true"><Icon n="ext" size={13} /></span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 // Menünün altında: Sistem · Açık · Koyu
 const THEMES: { v: ThemePref; label: string; icon: string }[] = [
@@ -40,7 +68,6 @@ const NAV = [
   { href: '/musteriler', label: 'Müşteriler', icon: 'clients' },
   { href: '/sohbet', label: 'Sohbet', icon: 'chat' },
   { href: '/durt', label: 'Dürtme', icon: 'hand' },
-  { href: '/yapay-zeka', label: 'Yapay Zekâ', icon: 'spark' },
 ];
 
 export function Shell({ path, children }: { path: string; children: ComponentChildren }) {
@@ -65,6 +92,7 @@ export function Shell({ path, children }: { path: string; children: ComponentChi
             </>
           )}
         </nav>
+        <AiQuick path={path} />
         <ThemePicker />
       </aside>
       <div class="main">{children}</div>
