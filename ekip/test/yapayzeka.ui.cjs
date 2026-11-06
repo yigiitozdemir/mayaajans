@@ -29,13 +29,15 @@ const { chromium } = require('playwright');
     ok(c[1].y < 2, 'üst çubuk yok: uygulama en üstten başlamalı (y=' + c[1].y + ')');
     const vh = await p.evaluate(() => innerHeight); ok(Math.abs(c[1].h - vh) < 2, 'tam yükseklik');
     ok(await p.locator('.aiq.gpt.on').count() === 1, 'menüde seçili görünmeli');
+    ok(await p.locator('.shell.rail').count() === 1 && side.width < 80, 'uygulama açıkken sol menü simge şeridi olmalı: ' + side.width);
+    await p.screenshot({ path: (process.argv[2] || '.') + '/yz-serit.png' });
   });
   await t('Claude sekmesi → Claude gösterilir', async () => {
     await clear(p); await p.locator('.aiq.cld').click(); await p.waitForTimeout(300);
     eq((await last(p, 'ai_show'))[1].which, 'claude');
   });
   await t('profil penceresi açılınca gizlenir, kapanınca geri gelir', async () => {
-    await clear(p); await p.getByRole('button', { name: 'Profilimi düzenle' }).click(); await p.waitForTimeout(300);
+    await clear(p); await p.getByRole('button', { name: 'Profilim' }).click(); await p.waitForTimeout(300);
     ok(await last(p, 'ai_hide'), 'gizlenmedi');
     await clear(p); await p.keyboard.press('Escape'); await p.waitForTimeout(300);
     ok(await last(p, 'ai_show'), 'geri gelmedi');
@@ -46,11 +48,12 @@ const { chromium } = require('playwright');
   });
   await t('pencere boyutu değişince yeni ölçü gönderilir', async () => {
     await clear(p); await p.setViewportSize({ width: 1100, height: 700 }); await p.waitForTimeout(400);
-    const c = await last(p, 'ai_show'); ok(c && c[1].w < 900 && c[1].h <= 700, JSON.stringify(c && c[1]));
+    const c = await last(p, 'ai_show'); ok(c && c[1].w <= 1100 - 60 && c[1].h <= 700, JSON.stringify(c && c[1]));
   });
   await t('başka sayfaya geçince gizlenir', async () => {
     await clear(p); await p.getByRole('link', { name: /İş Planı/ }).click(); await p.waitForTimeout(300);
     ok(await last(p, 'ai_hide'), 'gizlenmedi'); ok(!(await last(p, 'ai_show')), 'tekrar gösterilmemeli');
+    eq(await p.locator('.shell.rail').count(), 0, 'başka sayfada geniş menü geri gelmeli');
   });
   await t('"Ayrı pencere" düğmesi', async () => {
     await p.locator('.aiq.cld').click(); await p.waitForTimeout(300); await clear(p);
@@ -65,10 +68,10 @@ const { chromium } = require('playwright');
   });
   await t('tema ile uyumlu açılış rengi (koyu/açık bilgisi gönderilir)', async () => {
     await p.locator('.aiq.gpt').click(); await p.waitForTimeout(300);
-    await p.getByRole('radio', { name: 'Açık' }).click(); await p.waitForTimeout(300); await clear(p);
-    await p.getByRole('radio', { name: 'Koyu' }).click(); await p.waitForTimeout(300);
+    const theme = async (name) => { await p.keyboard.press('Control+k'); await p.locator('.ap-root input').fill(name); await p.waitForTimeout(250); await p.keyboard.press('Enter'); await p.waitForTimeout(400); };
+    await clear(p); await theme('Koyu tema');
     eq((await last(p, 'ai_show'))[1].dark, true); eq((await last(p, 'set_theme'))[1].theme, 'dark');
-    await clear(p); await p.getByRole('radio', { name: 'Açık' }).click(); await p.waitForTimeout(300);
+    await clear(p); await theme('Açık tema');
     eq((await last(p, 'ai_show'))[1].dark, false);
   });
   await t('WhatsApp: menüde, panelde açılır, okunmamış sayısı görünür', async () => {
@@ -79,7 +82,7 @@ const { chromium } = require('playwright');
     await p.locator('.aiq.wa .aiq-badge', { hasText: '4' }).waitFor();
     await p.evaluate(() => window.dispatchEvent(new CustomEvent('maya-desktop', { detail: { action: 'app-unread', app: 'whatsapp', count: 0 } })));
     await p.waitForTimeout(150); eq(await p.locator('.aiq.wa .aiq-badge').count(), 0);
-    await p.getByText('Uygulamalar').first().waitFor();
+    await p.getByRole('link', { name: 'Uygulamalar: nasıl kullanılır' }).waitFor();
   });
   await t('konsol hatası yok', async () => eq(errs.length, 0, errs.join(' | ')));
   await p.screenshot({ path: (process.argv[2] || '.') + '/yz-gomulu.png' });

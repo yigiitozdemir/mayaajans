@@ -202,6 +202,8 @@ fn unread_from_title(title: &str) -> u32 {
 static APP_UNREAD: std::sync::Mutex<Vec<(String, u32)>> = std::sync::Mutex::new(Vec::new());
 /// Şu an panelde görünen uygulama ("" = hiçbiri)
 static VISIBLE_APP: std::sync::Mutex<String> = std::sync::Mutex::new(String::new());
+/// Görünen uygulamanın sol/üst boşluğu (sol menü genişliği, üst boşluk)
+static LAYOUT: std::sync::Mutex<(f64, f64)> = std::sync::Mutex::new((0.0, 0.0));
 
 /// Okunmamış sayısı değişince menüye bildirir; arttıysa ve program önde değilse Mac bildirimi gönderir.
 fn on_app_title(app: &AppHandle, which: &str, title: &str) {
@@ -261,7 +263,8 @@ fn preload_whatsapp(app: &AppHandle) {
 }
 
 #[tauri::command]
-async fn ai_show(app: AppHandle, which: String, x: f64, y: f64, w: f64, h: f64, dark: Option<bool>) -> Result<(), String> {
+async fn ai_show(app: AppHandle, which: String, x: f64, y: f64, w: f64, h: f64, dark: Option<bool>) -> Result<serde_json::Value, String> {
+    let _ = (w, h); // ölçü artık pencerenin gerçek iç boyutundan hesaplanıyor (sayfanın ölçüsü yalnızca yedek)
     let Some(&(_, label, url)) = AI_EMBED.iter().find(|(id, _, _)| *id == which) else {
         return Err("bilinmeyen".into());
     };
@@ -273,8 +276,8 @@ async fn ai_show(app: AppHandle, which: String, x: f64, y: f64, w: f64, h: f64, 
         }
     }
     if let Ok(mut v) = VISIBLE_APP.lock() { *v = which.clone(); }
-    let pos = tauri::LogicalPosition::new(x.max(0.0), y.max(0.0));
-    let size = tauri::LogicalSize::new(w.max(200.0), h.max(200.0));
+    if let Ok(mut l) = LAYOUT.lock() { *l = (x.max(0.0), y.max(0.0)); }
+    let (pos, size, info) = app_rect(&app, x, y, w, h);
     // yüklenirken beyaz parlama olmasın: zemin programın temasıyla aynı
     let bg = if dark.unwrap_or(false) { tauri::window::Color(26, 21, 18, 255) } else { tauri::window::Color(244, 241, 236, 255) };
     if let Some(v) = app.get_webview(label) {
@@ -283,14 +286,46 @@ async fn ai_show(app: AppHandle, which: String, x: f64, y: f64, w: f64, h: f64, 
         let _ = v.set_size(size);
         let _ = v.show();
         let _ = v.set_focus();
-        return Ok(());
+        return Ok(info);
     }
     if which == "whatsapp" {
         set_flag(&app, "whatsapp-acik", true);
     }
     let v = create_app_view(&app, &which, label, url, pos, size, bg)?;
+    let _ = v.set_position(pos); // bazı macOS sürümlerinde ilk konum uygulanmayabiliyor
+    let _ = v.set_size(size);
     let _ = v.set_focus();
-    Ok(())
+    Ok(info)
+}
+
+/// Uygulamanın yeri: sol menünün sağı (x) ve sayfanın üst boşluğu (y); genişlik/yükseklik pencerenin GERÇEK iç
+/// boyutundan (mantıksal nokta) hesaplanır. Böylece sayfa ölçüsüyle yerel pencere ölçüsü farkı kaymaya yol açmaz.
+fn app_rect(app: &AppHandle, x: f64, y: f64, w: f64, h: f64) -> (tauri::LogicalPosition<f64>, tauri::LogicalSize<f64>, serde_json::Value) {
+    let x = x.max(0.0);
+    let y = y.max(0.0);
+    let win = main_window(app).and_then(|win| {
+        let sf = win.scale_factor().ok()?;
+        let sz = win.inner_size().ok()?.to_logical::<f64>(sf);
+        Some((sz.width, sz.height, sf))
+    });
+    let (ww, hh, sf) = win.unwrap_or((x + w, y + h, 1.0));
+    let width = (ww - x).max(200.0);
+    let height = (hh - y).max(200.0);
+    let info = serde_json::json!({ "window": [ww, hh], "scale": sf, "rect": [x, y, width, height], "page": [x, y, w, h] });
+    (tauri::LogicalPosition::new(x, y), tauri::LogicalSize::new(width, height), info)
+}
+
+/// Pencere boyutu değişince görünen uygulamayı anında yeniden yerleştir (sayfanın haber vermesini beklemeden).
+fn relayout_visible(app: &AppHandle) {
+    let which = VISIBLE_APP.lock().map(|v| v.clone()).unwrap_or_default();
+    if which.is_empty() { return; }
+    let Some(&(_, label, _)) = AI_EMBED.iter().find(|(id, _, _)| *id == which) else { return };
+    let (x, y) = LAYOUT.lock().map(|l| *l).unwrap_or((0.0, 0.0));
+    let (pos, size, _) = app_rect(app, x, y, 0.0, 0.0);
+    if let Some(v) = app.get_webview(label) {
+        let _ = v.set_position(pos);
+        let _ = v.set_size(size);
+    }
 }
 
 /// Başka sayfaya geçilince ya da üstte bir pencere (profil, iş detayı, bildirimler) açılınca gizle; sohbet kaybolmaz.
@@ -588,11 +623,14 @@ pub fn run() {
 
             // kapat düğmesi programı kapatmaz, arka plana alır
             let w = window.clone();
-            window.on_window_event(move |event| {
-                if let WindowEvent::CloseRequested { api, .. } = event {
+            let rl = handle.clone();
+            window.on_window_event(move |event| match event {
+                WindowEvent::CloseRequested { api, .. } => {
                     api.prevent_close();
                     let _ = w.hide();
                 }
+                WindowEvent::Resized(_) | WindowEvent::ScaleFactorChanged { .. } => relayout_visible(&rl),
+                _ => {}
             });
 
             build_tray(&handle)?;

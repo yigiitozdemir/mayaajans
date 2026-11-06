@@ -1,6 +1,6 @@
 [package]
 name = "maya-ekip"
-version = "1.0.3"
+version = "1.0.4"
 description = "Maya Ajans ekip programı"
 authors = ["Maya Ajans"]
 edition = "2021"

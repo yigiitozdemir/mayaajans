@@ -22,9 +22,9 @@ export function usePath(): string {
   }, []);
   return p;
 }
-export function Link(props: { href: string; class?: string; children: ComponentChildren; 'aria-current'?: 'page' }) {
+export function Link(props: { href: string; class?: string; children: ComponentChildren; 'aria-current'?: 'page'; title?: string }) {
   return (
-    <a href={props.href} class={props.class} aria-current={props['aria-current']}
+    <a href={props.href} class={props.class} aria-current={props['aria-current']} title={props.title}
       onClick={(e) => { if (e.metaKey || e.ctrlKey) return; e.preventDefault(); navigate(props.href); }}>
       {props.children}
     </a>

@@ -1,6 +1,10 @@
 # Maya Ekip — sürüm notları
 # Her sürüm için "## <sürüm>" başlığı altına kısa maddeler yaz. Güncelleme penceresinde ekibe aynen gösterilir.
 
+## 1.0.4
+• ChatGPT, Claude ve WhatsApp program içinde tam yerine oturuyor: üstten kesilme ve kayma düzeltildi, pencere büyütülüp küçültülünce anında uyum sağlıyor.
+• Uygulama açıkken sol menü ince simge şeridine dönüşüyor; uygulamaya daha fazla yer kalıyor.
+
 ## 1.0.3
 • ChatGPT, Claude ve WhatsApp artık gerçekten programın içinde açılıyor (1.0.2'de ayrı pencerede açılıyordu).
 • Arka planda bekleyen WhatsApp görünümünün menüdeki tıklamaları engellemesi düzeltildi.

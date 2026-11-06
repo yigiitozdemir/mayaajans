@@ -329,3 +329,29 @@ textarea.input { height: auto; padding: 10px 12px; line-height: 1.5; resize: ver
 /* pencereler telefonda ekrana sığsın, düğmeler görünür kalsın */
 .dialog { max-height: calc(100dvh - 32px); }
 @media (max-width: 640px) { .overlay { padding: 8px; align-items: flex-end; } .dialog { padding: 20px 16px; border-radius: 18px; max-height: calc(100dvh - 16px); } }
+
+/* ---------- simge şeridi: Mac'te uygulama panelin içinde açıkken sol menü daralır ---------- */
+.shell.rail .side { flex: 0 0 68px; max-width: 68px; padding: 14px 8px; gap: 2px; align-items: stretch; }
+.shell.rail .brand { padding: 4px 0 12px; align-items: center; }
+.shell.rail .brand img { width: 40px; height: 40px; object-fit: cover; object-position: left center; border-radius: 10px; content: url(/icon-64.png); }
+.shell.rail .brand span, .shell.rail .searchbtn span, .shell.rail .searchbtn kbd,
+.shell.rail .pcard .pcard-name, .shell.rail .pcard .moodbtn, .shell.rail .pcard > .btn,
+.shell.rail .navh, .shell.rail .aiq-n, .shell.rail .aiq-go { display: none !important; }
+.shell.rail .aiquick-h { justify-content: center; margin: 0 0 6px; }
+.shell.rail .aiquick-tools { flex-direction: row; gap: 2px; }
+.shell.rail .themepick { display: none; }
+.shell.rail .searchbtn { justify-content: center; padding: 0; margin: 0 0 10px; min-height: 40px; }
+.shell.rail .pcard { padding: 6px; align-items: center; background: transparent; border: 0; margin: 0 0 8px; }
+.shell.rail .pcard .row { justify-content: center; }
+.shell.rail .nav a { justify-content: center; padding: 0; min-height: 42px; font-size: 0; gap: 0; position: relative; }
+.shell.rail .nav a svg { width: 20px; height: 20px; }
+.shell.rail .nav a .count:not([style]) { display: none; }
+.shell.rail .nav a .count { position: absolute; top: 3px; right: 6px; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 99px; font-size: 10px; line-height: 16px; text-align: center; background: var(--chip); }
+.shell.rail .aiquick { padding-top: 10px; }
+.shell.rail .aiq { justify-content: center; padding: 0; min-height: 42px; position: relative; }
+.shell.rail .aiq-ic { width: 30px; height: 30px; border-radius: 9px; }
+.shell.rail .aiq-badge { position: absolute; top: 2px; right: 4px; min-width: 16px; height: 16px; font-size: 10px; padding: 0 4px; }
+.shell.rail .aiq.on { background: var(--sel); border-color: var(--accent); }
+
+.pcard-av { padding: 0; border: 0; background: transparent; border-radius: 12px; display: inline-flex; flex: none; }
+.pcard-av:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }

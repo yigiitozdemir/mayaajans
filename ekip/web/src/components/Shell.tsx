@@ -87,10 +87,14 @@ const NAV = [
 
 export function Shell({ path, children }: { path: string; children: ComponentChildren }) {
   const s = useStore();
+  const [, navTick] = useState(0); // aynı sayfada ?ai= / ?yardim değişince şeridi güncelle
+  useEffect(() => { const f = () => navTick((n) => n + 1); window.addEventListener('maya-nav', f); window.addEventListener('popstate', f); window.addEventListener('maya-ai-broken', f); return () => { window.removeEventListener('maya-nav', f); window.removeEventListener('popstate', f); window.removeEventListener('maya-ai-broken', f); }; }, []);
   const me = s.me!;
   const open = s.tasks.filter((t) => t.status !== 2).length;
+  // Mac'te ChatGPT/Claude/WhatsApp panelin içinde açıkken sol menü ince simge şeridine döner (uygulamaya yer kalır)
+  const rail = isDesktop && path === '/yapay-zeka' && !new URLSearchParams(location.search).has('yardim') && !document.documentElement.classList.contains('ai-broken');
   return (
-    <div class="shell">
+    <div class={'shell' + (rail ? ' rail' : '')}>
       <aside class="side">
         <Link href="/" class="brand"><img src="/logo.png" alt="Maya Ajans" /><span>Ekip alanı</span></Link>
         <button type="button" class="searchbtn" onClick={() => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true, metaKey: /Mac/.test(navigator.platform) }))}>
@@ -99,15 +103,15 @@ export function Shell({ path, children }: { path: string; children: ComponentChi
         <ProfileCard />
         <nav class="nav" aria-label="Ana menü">
           {(isDesktop ? [...NAV.slice(0, 2), { href: '/ekran', label: 'Ekran Görüntüleri', icon: 'image' }, ...NAV.slice(2)] : NAV).map((n) => (
-            <Link href={n.href} class={path === n.href ? 'on' : ''} aria-current={path === n.href ? 'page' : undefined}>
+            <Link href={n.href} class={path === n.href ? 'on' : ''} aria-current={path === n.href ? 'page' : undefined} title={n.label}>
               <Icon n={n.icon} />{n.label}{n.href === '/isler' && <span class="count">{open}</span>}{n.href === '/sohbet' && s.chatUnread > 0 && <span class="count" style="background:var(--badge);color:#fff">{s.chatUnread}</span>}
             </Link>
           ))}
           {me.role === 'admin' && (
             <>
               <div class="navh">Yönetim</div>
-              <Link href="/yonetici" class={path === '/yonetici' ? 'on' : ''}><Icon n="board" />Yönetici özeti</Link>
-              <Link href="/ekip" class={path === '/ekip' ? 'on' : ''}><Icon n="team" />Ekip yönetimi</Link>
+              <Link href="/yonetici" class={path === '/yonetici' ? 'on' : ''} title="Yönetici özeti"><Icon n="board" />Yönetici özeti</Link>
+              <Link href="/ekip" class={path === '/ekip' ? 'on' : ''} title="Ekip yönetimi"><Icon n="team" />Ekip yönetimi</Link>
             </>
           )}
         </nav>
@@ -205,10 +209,10 @@ function ProfileCard() {
   const me = s.me!;
   const [edit, setEdit] = useState(false);
   return (
-    <div style="margin:0 2px 14px;padding:10px;border-radius:12px;background:var(--chip);border:1px solid var(--line);display:flex;flex-direction:column;gap:8px">
+    <div class="pcard" style="margin:0 2px 14px;padding:10px;border-radius:12px;background:var(--chip);border:1px solid var(--line);display:flex;flex-direction:column;gap:8px">
       <div class="row" style="gap:10px;flex-wrap:nowrap">
-        <Avatar m={meAsMember(me)} size={38} radius={11} />
-        <span style="flex:1;min-width:0;display:flex;flex-direction:column">
+        <button type="button" class="pcard-av" aria-label="Profilim" title="Profilim" onClick={() => setEdit(true)}><Avatar m={meAsMember(me)} size={38} radius={11} /></button>
+        <span class="pcard-name" style="flex:1;min-width:0;display:flex;flex-direction:column">
           <span style="font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{(me.firstName + ' ' + me.lastName).trim()}</span>
           <span style="font-size:11px;color:var(--mute2)">{me.role === 'admin' ? 'Yönetici' : 'Üye'}</span>
         </span>

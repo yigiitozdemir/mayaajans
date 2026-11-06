@@ -35,6 +35,7 @@ const urlAi = (): AiId | null => { const v = new URLSearchParams(location.search
 /** Gömülü görünüm desteklenmiyorsa (tarayıcı / eski Mac sürümü) bir kez öğrenilir. */
 let embedBroken = !isDesktop;
 let embedError = '';
+let embedInfo = ''; // Mac programının bildirdiği gerçek ölçüler (teşhis)
 
 export function YapayZeka({ openTask }: { openTask: (id: string) => void }) {
   const [ai, setAi] = useState<AiId>(urlAi() || lastAi());
@@ -48,7 +49,7 @@ export function YapayZeka({ openTask }: { openTask: (id: string) => void }) {
   useEffect(() => { try { localStorage.setItem(LAST, ai); } catch { /* */ } }, [ai]);
 
   if (broken || help) return <AiInfo openTask={openTask} onBack={!broken ? () => navigate('/yapay-zeka?ai=' + ai) : undefined} />;
-  return <AiEmbed ai={ai} onFail={() => { embedBroken = true; setBroken(true); }} />;
+  return <AiEmbed ai={ai} onFail={() => { embedBroken = true; document.documentElement.classList.add('ai-broken'); window.dispatchEvent(new Event('maya-ai-broken')); setBroken(true); }} />;
 }
 
 function AiEmbed({ ai, onFail }: { ai: AiId; onFail: () => void }) {
@@ -63,7 +64,7 @@ function AiEmbed({ ai, onFail }: { ai: AiId; onFail: () => void }) {
         if (!alive || !host.current) return;
         if (covered()) { desktopCall('ai_hide').catch(() => {}); return; }
         const r = host.current.getBoundingClientRect();
-        desktopCall('ai_show', { which: ai, x: r.left, y: r.top, w: r.width, h: r.height, dark: document.documentElement.dataset.theme === 'dark' }).catch((e) => { embedError = String((e && (e.message || e)) || 'bilinmeyen hata'); if (alive) onFail(); });
+        desktopCall('ai_show', { which: ai, x: r.left, y: r.top, w: r.width, h: r.height, dark: document.documentElement.dataset.theme === 'dark' }).then((i) => { if (i) embedInfo = JSON.stringify(i) + ' sayfa:' + innerWidth + 'x' + innerHeight + ' dpr:' + devicePixelRatio; }).catch((e) => { embedError = String((e && (e.message || e)) || 'bilinmeyen hata'); if (alive) onFail(); });
       });
     };
     sync();
@@ -113,6 +114,7 @@ function Diagnose() {
       <code>
         masaüstü bağlantısı: {isDesktop ? 'var' : 'YOK'} · __TAURI__: {t ? 'var' : 'yok'} · internals: {ti ? 'var' : 'yok'}{'\n'}
         program sürümü: {ver || '—'} · gömme hatası: {embedError || '—'}{'\n'}
+        ölçüler: {embedInfo || '—'}{'\n'}
         adres: {location.origin} · tarayıcı kimliği: {ua}{looksMac ? ' (Mac uygulaması gibi)' : ''}
       </code>
     </details>
