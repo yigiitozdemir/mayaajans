@@ -14,7 +14,7 @@ export function IsPlani({ openTask }: { openTask: (id: string) => void }) {
   const s = useStore();
   const me = s.me!;
   const [view, setView] = useState<'board' | 'list'>('board');
-  const [person, setPerson] = useState('all');
+  const [person, setPerson] = useState(() => new URLSearchParams(location.search).get('kisi') || 'all'); // Yönetici özetinden ?kisi=
   const [firm, setFirm] = useState('all');
   const [q, setQ] = useState('');
   const [quick, setQuick] = useState<string | null>(null);

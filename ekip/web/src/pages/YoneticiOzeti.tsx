@@ -131,7 +131,7 @@ export function YoneticiOzeti({ openTask }: { openTask: (id: string) => void }) 
                 <tbody>
                   {data.people.map((p) => (
                     <tr class="yo-tr" tabIndex={0} role="link" aria-label={p.name + ': İş Planı'}
-                      onClick={() => navigate('/isler')} onKeyDown={(e) => { if (e.key === 'Enter') navigate('/isler'); }}>
+                      onClick={() => navigate('/isler' + (p.id ? '?kisi=' + p.id : ''))} onKeyDown={(e) => { if (e.key === 'Enter') navigate('/isler' + (p.id ? '?kisi=' + p.id : '')); }}>
                       <td><span class="row" style="gap:8px;flex-wrap:nowrap"><Avatar m={p.id ? (member(p.id) || p) : null} size={24} radius={7} /><span class="yo-name">{p.id ? p.firstName : 'Atanmamış'}</span></span></td>
                       <td class="n"><b>{p.open}</b></td>
                       <td class={'n' + (p.late ? ' yo-red' : ' yo-zero')}>{p.late}</td>
@@ -244,7 +244,15 @@ function AttGroup({ title, count, empty, children }: { title: string; count: num
 
 /** Son 8 haftanın tamamlanan iş sayısı: tek seri, sade çubuk grafik (inline SVG). */
 function Trend({ data }: { data: Summary['trend'] }) {
-  const W = 560, H = 210, L = 34, R = 8, T = 22, B = 34;
+  // genişlik kaba göre ölçülür: telefonda yazılar küçülmesin
+  const box = useRef<HTMLDivElement>(null);
+  const [W, setW] = useState(560);
+  useEffect(() => {
+    const el = box.current; if (!el || typeof ResizeObserver === 'undefined') return;
+    const ro = new ResizeObserver(() => setW(Math.max(300, Math.round(el.clientWidth))));
+    ro.observe(el); return () => ro.disconnect();
+  }, []);
+  const H = 210, L = 30, R = 6, T = 22, B = 34;
   const max = Math.max(...data.map((d) => d.count));
   const step = max <= 4 ? 1 : max <= 10 ? 2 : max <= 25 ? 5 : max <= 50 ? 10 : Math.ceil(max / 50) * 10;
   const top = Math.max(step, Math.ceil(max / step) * step);
@@ -254,7 +262,7 @@ function Trend({ data }: { data: Summary['trend'] }) {
   const y = (v: number) => T + (H - T - B) * (1 - v / top);
   const [hover, setHover] = useState<number | null>(null);
   return (
-    <div class="yo-trend">
+    <div class="yo-trend" ref={box}>
       <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={'Son 8 haftada tamamlanan iş: ' + data.map((d) => fmtDate(d.start) + ' haftası ' + d.count).join(', ')}>
         {ticks.map((v) => (
           <g>

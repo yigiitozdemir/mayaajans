@@ -84,6 +84,7 @@ function App() {
   else if (path === '/yapay-zeka') page = <YapayZeka openTask={openTask} />;
   else if (path === '/ekran') page = <EkranGoruntuleri openTask={openTask} />;
   else if (path === '/yonetici' && s.me.role === 'admin') page = <YoneticiOzeti openTask={openTask} />;
+  else if (path === '/yonetici') { history.replaceState({}, '', '/'); page = <Bugun openTask={openTask} />; }
   else page = <Bugun openTask={openTask} />;
 
   return (
