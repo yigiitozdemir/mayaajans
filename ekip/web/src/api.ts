@@ -103,6 +103,7 @@ export function systemNotify(title: string, body: string) {
   try {
     if (document.hasFocus()) return;
     if (isDesktop) { desktopInvoke('notify', { title, body }); return; }
+    try { if (localStorage.getItem('maya.push') === 'on') return; } catch { /* */ } // bu cihaz push alıyor: çift bildirim olmasın
     if (typeof Notification === 'undefined') return;
     if (Notification.permission === 'granted') new Notification(title, { body, icon: '/icon-192.png' });
   } catch { /* */ }

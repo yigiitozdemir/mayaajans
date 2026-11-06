@@ -146,7 +146,7 @@ export async function pushToUser(env: Env, userId: string, p: PushPayload): Prom
         status = r.status;
         await r.body?.cancel().catch(() => {});
       }
-    } catch (e) { status = 0; console.error("push gönderilemedi", String(e)); }
+    } catch (e) { status = 0; console.error('push gönderilemedi', String(e)); }
     try {
       if (status >= 200 && status < 300) {
         res.delivered++;

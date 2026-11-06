@@ -322,3 +322,9 @@ textarea.input { height: auto; padding: 10px 12px; line-height: 1.5; resize: ver
 .searchbtn kbd { font: 600 11px var(--font); padding: 1px 6px; border-radius: 5px; border: 1px solid var(--line2); color: var(--mute2); }
 .searchbtn:hover { border-color: var(--line2); color: var(--ink); }
 @media (max-width: 880px) { .searchbtn { display: none; } }
+
+/* uzun, boşluksuz başlıklar telefonda sayfayı taşırmasın */
+.tcard .title, .allmine-it .tt, .linkbtn, .nitem, .drawer h2, .page h1 { overflow-wrap: anywhere; }
+/* pencereler telefonda ekrana sığsın, düğmeler görünür kalsın */
+.dialog { max-height: calc(100dvh - 32px); }
+@media (max-width: 640px) { .overlay { padding: 8px; align-items: flex-end; } .dialog { padding: 20px 16px; border-radius: 18px; max-height: calc(100dvh - 16px); } }
