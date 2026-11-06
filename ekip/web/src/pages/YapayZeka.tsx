@@ -34,6 +34,7 @@ const urlAi = (): AiId | null => { const v = new URLSearchParams(location.search
 
 /** Gömülü görünüm desteklenmiyorsa (tarayıcı / eski Mac sürümü) bir kez öğrenilir. */
 let embedBroken = !isDesktop;
+let embedError = '';
 
 export function YapayZeka({ openTask }: { openTask: (id: string) => void }) {
   const [ai, setAi] = useState<AiId>(urlAi() || lastAi());
@@ -62,7 +63,7 @@ function AiEmbed({ ai, openTask, onHelp, onFail }: { ai: AiId; openTask: (id: st
         if (!alive || !host.current) return;
         if (covered()) { desktopCall('ai_hide').catch(() => {}); return; }
         const r = host.current.getBoundingClientRect();
-        desktopCall('ai_show', { which: ai, x: r.left, y: r.top, w: r.width, h: r.height, dark: document.documentElement.dataset.theme === 'dark' }).catch(() => { if (alive) onFail(); });
+        desktopCall('ai_show', { which: ai, x: r.left, y: r.top, w: r.width, h: r.height, dark: document.documentElement.dataset.theme === 'dark' }).catch((e) => { embedError = String((e && (e.message || e)) || 'bilinmeyen hata'); if (alive) onFail(); });
       });
     };
     sync();
@@ -116,6 +117,26 @@ function OldAppNotice() {
   );
 }
 
+/** Teşhis: programın içinde neden açılmadığını gösterir (destek için). */
+function Diagnose() {
+  const [ver, setVer] = useState('');
+  const t = (window as any).__TAURI__;
+  const ti = (window as any).__TAURI_INTERNALS__;
+  useEffect(() => { if (isDesktop) desktopCall<{ version: string }>('app_info').then((r) => setVer(r?.version || '')).catch((e) => setVer('hata: ' + String(e?.message || e))); }, []);
+  const ua = navigator.userAgent;
+  const looksMac = /Macintosh/.test(ua) && !/Safari\/\d/.test(ua.replace(/Version\/[\d.]+ /, ''));
+  return (
+    <details class="card ai-diag">
+      <summary>Teşhis bilgisi (programın içinde açılmıyorsa bunu Claude'a gönder)</summary>
+      <code>
+        masaüstü bağlantısı: {isDesktop ? 'var' : 'YOK'} · __TAURI__: {t ? 'var' : 'yok'} · internals: {ti ? 'var' : 'yok'}{'\n'}
+        program sürümü: {ver || '—'} · gömme hatası: {embedError || '—'}{'\n'}
+        adres: {location.origin} · tarayıcı kimliği: {ua}{looksMac ? ' (Mac uygulaması gibi)' : ''}
+      </code>
+    </details>
+  );
+}
+
 function AiInfo({ openTask, onBack }: { openTask: (id: string) => void; onBack?: () => void }) {
   const open = (t: (typeof AI_TOOLS)[number]) => (t.id === 'whatsapp' ? openAppOutside(t.id, t.url) : desktopOr('open_ai', { which: t.id }, () => openAppOutside(t.id, t.url)));
   return (
@@ -140,6 +161,7 @@ function AiInfo({ openTask, onBack }: { openTask: (id: string) => void; onBack?:
           </section>
         ))}
       </div>
+      <Diagnose />
       <section class="card ai-tips">
         <h2>Nasıl kullanılır?</h2>
         <ol>
