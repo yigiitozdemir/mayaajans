@@ -1,6 +1,9 @@
 # Maya Ekip — sürüm notları
 # Her sürüm için "## <sürüm>" başlığı altına kısa maddeler yaz. Güncelleme penceresinde ekibe aynen gösterilir.
 
+## 1.0.9
+• Dosya sürükle-bırak: masaüstünden WhatsApp'a fotoğraf/dosya sürükleyip bırakabilirsiniz (artıya basmaya gerek yok). Ajandam'a sürükleme de çalışıyor.
+
 ## 1.0.8
 • WhatsApp'taki linkler artık tıklanınca açılıyor (Safari/Chrome'da).
 

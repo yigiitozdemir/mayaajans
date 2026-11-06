@@ -167,6 +167,7 @@ fn open_ai_window(app: &AppHandle, which: &str) -> tauri::Result<()> {
         .inner_size(1180.0, 820.0)
         .min_inner_size(640.0, 520.0)
         .user_agent(SAFARI_UA)
+        .disable_drag_drop_handler()
         .on_new_window(move |url, _features| {
             if is_auth_or_ai_host(&url) {
                 tauri::webview::NewWindowResponse::Allow
@@ -358,6 +359,8 @@ fn create_app_view(app: &AppHandle, which: &str, label: &str, url: &str, pos: ta
     let builder = tauri::webview::WebviewBuilder::new(label, WebviewUrl::External(url.parse().map_err(|_| "adres")?))
         .user_agent(SAFARI_UA)
         .background_color(bg)
+        // sürüklenen dosyalar sayfaya ulaşsın (WhatsApp'a dosya/fotoğraf bırakma)
+        .disable_drag_drop_handler()
         .on_new_window(move |url, _features| {
             if is_auth_or_ai_host(&url) {
                 tauri::webview::NewWindowResponse::Allow
@@ -778,6 +781,7 @@ pub fn run() {
                 .center()
                 .visible(visible)
                 .auto_resize() // içine uygulama görünümleri eklense de pencereyle birlikte boyutlansın
+                .disable_drag_drop_handler() // dosya sürükle-bırak sayfaya ulaşsın (Ajandam, sohbet ekleri)
                 .on_navigation({
                     let app = handle.clone();
                     move |url| {
