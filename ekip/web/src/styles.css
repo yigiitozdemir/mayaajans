@@ -355,3 +355,6 @@ textarea.input { height: auto; padding: 10px 12px; line-height: 1.5; resize: ver
 
 .pcard-av { padding: 0; border: 0; background: transparent; border-radius: 12px; display: inline-flex; flex: none; }
 .pcard-av:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* yeni sürüm bandı */
+.surum-band { position: fixed; left: 50%; top: 14px; transform: translateX(-50%); z-index: 95; display: flex; align-items: center; gap: 12px; padding: 8px 8px 8px 16px; border-radius: 12px; background: var(--snack-bg); color: var(--snack-ink); font-size: 13px; font-weight: 600; box-shadow: 0 12px 30px rgba(var(--shadow-rgb), .25); animation: m-panel .2s ease-out; }

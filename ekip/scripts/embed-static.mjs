@@ -1,6 +1,7 @@
 // web/dist içindeki dosyaları Worker'a gömülü bir modüle çevirir (src/static.gen.ts).
 // Böylece ayrı "assets" yüklemesine gerek kalmaz; Worker sayfayı kendisi sunar.
 import { readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { join, relative, extname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -22,10 +23,13 @@ const files = {};
   }
 })(dist);
 if (!files['/index.html']) throw new Error('web/dist/index.html yok — önce npm run build:web');
+// sürüm kimliği: index.html değişince (yeni JS/CSS) değişir; açık sayfalar bunu görüp kendini yeniler
+const BUILD_ID = createHash('sha256').update(files['/index.html'].b64).digest('hex').slice(0, 12);
 const out = `// Otomatik üretildi (scripts/embed-static.mjs). Elle düzenleme.
+export const BUILD_ID = '${BUILD_ID}';
 export interface StaticFile { ct: string; b64: string; immutable: boolean }
 export const STATIC: Record<string, StaticFile> = ${JSON.stringify(files)};
 `;
 writeFileSync(join(root, 'src', 'static.gen.ts'), out);
 const kb = Math.round(out.length / 1024);
-console.log(`gömülü dosya: ${Object.keys(files).length} · ${kb} KB`);
+console.log(`gömülü dosya: ${Object.keys(files).length} · ${kb} KB · sürüm ${BUILD_ID}`);

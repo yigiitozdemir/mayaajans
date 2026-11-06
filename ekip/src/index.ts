@@ -6,6 +6,7 @@ import { authRoutes, createInviteLink, publicOrigin, requireAdmin, requireUser, 
 import { Hub, broadcast } from './hub';
 import { activeMood, clean, isDate, isEmail, istanbulHour, newId } from './util';
 import { serveStatic } from './static';
+import { BUILD_ID } from './static.gen';
 import { indir } from './indir';
 import { r as musteriler } from './routes/musteriler';
 import { r as ozelgunler } from './routes/ozelgunler';
@@ -31,6 +32,8 @@ app.onError((err, c) => { console.error(err); return c.json({ error: 'Beklenmeye
 
 app.route('/api/auth', authRoutes);
 app.get('/api/health', (c) => c.json({ ok: true }));
+// Web sürüm kimliği: açık sayfalar yeni yayını fark edip kendini yeniler
+app.get('/api/version', (c) => c.json({ build: BUILD_ID }, 200, { 'Cache-Control': 'no-store' }));
 
 const api = new Hono<{ Bindings: Env; Variables: Vars }>();
 api.use('*', requireUser);

@@ -23,6 +23,7 @@ import { EkranGoruntuleri, ShotWatcher } from './pages/EkranGoruntuleri';
 import { YoneticiOzeti } from './pages/YoneticiOzeti';
 import { AramaPaleti } from './components/AramaPaleti';
 import { PushBanner } from './components/PushToggle';
+import { SurumIzleyici } from './components/SurumIzleyici';
 import { NudgeReceiver } from './components/NudgeReceiver';
 import { ChatUnread } from './components/ChatUnread';
 
@@ -99,6 +100,7 @@ function App() {
       <ShotWatcher />
       <AramaPaleti openTask={openTask} />
       <PushBanner />
+      <SurumIzleyici />
       {s.snack && <div class="snack" role="status">{s.snack}</div>}
     </>
   );
