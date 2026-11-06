@@ -123,4 +123,9 @@ function OfflineNote({ online }: { online: boolean }) {
   return <div class="offline" role="status">İnternet bağlantısı bekleniyor… Bağlanınca her şey kendiliğinden güncellenir.</div>;
 }
 
+// iPhone: iki parmakla yakınlaştırma hareketini engelle (uygulama gibi sabit dursun)
+if (matchMedia('(pointer: coarse)').matches) {
+  for (const ev of ['gesturestart', 'gesturechange', 'gestureend']) document.addEventListener(ev, (e) => e.preventDefault(), { passive: false });
+}
+
 render(<App />, document.getElementById('app')!);

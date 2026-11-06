@@ -11,7 +11,7 @@ const { chromium } = require('playwright');
   const mk = async (w, h) => { const ctx = await b.newContext({ storageState: st, viewport: { width: w, height: h }, isMobile: w < 900, hasTouch: true }); const p = await ctx.newPage(); const errs = []; p.on('pageerror', (e) => errs.push(e.message)); return { p, ctx, errs }; };
   const vis = (p, sel) => p.locator(sel).first().isVisible();
 
-  for (const [ad, w, h] of [['telefon', 390, 844], ['Fold kapalı', 412, 968], ['iPhone Fold kapalı', 376, 668]]) {
+  for (const [ad, w, h] of [['iPhone 17 Pro Max', 440, 956], ['telefon', 390, 844], ['Fold kapalı', 412, 968], ['iPhone Fold kapalı', 376, 668]]) {
     const { p, ctx, errs } = await mk(w, h);
     await t(ad + ': üst başlık + alt sekmeler, sol menü gizli, yatay taşma yok', async () => {
       for (const pg of PAGES) {
@@ -20,7 +20,14 @@ const { chromium } = require('playwright');
         ok(!(await p.locator('.side').isVisible()), pg + ' sol menü kapalı olmalı');
         const ov = await p.evaluate(() => document.documentElement.scrollWidth - innerWidth);
         ok(ov <= 0, pg + ' yatay taşma: ' + ov + 'px');
+        const small = await p.evaluate(() => [...document.querySelectorAll('input:not([type=checkbox]):not([type=radio]), select, textarea')].filter((el) => el.offsetParent && parseFloat(getComputedStyle(el).fontSize) < 16).length);
+        eq(small, 0, pg + ' 16 pikselden küçük yazılı kutu (iPhone yakınlaştırır)');
       }
+    });
+    await t(ad + ': yakınlaştırma kapalı, kenarda esneme yok', async () => {
+      const v = await p.evaluate(() => ({ meta: document.querySelector('meta[name=viewport]').content, ob: getComputedStyle(document.documentElement).overscrollBehaviorY, ta: getComputedStyle(document.documentElement).touchAction }));
+      ok(/maximum-scale=1/.test(v.meta) && /user-scalable=no/.test(v.meta), v.meta);
+      eq(v.ob, 'none', 'overscroll'); ok(/pan-x/.test(v.ta) && /pan-y/.test(v.ta), v.ta);
     });
     await t(ad + ': Menü çekmecesi açılır, bölüme geçince kapanır', async () => {
       await p.goto(BASE + '/'); await p.locator('.mtabs button').click(); await p.waitForTimeout(350);
