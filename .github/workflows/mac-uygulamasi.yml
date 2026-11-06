@@ -19,14 +19,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  kontrol:
-    runs-on: ubuntu-latest
-    steps:
-      - run: echo "GitHub Actions çalışıyor"
-
   mac:
-    needs: kontrol
-    runs-on: macos-14
+    runs-on: macos-latest
     timeout-minutes: 45
     defaults:
       run:
