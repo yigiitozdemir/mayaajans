@@ -1,0 +1,61 @@
+# Maya Ekip Android uygulamasını (APK) derler. İmzasız çıktı "android-derleme" dalına konur;
+# imzalanıp ekip.mayaajans.net/indir'e yüklenmesi ayrıca yapılır (imza anahtarı GitHub'da tutulmaz).
+name: Android uygulaması
+
+on:
+  push:
+    branches: [ekip-programi, main]
+    paths:
+      - 'ekip/android/**'
+      - '.github/workflows/android-uygulamasi.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: android-uygulamasi
+  cancel-in-progress: true
+
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: ekip/android
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.10.2'
+
+      - name: Derle
+        run: gradle --no-daemon assembleRelease
+
+      - name: Paketle (hizala)
+        run: |
+          BT=$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -1)
+          mkdir -p out
+          "$BT/zipalign" -p -f 4 app/build/outputs/apk/release/app-release-unsigned.apk out/MayaEkip-imzasiz.apk
+          "$BT/zipalign" -c -p 4 out/MayaEkip-imzasiz.apk && echo hizali
+          grep -o "versionName '[^']*'" app/build.gradle | cut -d"'" -f2 > out/VERSION
+          echo "${GITHUB_SHA}" > out/COMMIT
+          ls -la out
+
+      - name: Derlemeyi dala koy
+        working-directory: ekip/android/out
+        run: |
+          git init -q
+          git config user.name "maya-derleme"
+          git config user.email "derleme@mayaajans.net"
+          git checkout -q -b android-derleme
+          git add -A
+          git commit -q -m "Android derlemesi $(cat VERSION) · ${GITHUB_SHA::7}"
+          git push -f -q "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" android-derleme
