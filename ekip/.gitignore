@@ -1,0 +1,5 @@
+node_modules/
+.wrangler/
+web/dist/
+.dev.vars
+*.log

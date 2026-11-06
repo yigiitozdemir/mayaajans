@@ -1,0 +1,5 @@
+# Ekip programının kaynak kodu sitede yayınlanmaz
+ekip/
+.assetsignore
+wrangler.jsonc
+functions/

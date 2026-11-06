@@ -1,0 +1,38 @@
+// Maya Ajans ekip programı — Cloudflare Worker ayarları
+{
+  "name": "maya-ekip",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "account_id": "7c415dad4c10378684d95d1776bb038a",
+
+  // Web arayüzü (Vite çıktısı). /api istekleri önce Worker'a gider; diğer yollar tek sayfa uygulamasına düşer.
+  "assets": {
+    "directory": "web/dist",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*"]
+  },
+
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "maya-ekip",
+      "database_id": "3d4d11ea-c158-4ad4-825c-d12c47cbabaa",
+      "migrations_dir": "migrations"
+    }
+  ],
+
+  // Canlı güncelleme merkezi (WebSocket). Ücretsiz planda SQLite tabanlı Durable Object.
+  "durable_objects": {
+    "bindings": [{ "name": "HUB", "class_name": "Hub" }]
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Hub"] }],
+
+  // Saatlik okunmamış atama hatırlatması
+  "triggers": { "crons": ["5 * * * *"] },
+
+  "routes": [{ "pattern": "ekip.mayaajans.net", "custom_domain": true }],
+
+  "observability": { "enabled": true }
+}
