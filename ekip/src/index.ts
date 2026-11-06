@@ -400,8 +400,8 @@ api.delete('/tasks/:id', async (c) => {
 api.get('/notifications', async (c) => {
   const { results } = await c.env.DB.prepare(
     `SELECT * FROM notifications WHERE user_id = ? AND (read_at IS NULL OR read_at > datetime('now', '-7 days')) ORDER BY read_at IS NOT NULL, created_at DESC LIMIT 50`,
-  ).bind(c.get('user').id).all<{ id: string; kind: string; task_id: string | null; actor_id: string | null; title: string; body: string; created_at: string; read_at: string | null; reminders: number }>();
-  return c.json(results.map((n) => ({ id: n.id, kind: n.kind, taskId: n.task_id, actorId: n.actor_id, title: n.title, body: n.body, createdAt: n.created_at, readAt: n.read_at, reminders: n.reminders })));
+  ).bind(c.get('user').id).all<{ id: string; kind: string; task_id: string | null; actor_id: string | null; title: string; body: string; created_at: string; read_at: string | null; reminders: number; link: string | null }>();
+  return c.json(results.map((n) => ({ id: n.id, kind: n.kind, taskId: n.task_id, actorId: n.actor_id, title: n.title, body: n.body, createdAt: n.created_at, readAt: n.read_at, reminders: n.reminders, link: n.link })));
 });
 
 // Okundu: belirli bildirimler, bir işe ait atamalar (işi açınca) ya da hepsi

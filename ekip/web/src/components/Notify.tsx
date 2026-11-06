@@ -2,6 +2,18 @@ import { useState } from 'preact/hooks';
 import { api, closeToast, reloadNotifications, store, memberName } from '../api';
 import { Avatar, Icon, navigate, useStore } from '../ui';
 
+// Bildirimin gideceği yer: iş → iş detayı; link → o sayfa; eski kayıtlarda link yoksa türüne göre
+const KIND_PAGE: Record<string, string> = { nudge: '/durt', morning: '/', reminder: '/ajanda', shoot: '/cekim', special: '/ozel-gunler', approval: '/isler', chat: '/sohbet' };
+export function openNotification(n: { id: string; taskId?: string | null; link?: string | null; kind?: string; readAt?: string | null }, onOpenTask: (id: string) => void) {
+  if (!n.readAt) {
+    store.set({ notifications: store.get().notifications.map((x) => (x.id === n.id ? { ...x, readAt: new Date().toISOString() } : x)) });
+    api('POST', '/notifications/read', { id: n.id }).catch(() => {});
+  }
+  if (n.taskId) { onOpenTask(n.taskId); return; }
+  const to = n.link || (n.kind ? KIND_PAGE[n.kind] : '');
+  if (to) navigate(to);
+}
+
 // Okunmamış atamayı okundu say (işi açınca çağrılır)
 export async function markTaskRead(taskId: string) {
   const s = store.get();
@@ -33,13 +45,7 @@ export function Bell({ onOpenTask }: { onOpenTask: (id: string) => void }) {
           {s.notifications.map((n) => {
             const task = s.tasks.find((t) => t.id === n.taskId);
             return (
-              <button type="button" class={'nitem' + (n.readAt ? '' : ' unread')} onClick={() => {
-                if (n.taskId) { onOpenTask(n.taskId); setOpen(false); }
-                else if (n.link) {
-                  setOpen(false); navigate(n.link);
-                  if (!n.readAt) { store.set({ notifications: store.get().notifications.map((x) => (x.id === n.id ? { ...x, readAt: new Date().toISOString() } : x)) }); api('POST', '/notifications/read', { id: n.id }).catch(() => {}); }
-                }
-              }}>
+              <button type="button" class={'nitem' + (n.readAt ? '' : ' unread')} onClick={() => { setOpen(false); openNotification(n, onOpenTask); }}>
                 <Avatar m={s.team.find((m) => m.id === n.actorId)} size={34} />
                 <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px">
                   <span style={'font-size:13px;' + (n.readAt ? 'color:var(--mute)' : 'font-weight:700')}>{n.title}</span>
