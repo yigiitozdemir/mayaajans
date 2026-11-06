@@ -4,7 +4,7 @@ import { api, loadMe, snack, shrinkImage, disconnectLive, store, initials, moodO
 import { Avatar, Icon, Link, Modal, Switch, meAsMember, navigate, useStore } from '../ui';
 import { applyTheme, useThemePref, type ThemePref } from '../theme';
 import { PushToggle } from './PushToggle';
-import { desktopOr, isDesktop, onDesktopEvent } from '../desktop';
+import { desktopOr, isDesktop, macOverlay, onDesktopEvent } from '../desktop';
 import { lastAi, openAppOutside } from '../pages/YapayZeka';
 
 // Menünün altında: ChatGPT ve Claude kısayolları (kişinin kendi hesabıyla; Mac'te programın içinde açılır)
@@ -95,6 +95,7 @@ export function Shell({ path, children }: { path: string; children: ComponentChi
   const rail = isDesktop && path === '/yapay-zeka' && !new URLSearchParams(location.search).has('yardim') && !document.documentElement.classList.contains('ai-broken');
   return (
     <div class={'shell' + (rail ? ' rail' : '')}>
+      {macOverlay && <div class="dragbar" data-tauri-drag-region />}
       <aside class="side">
         <Link href="/" class="brand"><img src="/logo.png" alt="Maya Ajans" /><span>Ekip alanı</span></Link>
         <button type="button" class="searchbtn" onClick={() => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true, metaKey: /Mac/.test(navigator.platform) }))}>

@@ -358,3 +358,10 @@ textarea.input { height: auto; padding: 10px 12px; line-height: 1.5; resize: ver
 
 /* yeni sürüm bandı */
 .surum-band { position: fixed; left: 50%; top: 14px; transform: translateX(-50%); z-index: 95; display: flex; align-items: center; gap: 12px; padding: 8px 8px 8px 16px; border-radius: 12px; background: var(--snack-bg); color: var(--snack-ink); font-size: 13px; font-weight: 600; box-shadow: 0 12px 30px rgba(var(--shadow-rgb), .25); animation: m-panel .2s ease-out; }
+
+/* Mac 1.0.7+: başlık çubuğu yok; pencere düğmeleri (kırmızı/sarı/yeşil) sol üstte, içerik pencerenin tepesine kadar */
+.dragbar { position: fixed; top: 0; left: 0; right: 0; height: 28px; z-index: 30; }
+.mac-overlay .side { padding-top: 46px; }
+.mac-overlay .shell.rail .side { padding-top: 40px; }
+.mac-overlay .page { padding-top: 38px; }
+.mac-overlay .ai-embed { padding-top: 30px; }

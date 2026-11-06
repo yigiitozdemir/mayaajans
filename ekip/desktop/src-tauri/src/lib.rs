@@ -260,6 +260,23 @@ fn wa_notify(app: AppHandle, title: String, body: String) {
 /// WhatsApp sayfasına eklenen köprü: tarayıcı bildirim özelliği varmış gibi davranır, bildirimleri Mac'e iletir.
 const WA_BRIDGE: &str = r#"(function () {
   if (location.hostname !== 'web.whatsapp.com') return;
+  // Görünürlük programdan gelir: ekranda + pencere odakta değilse WhatsApp "arka plandayım" sanıp bildirim gönderir.
+  var vis = false;
+  try { vis = sessionStorage.getItem('mayaWaVis') === '1'; } catch (e) {}
+  try {
+    Object.defineProperty(Document.prototype, 'hidden', { configurable: true, get: function () { return !vis; } });
+    Object.defineProperty(Document.prototype, 'visibilityState', { configurable: true, get: function () { return vis ? 'visible' : 'hidden'; } });
+    Object.defineProperty(Document.prototype, 'webkitHidden', { configurable: true, get: function () { return !vis; } });
+    Document.prototype.hasFocus = function () { return vis; };
+  } catch (e) {}
+  window.__mayaWaVis = function (v) {
+    v = !!v;
+    try { sessionStorage.setItem('mayaWaVis', v ? '1' : '0'); } catch (e) {}
+    if (v === vis) return;
+    vis = v;
+    try { document.dispatchEvent(new Event('visibilitychange')); } catch (e) {}
+    try { window.dispatchEvent(new Event(v ? 'focus' : 'blur')); } catch (e) {}
+  };
   var send = function (t, o) {
     try {
       var body = (o && o.body) ? String(o.body) : '';
@@ -351,6 +368,7 @@ async fn ai_show(app: AppHandle, which: String, x: f64, y: f64, w: f64, h: f64, 
         round_corners(&v, 12.0);
         let _ = v.show();
         let _ = v.set_focus();
+        sync_wa_visibility(&app, None);
         return Ok(info);
     }
     if which == "whatsapp" {
@@ -361,6 +379,7 @@ async fn ai_show(app: AppHandle, which: String, x: f64, y: f64, w: f64, h: f64, 
     let _ = v.set_size(size);
     round_corners(&v, 12.0);
     let _ = v.set_focus();
+    sync_wa_visibility(&app, None);
     Ok(info)
 }
 
@@ -382,7 +401,8 @@ fn place(app: &AppHandle, x: f64, y: f64, right: f64, bottom: f64) -> (tauri::Lo
     let width = (ww - x - right).max(200.0);
     let height = (hh - y - bottom).max(200.0);
     let info = serde_json::json!({ "window": [ww, hh], "scale": sf, "titlebar": tb, "rect": [x, y, width, height], "margins": [right, bottom] });
-    (tauri::LogicalPosition::new(x, y + tb), tauri::LogicalSize::new(width, height), info)
+    // 1.0.7: başlık çubuğu yok (pencere düğmeleri içeriğin üstünde) → içerik = pencere çerçevesi, ek pay gerekmez
+    (tauri::LogicalPosition::new(x, y), tauri::LogicalSize::new(width, height), info)
 }
 
 fn app_rect(app: &AppHandle, x: f64, y: f64, w: f64, h: f64) -> (tauri::LogicalPosition<f64>, tauri::LogicalSize<f64>, serde_json::Value) {
@@ -438,6 +458,17 @@ async fn ai_hide(app: AppHandle) {
             park(&v);
         }
     }
+    sync_wa_visibility(&app, None);
+}
+
+/// WhatsApp'a gerçekten ekranda olup olmadığını söyle. WhatsApp Web, kendini görünür sanınca bildirim yerine
+/// yalnızca ses çalar; gizli görünüm de macOS'ta "görünür" sayıldığı için bildirim hiç gelmiyordu.
+fn sync_wa_visibility(app: &AppHandle, focused: Option<bool>) {
+    let Some(v) = app.get_webview("ai-in-whatsapp") else { return };
+    let focused = focused.unwrap_or_else(|| main_window(app).and_then(|w| w.is_focused().ok()).unwrap_or(false));
+    let showing = VISIBLE_APP.lock().map(|v| v.as_str() == "whatsapp").unwrap_or(false);
+    let vis = focused && showing;
+    let _ = v.eval(&format!("window.__mayaWaVis && window.__mayaWaVis({vis})"));
 }
 
 /// Gizle ve ekranın çok dışına taşı: gizleme tam çalışmasa bile tıklamaların önüne geçmesin.
@@ -694,7 +725,14 @@ pub fn run() {
             let from_login = std::env::args().any(|a| a == AUTOSTART_ARG);
             let visible = !(from_login && flag(&handle, "acilista-gizli"));
 
-            let window = WebviewWindowBuilder::new(app, "main", WebviewUrl::App("index.html".into()))
+            let builder = WebviewWindowBuilder::new(app, "main", WebviewUrl::App("index.html".into()));
+            // Mac: ayrı başlık çubuğu yok; pencere düğmeleri sol menünün üst köşesinde (Slack/Notion gibi).
+            #[cfg(target_os = "macos")]
+            let builder = builder
+                .title_bar_style(tauri::TitleBarStyle::Overlay)
+                .hidden_title(true)
+                .initialization_script("window.__MAYA_OVERLAY__ = true;"); // sayfa üst köşede düğmelere yer açsın
+            let window = builder
                 .title("Maya Ekip")
                 .inner_size(1320.0, 840.0)
                 .min_inner_size(960.0, 620.0)
@@ -731,6 +769,7 @@ pub fn run() {
                     let _ = w.hide();
                 }
                 WindowEvent::Resized(_) | WindowEvent::ScaleFactorChanged { .. } => relayout_visible(&rl),
+                WindowEvent::Focused(f) => sync_wa_visibility(&rl, Some(*f)),
                 _ => {}
             });
 

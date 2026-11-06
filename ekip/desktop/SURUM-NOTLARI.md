@@ -1,6 +1,11 @@
 # Maya Ekip — sürüm notları
 # Her sürüm için "## <sürüm>" başlığı altına kısa maddeler yaz. Güncelleme penceresinde ekibe aynen gösterilir.
 
+## 1.0.7
+• Yeni görünüm: ayrı başlık çubuğu kalktı, pencere düğmeleri sol menünün üst köşesinde. ChatGPT, Claude ve WhatsApp her pencere boyutunda tam yerine oturuyor.
+• WhatsApp bildirimleri düzeltildi: başka sayfadayken ya da başka programdayken gelen mesajlar Mac bildirimi olarak (gönderen + mesaj) görünüyor.
+• Pencereyi üst kenarından tutup taşıyabilir, çift tıklayıp büyütebilirsiniz.
+
 ## 1.0.6
 • WhatsApp mesajları artık Mac bildirimi olarak geliyor: gönderen ve mesajla birlikte, sesli. WhatsApp ekranına bakarken bildirim çıkmaz.
 

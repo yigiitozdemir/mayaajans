@@ -1,6 +1,9 @@
 // Mac uygulaması (Tauri) köprüsü. Tarayıcıda çalışırken hiçbir şey yapmaz.
 const tauri = (window as any).__TAURI__;
 export const isDesktop = !!tauri?.core?.invoke;
+/** Mac 1.0.7+: başlık çubuğu yok, pencere düğmeleri sol menünün üst köşesinde. */
+export const macOverlay = isDesktop && !!(window as any).__MAYA_OVERLAY__;
+if (macOverlay) document.documentElement.classList.add('mac-overlay');
 
 export function desktopInvoke<T = unknown>(cmd: string, args?: Record<string, unknown>): Promise<T | undefined> {
   if (!isDesktop) return Promise.resolve(undefined);

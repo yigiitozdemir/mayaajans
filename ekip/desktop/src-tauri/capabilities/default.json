@@ -4,5 +4,5 @@
   "description": "ekip.mayaajans.net sayfasının Mac özelliklerine erişimi (üst çubuk sayısı, bildirim)",
   "windows": ["main"],
   "remote": { "urls": ["https://ekip.mayaajans.net/*"] },
-  "permissions": ["allow-set-unread", "allow-notify", "allow-app-info", "allow-set-theme", "allow-open-ai", "allow-ai-show", "allow-ai-hide", "allow-shots-status", "allow-shots-enable", "allow-shots-list", "allow-shots-thumb", "allow-shots-read", "allow-shots-copy", "allow-shots-reveal", "allow-shots-open", "allow-shots-trash", "allow-shots-save-as", "allow-shots-set-cleanup"]
+  "permissions": ["core:window:allow-start-dragging", "core:window:allow-internal-toggle-maximize", "allow-set-unread", "allow-notify", "allow-app-info", "allow-set-theme", "allow-open-ai", "allow-ai-show", "allow-ai-hide", "allow-shots-status", "allow-shots-enable", "allow-shots-list", "allow-shots-thumb", "allow-shots-read", "allow-shots-copy", "allow-shots-reveal", "allow-shots-open", "allow-shots-trash", "allow-shots-save-as", "allow-shots-set-cleanup"]
 }
