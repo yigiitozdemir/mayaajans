@@ -2,7 +2,7 @@
 # Her sürüm için "## <sürüm>" başlığı altına kısa maddeler yaz. Güncelleme penceresinde ekibe aynen gösterilir.
 
 ## 1.0.2
-• Yapay Zekâ: ChatGPT ve Claude artık Maya Ekip'in içinde, kendi hesabınla (görsel oluşturma, dosya yükleme, sesli konuşma). Sol menünün altında.
+• Uygulamalar: ChatGPT, Claude ve WhatsApp artık Maya Ekip'in içinde, kendi hesabınla. WhatsApp'ta yeni mesajlarda bildirim ve menüde okunmamış sayısı.
 • Ajandam: sana özel notlar (ekran görüntüleriyle), yapılacaklar, takvim ve anımsatıcı bildirimleri.
 • Ekran Görüntüleri: Mac'te aldığın ekran görüntüleri masaüstü yerine Maya Ekip'e gelir; kopyala, kaydet, Ajandama ekle, Sohbette paylaş. Yalnızca senin Mac'inde kalır.
 • Koyu tema: sol menünün altındaki "Görünüm"den Sistem / Açık / Koyu seçilebilir. Sistem seçiliyse Mac'in gece ayarına uyar; pencerenin üst çubuğu da temaya uyar.

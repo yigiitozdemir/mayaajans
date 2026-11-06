@@ -69,6 +69,16 @@ const { chromium } = require('playwright');
     await clear(p); await p.getByRole('radio', { name: 'Açık' }).click(); await p.waitForTimeout(300);
     eq((await last(p, 'ai_show'))[1].dark, false);
   });
+  await t('WhatsApp: menüde, panelde açılır, okunmamış sayısı görünür', async () => {
+    await clear(p); await p.locator('.aiq.wa').click(); await p.waitForTimeout(300);
+    eq((await last(p, 'ai_show'))[1].which, 'whatsapp');
+    eq(await p.getByRole('button', { name: /Ayrı pencere/ }).count(), 0, 'WhatsApp için ayrı pencere yok');
+    await p.evaluate(() => window.dispatchEvent(new CustomEvent('maya-desktop', { detail: { action: 'app-unread', app: 'whatsapp', count: 4 } })));
+    await p.locator('.aiq.wa .aiq-badge', { hasText: '4' }).waitFor();
+    await p.evaluate(() => window.dispatchEvent(new CustomEvent('maya-desktop', { detail: { action: 'app-unread', app: 'whatsapp', count: 0 } })));
+    await p.waitForTimeout(150); eq(await p.locator('.aiq.wa .aiq-badge').count(), 0);
+    await p.getByText('Uygulamalar').first().waitFor();
+  });
   await t('konsol hatası yok', async () => eq(errs.length, 0, errs.join(' | ')));
   await p.screenshot({ path: (process.argv[2] || '.') + '/yz-gomulu.png' });
   await ctx.close();
@@ -76,7 +86,7 @@ const { chromium } = require('playwright');
   const F = await mk(true);
   await t('eski Mac sürümü (gömme yok) → bilgi sayfası ve ayrı pencere', async () => {
     await F.p.locator('.aiq.gpt').click(); await F.p.waitForTimeout(500);
-    await F.p.getByRole('heading', { name: 'Yapay Zekâ' }).waitFor();
+    await F.p.getByRole('heading', { name: 'Uygulamalar' }).waitFor();
     await F.p.getByRole('button', { name: "ChatGPT'yi aç" }).click(); await F.p.waitForTimeout(200);
     eq((await last(F.p, 'open_ai'))[1].which, 'chatgpt');
   });

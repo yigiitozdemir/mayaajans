@@ -14,7 +14,7 @@ export function setDesktopUnread(count: number) {
   desktopInvoke('set_unread', { count });
 }
 
-export type DesktopEvent = { action: 'new-task' } | { action: 'go'; path: string } | { action: 'shot'; name: string } | { action: 'shots' };
+export type DesktopEvent = { action: 'new-task' } | { action: 'go'; path: string } | { action: 'shot'; name: string } | { action: 'shots' } | { action: 'app-unread'; app: string; count: number };
 export function onDesktopEvent(fn: (e: DesktopEvent) => void): () => void {
   const h = (e: Event) => fn((e as CustomEvent).detail);
   window.addEventListener('maya-desktop', h);

@@ -33,6 +33,7 @@ export function Link(props: { href: string; class?: string; children: ComponentC
 
 // ---------- simgeler (çizgi) ----------
 const P: Record<string, string> = {
+  phone: '<path d="M6.6 3h2.6l1.4 4-2 1.3a12 12 0 0 0 7.1 7.1l1.3-2 4 1.4v2.6A2.6 2.6 0 0 1 18.4 21 15.4 15.4 0 0 1 3 5.6 2.6 2.6 0 0 1 5.6 3z"/>',
   image: '<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-8 8"/>',
   folder: '<path d="M3 6a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
   trash: '<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',

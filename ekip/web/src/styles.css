@@ -246,14 +246,16 @@ textarea.input { height: auto; padding: 10px 12px; line-height: 1.5; resize: ver
 .aiquick-h .navh { margin: 0; }
 .aiquick-help { display: inline-flex; width: 24px; height: 24px; align-items: center; justify-content: center; border-radius: 7px; color: var(--mute2); }
 .aiquick-help:hover, .aiquick-help.on { background: var(--sel); color: var(--ink); }
-.aiquick-row { display: flex; flex-direction: column; gap: 6px; }
-.aiq { min-width: 0; display: flex; align-items: center; gap: 10px; min-height: 40px; padding: 0 10px 0 6px; border-radius: 11px; border: 1px solid var(--line); background: var(--card); color: var(--ink); font-size: 13px; font-weight: 600; text-align: left; transition: transform .12s ease, border-color .12s ease, box-shadow .12s ease; }
+.aiquick-row { display: flex; flex-direction: column; gap: 5px; }
+.aiq { min-width: 0; display: flex; align-items: center; gap: 10px; min-height: 36px; padding: 0 10px 0 5px; border-radius: 10px; border: 1px solid var(--line); background: var(--card); color: var(--ink); font-size: 13px; font-weight: 600; text-align: left; transition: transform .12s ease, border-color .12s ease, box-shadow .12s ease; }
 .aiq:hover { border-color: var(--line2); box-shadow: var(--shadow); transform: translateY(-1px); }
 .aiq:active { transform: none; }
 .aiq.on { background: var(--sel); border-color: var(--line2); }
-.aiq-ic { flex: none; width: 26px; height: 26px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; }
+.aiq-ic { flex: none; width: 24px; height: 24px; border-radius: 7px; display: inline-flex; align-items: center; justify-content: center; }
 .aiq.gpt .aiq-ic, .aiq-ic.gpt { background: #10A37F; }
 .aiq.cld .aiq-ic, .aiq-ic.cld { background: #D97757; }
+.aiq.wa .aiq-ic, .aiq-ic.wa { background: #1FAF54; }
+.aiq-badge { flex: none; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 99px; background: var(--badge); color: #fff; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; }
 .aiq-ic { display: inline-flex; align-items: center; justify-content: center; }
 .aiq-n { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .aiq-go { flex: none; color: var(--mute2); display: inline-flex; }
