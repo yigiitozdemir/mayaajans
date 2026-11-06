@@ -36,12 +36,14 @@ const { chromium } = require('playwright');
     await t(ad + ': konsol hatası yok', async () => eq(errs.length, 0, errs.join(' | ')));
     await ctx.close();
   }
-  for (const [ad, w, h] of [['Fold açık', 884, 1104], ['iPhone Fold açık', 1024, 760], ['masaüstü', 1320, 840]]) {
+  for (const [ad, w, h] of [['iPhone Fold açık (dik)', 768, 1000], ['iPhone Fold açık', 800, 1000], ['iPad dik', 834, 1112], ['dar pencere', 870, 700], ['Fold açık', 884, 1104], ['iPhone Fold açık (yatay)', 1024, 760], ['masaüstü', 1320, 840]]) {
     const { p, ctx } = await mk(w, h);
     await t(ad + ': sol menü yerinde, telefon çubukları yok, taşma yok', async () => {
       for (const pg of PAGES) {
         await p.goto(BASE + pg); await p.waitForTimeout(300);
         ok(await p.locator('.side').isVisible() && !(await vis(p, '.mtabs')) && !(await vis(p, '.mtop')), pg);
+        const sb = await p.locator('.side').boundingBox(), mb = await p.locator('.main').boundingBox();
+        ok(mb.x >= sb.x + sb.width - 1 && Math.abs(mb.y - sb.y) < 2 && sb.width < 260, pg + ' menü ve içerik yan yana olmalı: menü ' + JSON.stringify(sb) + ' içerik ' + JSON.stringify(mb));
         const ov = await p.evaluate(() => document.documentElement.scrollWidth - innerWidth);
         ok(ov <= 0, pg + ' yatay taşma: ' + ov + 'px');
       }
