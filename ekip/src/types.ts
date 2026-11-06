@@ -5,6 +5,8 @@ export interface Env {
   BACKUP: R2Bucket;
   VAPID_PUBLIC: string;
   VAPID_PRIVATE?: string;
+  DRIVE_API_KEY?: string;   // Google Drive API anahtarı (gizli) — yoksa önizleme kapalı
+  DRIVE_SAHTE?: string;     // test: Drive yanıtları yerine kullanılacak JSON
   /** Test: Open-Meteo yerine sahte hava verisi (JSON). Canlıda boş. */
   HAVA_SAHTE?: string;
 }

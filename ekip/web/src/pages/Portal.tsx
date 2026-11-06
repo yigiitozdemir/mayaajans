@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'preact/hooks';
 import { api, onLive, snack } from '../api';
 import { Icon, Modal, Sayi } from '../ui';
+import { DriveOnizleme } from '../components/DriveOnizleme';
 import { Bell } from '../components/Notify';
 import {
   CONTENT_STATUS, REQUEST_STATUS, DriveButton, NoteBox, NoteThread, StatusPill, fmtTime, itemDate,
@@ -174,6 +175,7 @@ function ItemModal({ client, item, kind, notes, onClose, reload }: { client: str
             {f.link && <DriveButton link={f.link} compact />}
           </div>
         </label>
+        {item && item.link && <DriveOnizleme link={item.link} />}
         <div class="pt-form2">
           {k === 'content' ? (
             <label class="field">Paylaşım için planlanan tarih<input class="input" type="date" value={f.planDate} onInput={set('planDate')} /></label>

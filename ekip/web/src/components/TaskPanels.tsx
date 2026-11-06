@@ -1,3 +1,4 @@
+import { DriveOnizleme } from './DriveOnizleme';
 import { useEffect, useRef, useState } from 'preact/hooks';
 import { api, reloadTasks, snack, store, type Task, fmtDate, dayDiff, DAY as SDAY, memberName } from '../api';
 import { Avatar, Icon, Modal, useStore, kutla } from '../ui';
@@ -173,6 +174,7 @@ export function TaskDrawer({ taskId, onClose }: { taskId: string; onClose: () =>
             ) : (
               <button type="button" class="btn sm" style="align-self:flex-start" onClick={() => { setDoneDraft(''); setAskLink(true); }}><Icon n="plus" size={14} />Teslim linki ekle</button>
             )}
+            {t.doneLink && <DriveOnizleme link={t.doneLink} />}
           </div>
         )}
         <ApprovalStrip t={t} onStep={(k) => { if (k === 'published' && !t.doneLink) { setDoneDraft(''); setAskLink(true); } else if (k !== 'published') setAskLink(false); }} />
@@ -195,6 +197,7 @@ export function TaskDrawer({ taskId, onClose }: { taskId: string; onClose: () =>
             {t.items.map((it) => <div style="padding:9px 12px;border-radius:10px;background:var(--chip);font-size:13px">{it}</div>)}
           </div>
         )}
+        {t.link && <DriveOnizleme link={t.link} />}
         <label class="field">Not
           <textarea class="input" rows={4} value={note} onInput={(e) => setNote((e.target as HTMLTextAreaElement).value)} onBlur={() => { if (note !== t.note) patch({ note }); }} />
         </label>

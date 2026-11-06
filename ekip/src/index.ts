@@ -30,6 +30,7 @@ import { r as ilham } from './routes/ilham';
 import { r as rozet } from './routes/rozet';
 import { havaUyarisi } from './hava';
 import { haftalikRozetler } from './rozet';
+import { r as drive } from './drive';
 
 export { Hub };
 
@@ -270,6 +271,7 @@ api.route('/takvim', takvim);
 api.route('/krizler', kriz);
 api.route('/ilham', ilham);
 api.route('/rozetler', rozet);
+api.route('/drive', drive);
 
 // ---------- işler ----------
 api.get('/tasks', async (c) => {

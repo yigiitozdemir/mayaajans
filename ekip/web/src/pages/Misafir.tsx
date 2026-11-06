@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'preact/hooks';
 import { api, snack } from '../api';
 import { Icon, Modal, Sayi, kutla } from '../ui';
+import { DriveOnizleme } from '../components/DriveOnizleme';
 import { applyTheme, themePref } from '../theme';
 import {
   DriveButton, NoteBox, NoteThread, StatusPill, itemDate, type PItem, type PNote,
@@ -157,6 +158,7 @@ function GuestItem({ item, notes, onClose, reload }: { item: PItem; notes: PNote
         <div class="row"><StatusPill kind={item.kind} status={item.status} />{itemDate(item) && <span class="sub"><Icon n="cal" size={13} /> {item.kind === 'content' ? 'Paylaşım: ' : ''}{itemDate(item)}</span>}</div>
         {item.description && <p class="ms-desc">{item.description}</p>}
         <DriveButton link={item.link} />
+        <DriveOnizleme link={item.link} misafir />
       </div>
       {canAct && (
         <div class="ms-actions">

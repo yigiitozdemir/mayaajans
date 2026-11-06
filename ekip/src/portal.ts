@@ -7,6 +7,7 @@ import type { Context, MiddlewareHandler } from 'hono';
 import { getCookie, setCookie, deleteCookie } from 'hono/cookie';
 import type { Env, Vars } from './types';
 import { broadcast } from './hub';
+import { driveOnizleme } from './drive';
 import { notify } from './notify';
 import { DAY, clean, hashPassword, isDate, isEmail, newId, randomToken, sha256, sqlNow } from './util';
 
@@ -295,6 +296,14 @@ guest.get('/me', (c) => {
 });
 
 guest.get('/items', async (c) => c.json(await listFor(c.env, c.get('guest').client)));
+
+// Drive önizlemesi: yalnızca kendi kurumunun içeriklerine eklenmiş bağlantılar için
+guest.get('/drive', async (c) => {
+  const g = c.get('guest'); const url = c.req.query('url') || '';
+  const own = await c.env.DB.prepare('SELECT 1 FROM portal_items WHERE client = ? AND link = ? AND deleted_at IS NULL').bind(g.client, url).first();
+  if (!own) return c.json({ aktif: false });
+  return c.json(await driveOnizleme(c.env, url), 200, { 'Cache-Control': 'private, max-age=300' });
+});
 
 const guestName = (g: GuestRow) => (g.first_name + ' ' + g.last_name).trim() + ' · ' + (PORTALS[g.client]?.name || '');
 
