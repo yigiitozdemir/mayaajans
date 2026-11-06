@@ -16,12 +16,12 @@ const { chromium } = require('playwright');
   };
 
   let all;
-  await t('Pelin: Vatan portalını görür, Slack verisi aktarılmış (15 içerik + 25 talep)', async () => {
+  await t('Pelin: Vatan portalını görür, Slack verisi aktarılmış (15 içerik + 26 talep)', async () => {
     const me = await pelin.get('/api/me'); ok(me.data.portals.includes('vatan'), 'portals');
     const r = await pelin.get('/api/portal/vatan/all'); eq(r.status, 200);
     all = r.data;
     eq(all.items.filter((i) => i.kind === 'content').length, 15, 'içerik');
-    eq(all.items.filter((i) => i.kind === 'request').length, 25, 'talep');
+    eq(all.items.filter((i) => i.kind === 'request').length, 26, 'talep');
     const c3 = all.items.find((i) => i.kind === 'content' && i.no === 3);
     ok(c3.link.startsWith('https://drive.google.com/') && c3.planDate === '2026-10-28' && c3.status === 'revize', JSON.stringify(c3));
     ok(all.notes.some((n) => n.itemId === c3.id && n.action === 'revise'), 'Vatan revize notu aktarılmalı');
