@@ -39,19 +39,19 @@ let embedError = '';
 export function YapayZeka({ openTask }: { openTask: (id: string) => void }) {
   const [ai, setAi] = useState<AiId>(urlAi() || lastAi());
   const [broken, setBroken] = useState(embedBroken);
-  const [help, setHelp] = useState(false);
+  const [help, setHelp] = useState(() => new URLSearchParams(location.search).has('yardim'));
   useEffect(() => {
-    const f = () => { const v = urlAi(); if (v) setAi(v); };
+    const f = () => { const q = new URLSearchParams(location.search); setHelp(q.has('yardim')); const v = urlAi(); if (v) setAi(v); };
     window.addEventListener('maya-nav', f); window.addEventListener('popstate', f);
     return () => { window.removeEventListener('maya-nav', f); window.removeEventListener('popstate', f); };
   }, []);
   useEffect(() => { try { localStorage.setItem(LAST, ai); } catch { /* */ } }, [ai]);
 
-  if (broken || help) return <AiInfo openTask={openTask} onBack={!broken ? () => setHelp(false) : undefined} />;
-  return <AiEmbed ai={ai} openTask={openTask} onHelp={() => setHelp(true)} onFail={() => { embedBroken = true; setBroken(true); }} />;
+  if (broken || help) return <AiInfo openTask={openTask} onBack={!broken ? () => navigate('/yapay-zeka?ai=' + ai) : undefined} />;
+  return <AiEmbed ai={ai} onFail={() => { embedBroken = true; setBroken(true); }} />;
 }
 
-function AiEmbed({ ai, openTask, onHelp, onFail }: { ai: AiId; openTask: (id: string) => void; onHelp: () => void; onFail: () => void }) {
+function AiEmbed({ ai, onFail }: { ai: AiId; onFail: () => void }) {
   const host = useRef<HTMLDivElement>(null);
   const tool = AI_TOOLS.find((t) => t.id === ai)!;
   useEffect(() => {
@@ -79,24 +79,6 @@ function AiEmbed({ ai, openTask, onHelp, onFail }: { ai: AiId; openTask: (id: st
 
   return (
     <div class="ai-embed">
-      <header class="ai-bar">
-        <div class="seg" role="tablist" aria-label="Uygulamalar">
-          {AI_TOOLS.map((t) => (
-            <button type="button" role="tab" aria-selected={t.id === ai} class={t.id === ai ? 'on' : ''} onClick={() => navigate('/yapay-zeka?ai=' + t.id)}>
-              <span class={'aiq-ic sm ' + appIconCls(t.id)} aria-hidden="true"><Icon n={t.icon} size={12} stroke="#fff" w={2.4} /></span>{t.name}
-            </button>
-          ))}
-        </div>
-        <span class="sub ai-bar-note">Kendi hesabınla · giriş bilgilerin yalnızca bu Mac'te</span>
-        <span class="spacer" />
-        {ai !== 'whatsapp' && (
-          <button type="button" class="btn sm" onClick={() => desktopOr('open_ai', { which: ai }, () => window.open(tool.url, '_blank', 'noopener'))} title="Yan yana çalışmak için ayrı pencerede aç">
-            <Icon n="ext" size={14} />Ayrı pencere
-          </button>
-        )}
-        <button type="button" class="iconbtn" aria-label="Nasıl kullanılır?" title="Nasıl kullanılır?" onClick={onHelp}><Icon n="help" size={16} /></button>
-        <Bell onOpenTask={openTask} />
-      </header>
       <div ref={host} class="ai-host" aria-label={tool.name}>
         <span class="sub">{tool.name} yükleniyor…</span>
       </div>

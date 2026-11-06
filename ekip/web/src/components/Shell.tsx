@@ -4,7 +4,7 @@ import { api, loadMe, snack, shrinkImage, disconnectLive, store, initials, moodO
 import { Avatar, Icon, Link, Modal, Switch, meAsMember, navigate, useStore } from '../ui';
 import { applyTheme, useThemePref, type ThemePref } from '../theme';
 import { PushToggle } from './PushToggle';
-import { isDesktop, onDesktopEvent } from '../desktop';
+import { desktopOr, isDesktop, onDesktopEvent } from '../desktop';
 import { lastAi, openAppOutside } from '../pages/YapayZeka';
 
 // Menünün altında: ChatGPT ve Claude kısayolları (kişinin kendi hesabıyla; Mac'te programın içinde açılır)
@@ -23,8 +23,14 @@ function AiQuick({ path }: { path: string }) {
     <div class="aiquick">
       <div class="aiquick-h">
         <span class="navh" id="maya-yz">Uygulamalar</span>
-        <a href="/yapay-zeka" class={'aiquick-help' + (path === '/yapay-zeka' ? ' on' : '')} aria-label="Uygulamalar: nasıl kullanılır" title="Nasıl kullanılır?"
-          onClick={(e) => { e.preventDefault(); navigate('/yapay-zeka'); }}><Icon n="help" size={14} /></a>
+        <span class="aiquick-tools">
+          {isDesktop && cur && cur !== 'whatsapp' && (
+            <button type="button" class="aiquick-help" aria-label="Ayrı pencerede aç" title="Ayrı pencerede aç (yan yana çalışmak için)"
+              onClick={() => desktopOr('open_ai', { which: cur }, () => {})}><Icon n="ext" size={14} /></button>
+          )}
+          <a href="/yapay-zeka?yardim=1" class="aiquick-help" aria-label="Uygulamalar: nasıl kullanılır" title="Nasıl kullanılır?"
+            onClick={(e) => { e.preventDefault(); navigate('/yapay-zeka?yardim=1'); }}><Icon n="help" size={14} /></a>
+        </span>
       </div>
       <div class="aiquick-row" role="group" aria-labelledby="maya-yz">
         {AI.map((a) => (

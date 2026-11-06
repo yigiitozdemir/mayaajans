@@ -244,7 +244,8 @@ textarea.input { height: auto; padding: 10px 12px; line-height: 1.5; resize: ver
 .aiquick { margin-top: auto; padding-top: 18px; display: flex; flex-direction: column; }
 .aiquick-h { display: flex; align-items: center; justify-content: space-between; margin: 0 4px 8px 10px; }
 .aiquick-h .navh { margin: 0; }
-.aiquick-help { display: inline-flex; width: 24px; height: 24px; align-items: center; justify-content: center; border-radius: 7px; color: var(--mute2); }
+.aiquick-tools { display: inline-flex; gap: 2px; }
+.aiquick-help { border: 0; background: transparent; padding: 0; display: inline-flex; width: 24px; height: 24px; align-items: center; justify-content: center; border-radius: 7px; color: var(--mute2); }
 .aiquick-help:hover, .aiquick-help.on { background: var(--sel); color: var(--ink); }
 .aiquick-row { display: flex; flex-direction: column; gap: 5px; }
 .aiq { min-width: 0; display: flex; align-items: center; gap: 10px; min-height: 36px; padding: 0 10px 0 5px; border-radius: 10px; border: 1px solid var(--line); background: var(--card); color: var(--ink); font-size: 13px; font-weight: 600; text-align: left; transition: transform .12s ease, border-color .12s ease, box-shadow .12s ease; }

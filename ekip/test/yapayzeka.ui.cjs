@@ -26,10 +26,12 @@ const { chromium } = require('playwright');
     const side = await p.locator('.side').boundingBox(); const host = await p.locator('.ai-host').boundingBox();
     ok(Math.abs(c[1].x - side.width) < 2, 'x sol menünün sağı olmalı: ' + c[1].x + ' / ' + side.width);
     ok(Math.abs(c[1].y - host.y) < 2 && Math.abs(c[1].h - host.height) < 2 && c[1].w > 900, JSON.stringify(c[1]));
+    ok(c[1].y < 2, 'üst çubuk yok: uygulama en üstten başlamalı (y=' + c[1].y + ')');
+    const vh = await p.evaluate(() => innerHeight); ok(Math.abs(c[1].h - vh) < 2, 'tam yükseklik');
     ok(await p.locator('.aiq.gpt.on').count() === 1, 'menüde seçili görünmeli');
   });
   await t('Claude sekmesi → Claude gösterilir', async () => {
-    await clear(p); await p.getByRole('tab', { name: 'Claude' }).click(); await p.waitForTimeout(300);
+    await clear(p); await p.locator('.aiq.cld').click(); await p.waitForTimeout(300);
     eq((await last(p, 'ai_show'))[1].which, 'claude');
   });
   await t('profil penceresi açılınca gizlenir, kapanınca geri gelir', async () => {
@@ -39,12 +41,12 @@ const { chromium } = require('playwright');
     ok(await last(p, 'ai_show'), 'geri gelmedi');
   });
   await t('bildirim paneli açılınca gizlenir', async () => {
-    await clear(p); await p.locator('.ai-bar .bell').click(); await p.waitForTimeout(300);
-    ok(await last(p, 'ai_hide'), 'gizlenmedi'); await p.locator('.ai-bar .bell').click(); await p.waitForTimeout(300);
+    await clear(p); await p.evaluate(() => { const d = document.createElement('div'); d.className = 'bellpanel'; d.id = 'sahte-panel'; document.body.appendChild(d); }); await p.waitForTimeout(300);
+    ok(await last(p, 'ai_hide'), 'gizlenmedi'); await p.evaluate(() => document.getElementById('sahte-panel').remove()); await p.waitForTimeout(300);
   });
   await t('pencere boyutu değişince yeni ölçü gönderilir', async () => {
     await clear(p); await p.setViewportSize({ width: 1100, height: 700 }); await p.waitForTimeout(400);
-    const c = await last(p, 'ai_show'); ok(c && c[1].w < 900 && c[1].h < 700, JSON.stringify(c && c[1]));
+    const c = await last(p, 'ai_show'); ok(c && c[1].w < 900 && c[1].h <= 700, JSON.stringify(c && c[1]));
   });
   await t('başka sayfaya geçince gizlenir', async () => {
     await clear(p); await p.getByRole('link', { name: /İş Planı/ }).click(); await p.waitForTimeout(300);
@@ -52,11 +54,11 @@ const { chromium } = require('playwright');
   });
   await t('"Ayrı pencere" düğmesi', async () => {
     await p.locator('.aiq.cld').click(); await p.waitForTimeout(300); await clear(p);
-    await p.getByRole('button', { name: /Ayrı pencere/ }).click(); await p.waitForTimeout(200);
+    await p.getByRole('button', { name: 'Ayrı pencerede aç' }).click(); await p.waitForTimeout(200);
     eq((await last(p, 'open_ai'))[1].which, 'claude');
   });
   await t('yardım (?) bilgi sayfası ve geri dönüş', async () => {
-    await clear(p); await p.getByRole('button', { name: 'Nasıl kullanılır?' }).click(); await p.waitForTimeout(300);
+    await clear(p); await p.getByRole('link', { name: 'Uygulamalar: nasıl kullanılır' }).click(); await p.waitForTimeout(300);
     ok(await last(p, 'ai_hide'), 'yardımda gizlenmeli'); await p.getByText('Nasıl kullanılır?').first().waitFor();
     await clear(p); await p.getByRole('button', { name: 'Sohbete dön' }).click(); await p.waitForTimeout(300);
     ok(await last(p, 'ai_show'), 'dönünce gösterilmeli');
@@ -72,7 +74,7 @@ const { chromium } = require('playwright');
   await t('WhatsApp: menüde, panelde açılır, okunmamış sayısı görünür', async () => {
     await clear(p); await p.locator('.aiq.wa').click(); await p.waitForTimeout(300);
     eq((await last(p, 'ai_show'))[1].which, 'whatsapp');
-    eq(await p.getByRole('button', { name: /Ayrı pencere/ }).count(), 0, 'WhatsApp için ayrı pencere yok');
+    eq(await p.getByRole('button', { name: 'Ayrı pencerede aç' }).count(), 0, 'WhatsApp için ayrı pencere yok');
     await p.evaluate(() => window.dispatchEvent(new CustomEvent('maya-desktop', { detail: { action: 'app-unread', app: 'whatsapp', count: 4 } })));
     await p.locator('.aiq.wa .aiq-badge', { hasText: '4' }).waitFor();
     await p.evaluate(() => window.dispatchEvent(new CustomEvent('maya-desktop', { detail: { action: 'app-unread', app: 'whatsapp', count: 0 } })));
