@@ -12,12 +12,12 @@ export const AI_TOOLS = [
     good: ['Görsel oluşturma (story, post, kapak fikirleri)', 'Caption, metin, hashtag', 'Dosya / ekran görüntüsü yükleyip yorumlatma', 'Sesli konuşma'],
   },
   {
-    id: 'whatsapp', name: 'WhatsApp', cta: "WhatsApp'ı aç", url: 'https://web.whatsapp.com/', by: 'Meta', icon: 'phone',
-    good: ['Telefonundaki WhatsApp\'ı QR kodla bir kez bağla', 'Müşteri ve ekip yazışmaları, gruplar', 'Görsel, dosya, ekran görüntüsü gönderme', 'Yeni mesajda Mac bildirimi ve menüde sayı'],
-  },
-  {
     id: 'claude', name: 'Claude', cta: "Claude'u aç", url: 'https://claude.ai/new', by: 'Anthropic', icon: 'asterisk',
     good: ['Uzun metin, caption ve içerik planı', 'Brief, sunum ve rapor taslağı', 'PDF / görsel inceleme ve özetleme', 'Fikir geliştirme, düzeltme, çeviri'],
+  },
+  {
+    id: 'whatsapp', name: 'WhatsApp', cta: "WhatsApp'ı aç", url: 'https://web.whatsapp.com/', by: 'Meta', icon: 'phone',
+    good: ['Telefonundaki WhatsApp\'ı QR kodla bir kez bağla', 'Müşteri ve ekip yazışmaları, gruplar', 'Görsel, dosya, ekran görüntüsü gönderme', 'Yeni mesajda Mac bildirimi ve menüde sayı'],
   },
 ] as const;
 type AiId = (typeof AI_TOOLS)[number]['id'];
