@@ -28,6 +28,9 @@ import { NudgeReceiver } from './components/NudgeReceiver';
 import { ChatUnread } from './components/ChatUnread';
 import { Portal } from './pages/Portal';
 import { Misafir } from './pages/Misafir';
+import { Duyurular } from './pages/Duyurular';
+import { GeriBildirimler } from './pages/GeriBildirimler';
+import { Krizler } from './pages/Krizler';
 import './styles/tema.css'; // yeni görünüm — en sonda yüklenir
 
 function App() {
@@ -89,6 +92,9 @@ function App() {
   else if (path === '/ajanda') page = <Ajanda openTask={openTask} />;
   else if (path === '/yapay-zeka') page = <YapayZeka openTask={openTask} />;
   else if (path === '/ekran') page = <EkranGoruntuleri openTask={openTask} />;
+  else if (path === '/duyurular') page = <Duyurular openTask={openTask} />;
+  else if (path === '/krizler') page = <Krizler openTask={openTask} />;
+  else if (path === '/geri-bildirim' && s.me.role === 'admin') page = <GeriBildirimler openTask={openTask} />;
   else if (path === '/vatan' && s.me.portals?.includes('vatan')) page = <Portal client="vatan" openTask={openTask} />;
   else if (path === '/yonetici' && s.me.role === 'admin') page = <YoneticiOzeti openTask={openTask} />;
   else if (path === '/yonetici') { history.replaceState({}, '', '/'); page = <Bugun openTask={openTask} />; }

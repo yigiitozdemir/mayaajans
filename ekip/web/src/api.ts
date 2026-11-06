@@ -1,3 +1,4 @@
+import { bildirimSesi } from './ses';
 import { desktopInvoke, isDesktop } from './desktop';
 // Sunucu ile konuşma + ortak uygulama durumu + canlı bağlantı
 export interface Me {
@@ -170,6 +171,7 @@ export function connectLive() {
       const meta = n.meta || [n.task?.client, n.task?.dueDate ? 'Teslim: ' + fmtDate(n.task.dueDate) : '', msg.type === 'remind' ? n.reminders + '. hatırlatma' : actor ? 'Atayan: ' + actor.name : ''].filter(Boolean).join(' · ');
       if (n.kind !== 'nudge' && n.kind !== 'chat') pushToast({ id: n.id + ':' + Date.now(), heading: n.title, title: n.body, meta, taskId: n.taskId, actorId: n.actorId, link: n.link });
       if (n.kind !== 'nudge') systemNotify(n.title, n.body);
+      if (n.kind !== 'nudge') bildirimSesi(n.kind); // kendine has kısa ses + titreşim (ses.ts)
     } else if (msg.type === 'session-revoked') {
       stopped = true; store.set({ me: null });
     }

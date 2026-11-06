@@ -5,7 +5,7 @@ import { Icon, useStore, Sayi } from '../ui';
 import { Bell } from '../components/Notify';
 import { ClientMark, findClient } from '../components/ClientMark';
 import {
-  type Shoot, STATUS, REMIND_INFO, ShootForm, ShootDrawer, MonthCal, CrewStack,
+  type Shoot, type HavaMap, STATUS, REMIND_INFO, HAVA_INFO, ShootForm, ShootDrawer, MonthCal, CrewStack, HavaRozet,
   lower, longDate, isLate, byWhenAsc, byWhenDesc,
 } from '../components/CekimPanels';
 import '../styles/cekim.css';
@@ -33,11 +33,14 @@ export function Cekim({ openTask }: { openTask: (id: string) => void }) {
   const [showCancel, setShowCancel] = useState(!!ui0.showCancel);
   const [openId, setOpenId] = useState<string | null>(urlId());
   const [form, setForm] = useState<Partial<Shoot> | null>(null);
+  const [hava, setHava] = useState<HavaMap>({});
 
   useEffect(() => { try { localStorage.setItem(UI_KEY, JSON.stringify({ view, showDone, showCancel })); } catch { /* */ } }, [view, showDone, showCancel]);
 
+  // hava durumu ayrı yüklenir (yavaşlarsa liste beklemez; hata olursa sessizce gösterilmez)
+  const loadHava = () => { api<HavaMap>('GET', '/shoots/hava').then(setHava).catch(() => {}); };
   const load = async () => {
-    try { setShoots(await api<Shoot[]>('GET', '/shoots')); }
+    try { setShoots(await api<Shoot[]>('GET', '/shoots')); loadHava(); }
     catch (e: any) { snack(e.message); setShoots((x) => x || []); }
   };
   useEffect(() => { load(); return onLive(['shoots'], () => { load(); }); }, []);
@@ -61,7 +64,7 @@ export function Cekim({ openTask }: { openTask: (id: string) => void }) {
     if (location.search) history.replaceState({}, '', '/cekim');
   }
   const openShoot = (id: string) => { setOpenId(id); history.replaceState({}, '', '/cekim?id=' + id); };
-  const applyOne = (x: Shoot | null) => { if (x) setShoots((l) => (l || []).map((y) => (y.id === x.id ? x : y))); else load(); };
+  const applyOne = (x: Shoot | null) => { if (x) { setShoots((l) => (l || []).map((y) => (y.id === x.id ? x : y))); loadHava(); } else load(); };
 
   const all = shoots || [];
   const firms = useMemo(() => Array.from(new Set([...s.clients.map((c) => c.name), ...all.map((x) => x.client).filter(Boolean)])).sort((a, b) => a.localeCompare(b, 'tr')), [s.clients, shoots]);
@@ -92,6 +95,7 @@ export function Cekim({ openTask }: { openTask: (id: string) => void }) {
     const late = isLate(x);
     const doneN = x.checks.filter((c) => c.done).length;
     const d = parseD(x.date);
+    const hv = x.status === 0 && x.outdoor ? hava[x.id] : undefined;
     return (
       <div class={'ck-card' + (late ? ' late' : '') + (x.status === 2 ? ' cancel' : '') + (findClient(s.clients, x.client)?.color ? ' stripe' : '')} style={findClient(s.clients, x.client)?.color ? { '--stripe': findClient(s.clients, x.client)!.color } : undefined}>
         <span class="ck-when"><b>{x.time || '—'}</b><span>{DAY[d.getDay()]} · {d.getDate()} {LMON[d.getMonth()].slice(0, 3)}</span></span>
@@ -104,7 +108,10 @@ export function Cekim({ openTask }: { openTask: (id: string) => void }) {
             <span class="cline"><ClientMark name={x.client} size={16} /><span>{x.client || '—'}</span></span>
             {x.location && <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z" /><circle cx="12" cy="10" r="2.5" /></svg>{x.location}</span>}
             {x.checks.length > 0 && <span style={doneN === x.checks.length ? 'color:var(--green)' : ''}><Icon n="check" size={12} />Hazırlık {doneN}/{x.checks.length}</span>}
+            {x.outdoor && !hv && x.status === 0 && <span class="ck-outtag"><Icon n="sun" size={12} />Dış çekim</span>}
+            {hv && <HavaRozet h={hv} />}
           </span>
+          {hv?.risk && <span class="ck-hava-w"><Icon n="uyari" size={13} />{hv.reason}</span>}
           {x.note && <span class="ck-note">{x.note}</span>}
         </button>
         <span class="ck-side">
@@ -218,11 +225,12 @@ export function Cekim({ openTask }: { openTask: (id: string) => void }) {
           <aside class="ck-rail">
             <MonthCal month={month} setMonth={setMonth} shoots={base} day={day} onPick={pickDay} />
             <section class="panel ck-info"><Icon n="bell" size={16} /><span><strong style="display:block;color:var(--ink);margin-bottom:2px">Çekim hatırlatması</strong>{REMIND_INFO}</span></section>
+            <section class="panel ck-info"><Icon n="bulut" size={16} /><span><strong style="display:block;color:var(--ink);margin-bottom:2px">Hava durumu</strong>{HAVA_INFO}</span></section>
           </aside>
         </div>
       )}
 
-      {opened && <ShootDrawer shoot={opened} onClose={closeDrawer} onEdit={() => setForm(opened)} onChanged={applyOne} />}
+      {opened && <ShootDrawer shoot={opened} hava={opened.outdoor && opened.status === 0 ? hava[opened.id] : undefined} onClose={closeDrawer} onEdit={() => setForm(opened)} onChanged={applyOne} />}
       {form && <ShootForm initial={form} firms={firms} onClose={() => setForm(null)} onSaved={(x) => { setForm(null); setShoots((l) => [...(l || []).filter((y) => y.id !== x.id), x]); if (!form.id) setMonth(x.date.slice(0, 7)); load(); }} />}
     </div>
   );

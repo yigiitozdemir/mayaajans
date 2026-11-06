@@ -1,9 +1,13 @@
 import { useEffect, useState } from 'preact/hooks';
 import type { ComponentChildren } from 'preact';
-import { api, loadMe, snack, shrinkImage, disconnectLive, store, initials, moodOf, type Mood } from '../api';
+import { api, onLive, loadMe, snack, shrinkImage, disconnectLive, store, initials, moodOf, type Mood } from '../api';
 import { Avatar, Icon, Link, Modal, Switch, meAsMember, navigate, useStore } from '../ui';
 import { applyTheme, useThemePref, type ThemePref } from '../theme';
 import { PushToggle } from './PushToggle';
+import { GeriBildirimDugmesi } from './GeriBildirimDugmesi';
+import { TakvimAbonelik } from './TakvimAbonelik';
+import { SesAyari } from './SesAyari';
+import { RozetRafi } from './RozetRafi';
 import { desktopOr, isDesktop, macOverlay, onDesktopEvent } from '../desktop';
 import { lastAi, openAppOutside } from '../pages/YapayZeka';
 
@@ -83,6 +87,8 @@ const NAV = [
   { href: '/musteriler', label: 'Müşteriler', icon: 'clients' },
   { href: '/sohbet', label: 'Sohbet', icon: 'chat' },
   { href: '/durt', label: 'Dürtme', icon: 'hand' },
+  { href: '/duyurular', label: 'Duyurular', icon: 'megafon' },
+  { href: '/krizler', label: 'Kriz kayıtları', icon: 'uyari' },
 ];
 
 // Telefonda alttaki sekmeler (geri kalanı "Menü"de)
@@ -99,6 +105,12 @@ export function Shell({ path, children }: { path: string; children: ComponentChi
   useEffect(() => { const f = () => navTick((n) => n + 1); window.addEventListener('maya-nav', f); window.addEventListener('popstate', f); window.addEventListener('maya-ai-broken', f); return () => { window.removeEventListener('maya-nav', f); window.removeEventListener('popstate', f); window.removeEventListener('maya-ai-broken', f); }; }, []);
   const me = s.me!;
   const [menuOpen, setMenuOpen] = useState(false);
+  // okunmamış duyuru sayısı (menü rozeti)
+  const [duyuruSayi, setDuyuruSayi] = useState(0);
+  useEffect(() => {
+    const f = () => api<{ sayi: number }>('GET', '/duyurular/okunmamis').then((r) => setDuyuruSayi(r?.sayi || 0)).catch(() => {});
+    f(); return onLive(['duyuru', '*'], f);
+  }, []);
   useEffect(() => { setMenuOpen(false); }, [path]); // bir bölüme geçince menü kapanır
   useEffect(() => {
     if (!menuOpen) return;
@@ -130,7 +142,7 @@ export function Shell({ path, children }: { path: string; children: ComponentChi
         <nav class="nav" aria-label="Ana menü">
           {(isDesktop ? [...NAV.slice(0, 2), { href: '/ekran', label: 'Ekran Görüntüleri', icon: 'image' }, ...NAV.slice(2)] : NAV).map((n) => (
             <Link href={n.href} class={path === n.href ? 'on' : ''} aria-current={path === n.href ? 'page' : undefined} title={n.label}>
-              <Icon n={n.icon} />{n.label}{n.href === '/isler' && <span class="count">{open}</span>}{n.href === '/sohbet' && s.chatUnread > 0 && <span class="count" style="background:var(--badge);color:#fff">{s.chatUnread}</span>}
+              <Icon n={n.icon} />{n.label}{n.href === '/isler' && <span class="count">{open}</span>}{n.href === '/sohbet' && s.chatUnread > 0 && <span class="count" style="background:var(--badge);color:#fff">{s.chatUnread}</span>}{n.href === '/duyurular' && duyuruSayi > 0 && <span class="count" style="background:var(--badge);color:#fff">{duyuruSayi}</span>}
             </Link>
           ))}
           {me.portals?.includes('vatan') && (
@@ -141,10 +153,12 @@ export function Shell({ path, children }: { path: string; children: ComponentChi
               <div class="navh">Yönetim</div>
               <Link href="/yonetici" class={path === '/yonetici' ? 'on' : ''} title="Yönetici özeti"><Icon n="board" />Yönetici özeti</Link>
               <Link href="/ekip" class={path === '/ekip' ? 'on' : ''} title="Ekip yönetimi"><Icon n="team" />Ekip yönetimi</Link>
+              <Link href="/geri-bildirim" class={path === '/geri-bildirim' ? 'on' : ''} title="Geri bildirimler"><Icon n="mail" />Geri bildirimler</Link>
             </>
           )}
         </nav>
         <AiQuick path={path} />
+        <GeriBildirimDugmesi />
         <ThemePicker />
       </aside>
       <div class="main">{children}</div>
@@ -289,7 +303,10 @@ function ProfileModal({ onClose }: { onClose: () => void }) {
     if (!first.trim()) { setErr('Adını yaz.'); return; }
     setBusy(true);
     try {
-      await api('PATCH', '/me', { firstName: first, lastName: last, photo: photo || null, settings });
+      // yalnızca bu pencerenin kendi ayarlarını gönder; anında kaydedilen ayarlar (ses, titreşim, hava, tema…) geri dönmesin
+      const OWN = ['remindHourly', 'quietHours', 'morning', 'morningTime', 'weekendQuiet'];
+      const own = Object.fromEntries(OWN.filter((k) => k in settings).map((k) => [k, (settings as any)[k]]));
+      await api('PATCH', '/me', { firstName: first, lastName: last, photo: photo || null, settings: own });
       await loadMe(); snack('Profilin güncellendi'); onClose();
     } catch (e: any) { setErr(e.message); } finally { setBusy(false); }
   }
@@ -320,6 +337,7 @@ function ProfileModal({ onClose }: { onClose: () => void }) {
         <Switch on={flag('remindHourly')} label="Okumadığım atamaları saatte bir hatırlat" hint="İşi açana kadar" onToggle={() => toggle('remindHourly')} />
         <Switch on={flag('quietHours')} label="Mesai dışında hatırlatma gönderme" hint="19:00 – 09:00 arası sessiz" onToggle={() => toggle('quietHours')} />
         <PushToggle />
+        <SesAyari />
         <Switch on={flag('morning')} label="Sabah özeti gönder" hint="Bugünkü işlerim, çekimlerim ve özel günler" onToggle={() => toggle('morning')} />
         {flag('morning') && (
           <div class="row" style="gap:10px;padding:4px 0 8px">
@@ -335,6 +353,8 @@ function ProfileModal({ onClose }: { onClose: () => void }) {
           </div>
         )}
       </div>
+      <TakvimAbonelik />
+      <RozetRafi />
       {err && <span class="errtext" role="alert">{err}</span>}
       <div class="row">
         <button type="button" class="btn ghost" style="color:var(--red);border:0;padding:0 4px" onClick={logout}><Icon n="out" size={15} />Oturumu kapat</button>

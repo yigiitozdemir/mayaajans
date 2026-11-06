@@ -5,6 +5,7 @@ import type { Env, Vars } from '../types';
 import { notify, changed } from '../notify';
 import { broadcast } from '../hub';
 import { clean, isDate, newId } from '../util';
+import { cekimHavalari, istanbulDate, HAVA_GUN } from '../hava';
 
 export const r = new Hono<{ Bindings: Env; Variables: Vars }>();
 type C = Context<{ Bindings: Env; Variables: Vars }>;
@@ -12,7 +13,7 @@ type C = Context<{ Bindings: Env; Variables: Vars }>;
 interface ShootRow {
   id: string; title: string; client: string; date: string; time: string; location: string; status: number;
   note: string; crew: string; checks: string; source: string; created_by: string | null;
-  created_at: string; updated_at: string; completed_at: string | null; reminded_for: string | null;
+  created_at: string; updated_at: string; completed_at: string | null; reminded_for: string | null; outdoor: number;
 }
 interface Check { text: string; done: boolean }
 
@@ -50,6 +51,7 @@ function view(s: ShootRow) {
     id: s.id, title: s.title, client: s.client, date: s.date, time: s.time, location: s.location, status: s.status,
     note: s.note, crew: parseArr<string>(s.crew), checks: parseArr<Check>(s.checks), source: s.source, createdBy: s.created_by,
     createdAt: s.created_at, updatedAt: s.updated_at, completedAt: s.completed_at, remindedFor: s.reminded_for,
+    outdoor: !!s.outdoor,
   };
 }
 type ShootView = ReturnType<typeof view>;
@@ -105,6 +107,17 @@ r.get('/', async (c) => {
   return c.json(results.map(view).sort(sortShoots));
 });
 
+// ---------- hava durumu: önümüzdeki 16 gündeki planlı dış çekimler ----------
+// { [çekimId]: HavaOzet } · ağ hatasında ilgili çekim listede olmaz (arayüz sessizce göstermez)
+r.get('/hava', async (c) => {
+  const from = istanbulDate(), to = istanbulDate(new Date(), HAVA_GUN - 1);
+  const { results } = await c.env.DB.prepare(
+    'SELECT id, date, time, location FROM shoots WHERE outdoor = 1 AND status = 0 AND date >= ? AND date <= ?',
+  ).bind(from, to).all<{ id: string; date: string; time: string; location: string }>();
+  const out = results.length ? await cekimHavalari(c.env, results) : {};
+  return c.json(out, 200, { 'Cache-Control': 'no-store' });
+});
+
 r.get('/:id', async (c) => {
   const row = await getRow(c, c.req.param('id'));
   if (!row) return c.json({ error: 'Çekim bulunamadı' }, 404);
@@ -125,10 +138,10 @@ r.post('/', async (c) => {
   if (b.checks !== undefined) { checks = cleanChecks(b.checks); if (!checks) return c.json({ error: 'Hazırlık listesi geçersiz' }, 400); }
   const id = newId('s');
   await c.env.DB.prepare(
-    `INSERT INTO shoots (id, title, client, date, time, location, status, note, crew, checks, source, created_by, completed_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'app', ?, ${status === 1 ? "datetime('now')" : 'NULL'})`,
+    `INSERT INTO shoots (id, title, client, date, time, location, status, note, crew, checks, source, created_by, completed_at, outdoor)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'app', ?, ${status === 1 ? "datetime('now')" : 'NULL'}, ?)`,
   ).bind(id, title, clean(b.client, 120), b.date, clean(b.time, 40), clean(b.location, 160), status, clean(b.note, 4000),
-    JSON.stringify(crew), JSON.stringify(checks), u.id).run();
+    JSON.stringify(crew), JSON.stringify(checks), u.id, b.outdoor === true ? 1 : 0).run();
   const s = view((await getRow(c, id))!);
   if (status !== 2) await notifyCrew(c, s, crew, 'Çekim ekibine eklendin');
   live(c, id);
@@ -153,6 +166,10 @@ r.patch('/:id', async (c) => {
   if ('time' in b) { sets.push('time = ?'); vals.push(clean(b.time, 40)); }
   if ('location' in b) { sets.push('location = ?'); vals.push(clean(b.location, 160)); }
   if ('note' in b) { sets.push('note = ?'); vals.push(clean(b.note, 4000)); }
+  if ('outdoor' in b) {
+    if (typeof b.outdoor !== 'boolean') return c.json({ error: 'Dış çekim işareti geçersiz' }, 400);
+    sets.push('outdoor = ?'); vals.push(b.outdoor ? 1 : 0);
+  }
   if ('status' in b) {
     if (![0, 1, 2].includes(b.status as number)) return c.json({ error: 'Geçersiz durum' }, 400);
     sets.push('status = ?'); vals.push(b.status);

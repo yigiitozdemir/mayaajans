@@ -111,3 +111,30 @@
 .ck-alert { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 10px 12px; border-radius: 12px; background: var(--red-soft); color: var(--red); font-size: 13px; font-weight: 600; }
 .ck-prog { height: 6px; border-radius: 99px; background: var(--chip); overflow: hidden; }
 .ck-prog i { display: block; height: 100%; background: var(--green-dot); }
+
+/* ---------- dış çekim + hava durumu ---------- */
+.page { --ck-amber-rgb: 143, 86, 0; }
+:root[data-theme="dark"] .page { --ck-amber-rgb: 255, 200, 87; }
+.ck-outtag { color: var(--mute); }
+.ck-hava { display: inline-flex; align-items: center; gap: 4px; height: 22px; padding: 0 8px 0 6px; border-radius: 99px; background: var(--chip); border: 1px solid var(--line); color: var(--ink2); font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.ck-hava .e { font-size: 13px; line-height: 1; }
+.ck-hava .p { color: var(--blue); font-weight: 700; margin-left: 2px; }
+.ck-hava.risk { background: rgba(var(--ck-amber-rgb), .16); border-color: rgba(var(--ck-amber-rgb), .45); color: var(--amber-ink); }
+.ck-hava.risk .p { color: var(--amber-ink); }
+.ck-hava-w { display: inline-flex; align-items: center; gap: 6px; align-self: flex-start; font-size: 12px; font-weight: 600; color: var(--amber-ink); padding: 3px 9px; border-radius: 8px; background: rgba(var(--ck-amber-rgb), .12); }
+.ck-card:has(.ck-hava.risk) { border-color: rgba(var(--ck-amber-rgb), .45); }
+.ck-chip-out { color: var(--ink2); }
+.ck-outdoor { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.ck-hv { display: flex; gap: 12px; align-items: flex-start; padding: 12px 14px; border-radius: 14px; background: var(--chip); border: 1px solid var(--line); }
+.ck-hv.soon { align-items: center; font-size: 12px; color: var(--mute); padding: 10px 12px; }
+.ck-hv.soon svg { flex: none; color: var(--blue); }
+.ck-hv .big { font-size: 30px; line-height: 1; flex: none; }
+.ck-hv .hv-b { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.ck-hv .hv-t { display: flex; flex-direction: column; gap: 1px; }
+.ck-hv .hv-t strong { font-size: 14px; }
+.ck-hv .hv-t .sub { font-size: 12px; }
+.ck-hv .hv-m { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12px; color: var(--mute); }
+.ck-hv .hv-m b { color: var(--ink); font-variant-numeric: tabular-nums; }
+.ck-hv.risk { background: rgba(var(--ck-amber-rgb), .13); border-color: rgba(var(--ck-amber-rgb), .45); }
+.ck-hv .hv-w { display: flex; gap: 6px; align-items: flex-start; font-size: 12.5px; font-weight: 600; line-height: 1.45; color: var(--amber-ink); }
+.ck-hv .hv-w svg { flex: none; margin-top: 2px; }

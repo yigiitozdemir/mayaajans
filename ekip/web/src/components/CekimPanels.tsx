@@ -1,7 +1,7 @@
 // Çekim Planı: ortak tipler, form, detay paneli, takvim
 import { useEffect, useState } from 'preact/hooks';
 import { api, snack, store, todayIso, parseD, LMON, LDAY, DAY, dayDiff, memberName, type Member } from '../api';
-import { Avatar, Icon, Modal, useStore } from '../ui';
+import { Avatar, Icon, Modal, Switch, useStore } from '../ui';
 import { ClientMark } from './ClientMark';
 
 export interface Check { text: string; done: boolean }
@@ -9,6 +9,50 @@ export interface Shoot {
   id: string; title: string; client: string; date: string; time: string; location: string; status: 0 | 1 | 2;
   note: string; crew: string[]; checks: Check[]; source: string; createdBy: string | null;
   createdAt: string; updatedAt: string; completedAt: string | null; remindedFor: string | null;
+  outdoor: boolean;
+}
+
+/** Sunucudaki hava özeti (GET /shoots/hava → { [çekimId]: Hava }) */
+export interface Hava {
+  date: string; hour: string; range: string; temp: number; pop: number; mm: number; wind: number; code: number;
+  icon: string; label: string; risk: boolean; reason: string; place: string;
+}
+export type HavaMap = Record<string, Hava>;
+export const HAVA_INFO = "Dış çekimlerde 16 gün kala hava tahmini görünür; ertesi gün yağmur ya da kuvvetli rüzgâr bekleniyorsa 18:00'de ekibe uyarı gider.";
+
+/** Kart üzerindeki küçük rozet: simge + sıcaklık + yağış olasılığı */
+export function HavaRozet({ h }: { h: Hava }) {
+  return (
+    <span class={'ck-hava' + (h.risk ? ' risk' : '')} title={h.label + ' · ' + h.range + (h.reason ? ' · ' + h.reason : '') + ' · ' + h.place}
+      aria-label={'Hava: ' + h.label + ', ' + h.temp + ' derece, yağış olasılığı yüzde ' + h.pop + (h.risk ? ', dikkat: ' + h.reason : '')}>
+      <span class="e" aria-hidden="true">{h.icon}</span>{h.temp}°<span class="p">%{h.pop}</span>
+    </span>
+  );
+}
+
+/** Detay panelindeki hava kutusu */
+export function HavaKutu({ x, h }: { x: Shoot; h: Hava | undefined }) {
+  if (!x.outdoor || x.status !== 0) return null;
+  const n = dayDiff(x.date);
+  if (n < 0) return null;
+  if (!h) {
+    if (n < 16) return null; // ağ hatası / tahmin yok: sessizce gösterme
+    return <div class="ck-hv soon"><Icon n="bulut" size={16} /><span>Hava tahmini çekime 16 gün kala burada görünür.</span></div>;
+  }
+  return (
+    <div class={'ck-hv' + (h.risk ? ' risk' : '')} role={h.risk ? 'alert' : undefined}>
+      <span class="big" aria-hidden="true">{h.icon}</span>
+      <div class="hv-b">
+        <span class="hv-t"><strong>{h.label} · {h.temp}°C</strong><span class="sub">{h.range} · {h.place}</span></span>
+        <span class="hv-m">
+          <span>Yağış olasılığı <b>%{h.pop}</b></span>
+          <span>Rüzgâr <b>{h.wind} km/sa</b></span>
+          {h.mm > 0 && <span>Yağış <b>{h.mm} mm</b></span>}
+        </span>
+        {h.risk && <span class="hv-w"><Icon n="uyari" size={14} />{h.reason} — yedek plan ya da kapalı alan düşün.</span>}
+      </div>
+    </div>
+  );
 }
 
 export const STATUS = [
@@ -121,6 +165,7 @@ export function ShootForm({ initial, firms, onClose, onSaved }: { initial: Parti
     title: initial.title || '', client: initial.client || '', date: initial.date || '', time: initial.time || '',
     location: initial.location || '', status: (initial.status ?? 0) as 0 | 1 | 2, note: initial.note || '',
     crew: initial.crew || [], checks: initial.checks || DEFAULT_CHECKS.map((text) => ({ text, done: false })),
+    outdoor: !!initial.outdoor,
   });
   const [err, setErr] = useState('');
   const [busy, setBusy] = useState(false);
@@ -170,6 +215,9 @@ export function ShootForm({ initial, firms, onClose, onSaved }: { initial: Parti
             <span class="row" style="gap:6px">{TIME_CHIPS.map((t) => <button type="button" class="ck-tchip" aria-pressed={f.time === t} onClick={() => set({ time: t })}>{t}</button>)}</span>
           </div>
         </div>
+        <div class="ck-outdoor">
+          <Switch on={f.outdoor} label="Dış çekim" hint="Hava durumu gösterilir; yarın yağmur ya da rüzgâr varsa 18:00'de ekibe uyarı gider" onToggle={() => set({ outdoor: !f.outdoor })} />
+        </div>
         <div class="field">Durum
           <div class="seg" role="group" aria-label="Durum">
             {STATUS.map((st, i) => <button type="button" style="flex:1" class={f.status === i ? 'on' : ''} aria-pressed={f.status === i} onClick={() => set({ status: i as 0 | 1 | 2 })}><span class={'dot ck-dot' + i} style="display:inline-block;margin-right:6px" />{st.label}</button>)}
@@ -198,7 +246,7 @@ export function ShootForm({ initial, firms, onClose, onSaved }: { initial: Parti
 }
 
 // ---------- detay paneli ----------
-export function ShootDrawer({ shoot: x, onClose, onEdit, onChanged }: { shoot: Shoot; onClose: () => void; onEdit: () => void; onChanged: (s: Shoot | null) => void }) {
+export function ShootDrawer({ shoot: x, hava, onClose, onEdit, onChanged }: { shoot: Shoot; hava?: Hava; onClose: () => void; onEdit: () => void; onChanged: (s: Shoot | null) => void }) {
   const s = useStore();
   const [confirmDel, setConfirmDel] = useState(false);
   const [note, setNote] = useState(x.note);
@@ -226,6 +274,7 @@ export function ShootDrawer({ shoot: x, onClose, onEdit, onChanged }: { shoot: S
       <aside class="drawer" role="dialog" aria-label="Çekim detayı">
         <div class="row">
           <span class="chip"><ClientMark name={x.client} size={18} />{x.client || 'Firma yok'}</span>
+          {x.outdoor && <span class="chip ck-chip-out"><Icon n="sun" size={13} />Dış çekim</span>}
           {x.source === 'slack' && <span class="chip">Slack'ten aktarıldı</span>}
           <span class="spacer" />
           <button type="button" class="iconbtn" aria-label="Kapat" onClick={onClose}><Icon n="x" size={16} /></button>
@@ -253,6 +302,10 @@ export function ShootDrawer({ shoot: x, onClose, onEdit, onChanged }: { shoot: S
           <dt>Ekleyen</dt><dd>{x.createdBy ? memberName(s.team, x.createdBy) : 'Slack listesi'}</dd>
           {x.completedAt && <><dt>Tamamlandı</dt><dd class="sub">{x.completedAt.slice(0, 10).split('-').reverse().join('.')}</dd></>}
         </dl>
+        <HavaKutu x={x} h={hava} />
+        <div class="ck-outdoor">
+          <Switch on={x.outdoor} label="Dış çekim" hint={x.outdoor ? 'Hava durumu izleniyor' : 'Açarsan hava durumu ve yağmur uyarısı gelir'} onToggle={() => patch({ outdoor: !x.outdoor }, x.outdoor ? 'Dış çekim işareti kaldırıldı' : 'Dış çekim olarak işaretlendi · hava durumu izleniyor')} />
+        </div>
         <div style="display:flex;flex-direction:column;gap:8px">
           <h3 class="ck-h3">Çekim ekibi</h3>
           <CrewPicker value={x.crew} onToggle={(id) => {

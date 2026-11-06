@@ -22,6 +22,14 @@ import { haftalikYedek } from './yedek';
 import { sendPush } from './push';
 import { onayHatirlatma } from './onay';
 import { guest as portalGuest, portalsOf, team as portalTeam } from './portal';
+import { r as duyuru } from './routes/duyuru';
+import { r as geribildirim } from './routes/geribildirim';
+import { r as takvim, feed as takvimFeed } from './routes/takvim';
+import { r as kriz } from './routes/kriz';
+import { r as ilham } from './routes/ilham';
+import { r as rozet } from './routes/rozet';
+import { havaUyarisi } from './hava';
+import { haftalikRozetler } from './rozet';
 
 export { Hub };
 
@@ -44,13 +52,15 @@ app.get('/api/version', (c) => c.json({ build: BUILD_ID }, 200, { 'Cache-Control
 
 // müşteri portalı misafirleri (ayrı oturum; ekip API'sine erişemez)
 app.route('/api/misafir', portalGuest);
+// kişiye özel takvim aboneliği (Google / iPhone takvimi çeker; gizli adresle, girişsiz)
+app.route('/takvim', takvimFeed);
 
 const api = new Hono<{ Bindings: Env; Variables: Vars }>();
 api.use('*', requireUser);
 
 // ---------- yardımcılar ----------
 const PALETTE = ['#2F6F8F', '#7A4E9C', '#3E7A55', '#9C4A5E', '#8A5A2B', '#5B6B3A', '#4C6A9E', '#8E5B8A'];
-const SETTING_BOOLS = ['remindHourly', 'quietHours', 'morning', 'weekendQuiet', 'nudgeSound', 'nudgeShake', 'nudgeMac', 'dnd', 'launchWindow'];
+const SETTING_BOOLS = ['remindHourly', 'quietHours', 'morning', 'weekendQuiet', 'nudgeSound', 'nudgeShake', 'nudgeMac', 'dnd', 'launchWindow', 'sesler', 'titresim', 'havaUyarisi'];
 
 function teamView(u: UserRow, admin: boolean) {
   return {
@@ -254,6 +264,12 @@ api.route('/search', arama);
 api.route('/admin-summary', yonetim);
 api.route('/push', pushRoutes);
 api.route('/portal', portalTeam);
+api.route('/duyurular', duyuru);
+api.route('/geri-bildirim', geribildirim);
+api.route('/takvim', takvim);
+api.route('/krizler', kriz);
+api.route('/ilham', ilham);
+api.route('/rozetler', rozet);
 
 // ---------- işler ----------
 api.get('/tasks', async (c) => {
@@ -478,6 +494,6 @@ export default {
     if (e.cron === '* * * * *') ctx.waitUntil(ajandaHatirlatma(env)); // Ajandam anımsatıcıları (dakikalık)
     else if (e.cron === '17 0 * * 1') ctx.waitUntil(haftalikYedek(env)); // haftalık yedek
     else if (e.cron === '30 13 * * *') ctx.waitUntil(cekimHatirlatma(env)); // 16:30 İstanbul
-    else ctx.waitUntil(Promise.all([hourlyReminders(env), sabahOzeti(env), onayHatirlatma(env)]));
+    else ctx.waitUntil(Promise.all([hourlyReminders(env), sabahOzeti(env), onayHatirlatma(env), havaUyarisi(env), haftalikRozetler(env)]));
   },
 } satisfies ExportedHandler<Env>;

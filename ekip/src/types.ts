@@ -5,6 +5,8 @@ export interface Env {
   BACKUP: R2Bucket;
   VAPID_PUBLIC: string;
   VAPID_PRIVATE?: string;
+  /** Test: Open-Meteo yerine sahte hava verisi (JSON). Canlıda boş. */
+  HAVA_SAHTE?: string;
 }
 
 export interface UserRow {

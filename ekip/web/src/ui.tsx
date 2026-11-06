@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useState } from 'preact/hooks';
 import type { ComponentChildren } from 'preact';
 import { createPortal } from 'preact/compat';
+import { sesCal } from './ses';
 import { store, type State, type Member, type Me, initials, moodOf } from './api';
 
 export function useStore(): State {
@@ -59,6 +60,11 @@ const P: Record<string, string> = {
   plus: '<path d="M12 5v14M5 12h14"/>',
   x: '<path d="M6 6l12 12M18 6L6 18"/>',
   menu: '<path d="M4 7h16M4 12h16M4 17h16"/>',
+  megafon: '<path d="M3 11v2a1 1 0 0 0 1 1h2l5 4V6L6 10H4a1 1 0 0 0-1 1z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/>',
+  uyari: '<path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/>',
+  yildiz: '<path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/>',
+  bulut: '<path d="M17.5 19H8a5 5 0 1 1 1.4-9.8A6 6 0 0 1 21 11.5 3.8 3.8 0 0 1 17.5 19z"/>',
+  pin: '<path d="M12 17v5M9 3h6l-1 6 3 3H7l3-3z"/>',
   search: '<circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>',
   user: '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
   out: '<path d="M15 4h4a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-4"/><path d="M10 17l-5-5 5-5M5 12h11"/>',
@@ -163,6 +169,7 @@ export function Sayi({ v }: { v: number | string | null | undefined }) {
 
 /** Tamamlama kutlaması: tıklanan yerden küçük bir parıltı patlaması. */
 export function kutla(from?: Element | EventTarget | null) {
+  sesCal('tamam');
   if (reduceMotion() || typeof document === 'undefined') return;
   const el = from instanceof Element ? from : null;
   const r = el?.getBoundingClientRect();
