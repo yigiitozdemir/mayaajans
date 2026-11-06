@@ -199,7 +199,7 @@ export function DayDetail({ day, onBack, onChange, onEdit, onDeleted, openTask }
         {dd === 0 && <span class="daytag">Bugün</span>}
         {dd === 1 && <span class="daytag">Yarın</span>}
         <span class={'tone ' + day.tone}>{toneLabel(day.tone)}</span>
-        {day.star && <span class="chip" style="color:#9A6A12"><span aria-hidden="true">★</span> Önemli</span>}
+        {day.star && <span class="chip" style="color:var(--amber-ink)"><span aria-hidden="true">★</span> Önemli</span>}
         {day.rangeLabel && <span class="chip">{day.rangeLabel}</span>}
         <span class="spacer" />
         <button type="button" class="iconbtn" aria-label="Detayı kapat" onClick={onBack}><Icon n="x" size={16} /></button>

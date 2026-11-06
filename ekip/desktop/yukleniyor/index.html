@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Maya Ekip</title>
 <style>
-  :root { color-scheme: light; }
+  :root { color-scheme: light dark; }
   html, body { height: 100%; margin: 0; }
   body { background: #F4F1EC; color: #2B1E17; font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
          display: flex; align-items: center; justify-content: center; -webkit-user-select: none; user-select: none; }
@@ -14,12 +14,17 @@
   p { margin: 0; color: #6E5F55; }
   .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #9B573F; margin-right: 8px; animation: p 1.2s ease-in-out infinite; }
   @keyframes p { 50% { opacity: .25; } }
+  @media (prefers-color-scheme: dark) {
+    body { background: #1A1512; color: #EDE6DD; }
+    p { color: #AFA497; }
+    .dot { background: #D68E70; }
+  }
   button { margin-top: 18px; font: inherit; font-weight: 600; color: #fff; background: #9B573F; border: 0; border-radius: 8px; padding: 8px 16px; cursor: pointer; display: none; }
 </style>
 </head>
 <body>
 <main>
-  <img src="logo.png" alt="Maya Ajans">
+  <picture><source srcset="logo-koyu.png" media="(prefers-color-scheme: dark)"><img src="logo.png" alt="Maya Ajans"></picture>
   <p id="msg"><span class="dot"></span>Bağlanıyor…</p>
   <button id="again" type="button">Tekrar dene</button>
 </main>

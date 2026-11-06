@@ -72,7 +72,7 @@ export function Ekip() {
       </section>
 
       {link && (
-        <section class="card" style="padding:16px;display:flex;flex-direction:column;gap:10px;border-color:rgba(155,87,63,.4)">
+        <section class="card" style="padding:16px;display:flex;flex-direction:column;gap:10px;border-color:rgba(var(--accent-rgb), .4)">
           <strong>{link.kind === 'reset' ? 'Şifre belirleme bağlantısı' : 'Davet bağlantısı'} · {link.who}</strong>
           <div class="row"><input class="input" readOnly value={link.url} style="flex:1" onFocus={(e) => (e.target as HTMLInputElement).select()} />
             <button type="button" class="btn primary" onClick={async () => { try { await navigator.clipboard.writeText(link.url); snack('Bağlantı kopyalandı'); } catch { snack('Kopyalanamadı, elle seç'); } }}><Icon n="copy" size={15} />Kopyala</button>

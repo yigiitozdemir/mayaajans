@@ -23,12 +23,15 @@ echo "Sürüm $VERSION ($(cat "$W/COMMIT" | cut -c1-7)) imzalanıyor…"
 (cd desktop && npx tauri signer sign -f "$TAURI_KEY" -p "" "$W/MayaEkip.app.tar.gz" >/dev/null)
 SIG="$(cat "$W/MayaEkip.app.tar.gz.sig")"
 URL="https://ekip.mayaajans.net/indir/MayaEkip.app.tar.gz"
+# sürüm notları: desktop/SURUM-NOTLARI.md içindeki "## <sürüm>" bölümü
+NOTES="$(awk -v v="## $VERSION" '$0==v{f=1;next} /^## /{f=0} f' desktop/SURUM-NOTLARI.md | sed '/^[[:space:]]*$/d')"
+[ -n "$NOTES" ] || { echo "UYARI: desktop/SURUM-NOTLARI.md içinde '## $VERSION' bölümü yok"; }
 node -e '
-const [v, sig, url] = process.argv.slice(1);
+const [v, sig, url, notes] = process.argv.slice(1);
 const p = { signature: sig, url };
-console.log(JSON.stringify({ version: v, notes: "", pub_date: new Date().toISOString(),
+console.log(JSON.stringify({ version: v, notes, pub_date: new Date().toISOString(),
   platforms: { "darwin-aarch64": p, "darwin-x86_64": p, "darwin-universal": p } }, null, 2));
-' "$VERSION" "$SIG" "$URL" > "$W/latest.json"
+' "$VERSION" "$SIG" "$URL" "$NOTES" > "$W/latest.json"
 
 put() { npx wrangler r2 object put "maya-ekip-dosyalar/desktop/$1" --file "$W/$1" --content-type "$2" --remote >/dev/null; echo "  ✓ $1"; }
 # önce paketler, en son latest.json (yarım yükleme uygulamaları bozmasın)

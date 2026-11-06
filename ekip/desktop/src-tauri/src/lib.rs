@@ -125,6 +125,19 @@ fn notify(app: AppHandle, title: String, body: String) {
     let _ = app.notification().builder().title(title).body(body).show();
 }
 
+/// Tema: "dark" / "light" pencerenin başlık çubuğunu da o renge çevirir, "system" Mac ayarına bırakır.
+#[tauri::command]
+fn set_theme(app: AppHandle, theme: String) {
+    if let Some(w) = app.get_webview_window("main") {
+        let t = match theme.as_str() {
+            "dark" => Some(tauri::Theme::Dark),
+            "light" => Some(tauri::Theme::Light),
+            _ => None,
+        };
+        let _ = w.set_theme(t);
+    }
+}
+
 /// Sayfa, Mac uygulamasında çalıştığını ve kabuk sürümünü buradan öğrenir.
 #[tauri::command]
 fn app_info(app: AppHandle) -> serde_json::Value {
@@ -136,42 +149,50 @@ fn app_info(app: AppHandle) -> serde_json::Value {
 
 // ---------- güncelleme ----------
 
+/// Yeni sürüm varsa "neler yeni" notlarını gösterir; kişi "Güncelle" derse indirip kurar ve yeniden başlatır.
 async fn check_update(app: AppHandle, manual: bool) {
-    let result = async {
-        let updater = app.updater()?;
-        match updater.check().await? {
-            Some(update) => {
-                let version = update.version.clone();
-                update.download_and_install(|_, _| {}, || {}).await?;
-                Ok::<Option<String>, tauri_plugin_updater::Error>(Some(version))
-            }
-            None => Ok(None),
-        }
-    }
-    .await;
-
-    match result {
-        Ok(Some(version)) => {
+    let found = match app.updater() {
+        Ok(u) => u.check().await,
+        Err(e) => Err(e),
+    };
+    match found {
+        Ok(Some(update)) => {
+            let version = update.version.clone();
+            let notes = update
+                .body
+                .clone()
+                .map(|n| n.trim().to_string())
+                .filter(|n| !n.is_empty())
+                .unwrap_or_else(|| "Hata düzeltmeleri ve iyileştirmeler.".to_string());
             let handle = app.clone();
             app.dialog()
                 .message(format!(
-                    "Maya Ekip'in yeni sürümü ({version}) yüklendi. Şimdi yeniden başlatılsın mı?"
+                    "Neler yeni:\n\n{notes}\n\nGüncelle'ye basınca yeni sürüm indirilir ve Maya Ekip birkaç saniye içinde yeniden açılır."
                 ))
-                .title("Güncelleme hazır")
-                .buttons(MessageDialogButtons::OkCancelCustom(
-                    "Yeniden başlat".into(),
-                    "Sonra".into(),
-                ))
+                .title(format!("Maya Ekip {version} hazır"))
+                .buttons(MessageDialogButtons::OkCancelCustom("Güncelle".into(), "Sonra".into()))
                 .show(move |ok| {
-                    if ok {
-                        handle.restart();
+                    if !ok {
+                        return;
                     }
+                    tauri::async_runtime::spawn(async move {
+                        match update.download_and_install(|_, _| {}, || {}).await {
+                            Ok(()) => handle.restart(),
+                            Err(e) => {
+                                handle
+                                    .dialog()
+                                    .message(format!("Güncelleme kurulamadı: {e}\n\nDaha sonra üst çubuktaki menüden \"Güncellemeleri denetle\" ile yeniden deneyebilirsin."))
+                                    .title("Güncelleme")
+                                    .show(|_| {});
+                            }
+                        }
+                    });
                 });
         }
         Ok(None) => {
             if manual {
                 app.dialog()
-                    .message("Maya Ekip güncel.")
+                    .message(format!("Maya Ekip güncel (sürüm {}).", app.package_info().version))
                     .title("Güncelleme")
                     .show(|_| {});
             }
@@ -293,7 +314,7 @@ pub fn run() {
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
-        .invoke_handler(tauri::generate_handler![set_unread, notify, app_info])
+        .invoke_handler(tauri::generate_handler![set_unread, notify, app_info, set_theme])
         .setup(|app| {
             let handle = app.handle().clone();
 

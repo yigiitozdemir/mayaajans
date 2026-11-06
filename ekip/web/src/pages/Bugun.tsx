@@ -2,11 +2,13 @@ import { useState } from 'preact/hooks';
 import { type Task, dayDiff, fmtDate, DAY, LDAY, LMON, memberName, parseD, todayIso } from '../api';
 import { Icon, Link, useStore } from '../ui';
 import { Bell } from '../components/Notify';
+import { dueTag } from '../components/TaskPanels';
 
 export function Bugun({ openTask }: { openTask: (id: string) => void }) {
   const s = useStore();
   const me = s.me!;
   const [scope, setScope] = useState<'me' | 'team'>('me');
+  const [allFilter, setAllFilter] = useState<'all' | 0 | 1>('all');
   const team = scope === 'team';
   const mine = s.tasks.filter((t) => t.status !== 2 && (team || t.assigneeId === me.id));
   const byD = (a: Task, b: Task) => ((a.dueDate || '') < (b.dueDate || '') ? -1 : 1);
@@ -28,6 +30,12 @@ export function Bugun({ openTask }: { openTask: (id: string) => void }) {
   if (late.length) parts.push(late.length + ' geciken iş');
   if (!team && unread.length) parts.push(unread.length + ' okunmamış atama');
   const d = parseD(todayIso());
+  // bana atanan bütün açık işler: tarihe göre, tarihsizler en sonda
+  const allMine = s.tasks
+    .filter((t) => t.status !== 2 && t.assigneeId === me.id && (allFilter === 'all' || t.status === allFilter))
+    .sort((a, b) => (a.dueDate || '9999') < (b.dueDate || '9999') ? -1 : (a.dueDate || '9999') > (b.dueDate || '9999') ? 1 : a.title.localeCompare(b.title, 'tr'));
+  const myOpen = s.tasks.filter((t) => t.status !== 2 && t.assigneeId === me.id);
+  const doneThisWeek = s.tasks.filter((t) => t.status === 2 && t.assigneeId === me.id && t.completedAt && Date.now() - Date.parse(t.completedAt.replace(' ', 'T') + 'Z') < 7 * 864e5).length;
 
   return (
     <div class="page">
@@ -57,9 +65,40 @@ export function Bugun({ openTask }: { openTask: (id: string) => void }) {
           </section>
         ))}
       </div>
+      {!team && (
+        <section class="card allmine" aria-labelledby="maya-tum-islerim">
+          <div class="row" style="gap:10px">
+            <span class="dot" style="background:var(--accent)" />
+            <h2 id="maya-tum-islerim" style="margin:0;font-size:15px;font-weight:800">Bana atanan tüm işler <span style="font-weight:500;color:var(--mute2)">{myOpen.length}</span></h2>
+            <span class="sub">{myOpen.filter((t) => t.status === 1).length} devam ediyor · {myOpen.filter((t) => t.status === 0).length} beklemede{doneThisWeek ? ' · bu hafta ' + doneThisWeek + ' tamamladın' : ''}</span>
+            <span class="spacer" />
+            <div class="seg" role="group" aria-label="Duruma göre süz">
+              <button type="button" class={allFilter === 'all' ? 'on' : ''} aria-pressed={allFilter === 'all'} onClick={() => setAllFilter('all')}>Hepsi</button>
+              <button type="button" class={allFilter === 1 ? 'on' : ''} aria-pressed={allFilter === 1} onClick={() => setAllFilter(1)}>Devam ediyor</button>
+              <button type="button" class={allFilter === 0 ? 'on' : ''} aria-pressed={allFilter === 0} onClick={() => setAllFilter(0)}>Beklemede</button>
+            </div>
+          </div>
+          <div class="allmine-list">
+            {allMine.map((t) => {
+              const due = dueTag(t);
+              return (
+                <button type="button" class="allmine-it" onClick={() => openTask(t.id)}>
+                  <span class="dot" style={{ background: t.status === 1 ? 'var(--accent)' : 'var(--wait)' }} title={status(t)} />
+                  <span class="t">
+                    <span class="tt">{t.title}</span>
+                    <span class="sub" style="font-size:12px">{(t.client || '—') + ' · ' + status(t)}</span>
+                  </span>
+                  <span class={'tag ' + due.cls} style="font-size:11px">{due.label}</span>
+                </button>
+              );
+            })}
+          </div>
+          {allMine.length === 0 && <p class="empty" style="padding:6px 0 0">{myOpen.length ? 'Bu durumda işin yok.' : 'Sana atanmış açık iş yok. 🎉'}</p>}
+        </section>
+      )}
       {noDate.length > 0 && (
         <Link href="/isler" class="row nodatelink">
-          <span style="display:flex;gap:10px;padding:14px 16px;border-radius:14px;background:rgba(242,132,130,.08);border:1px dashed rgba(242,132,130,.4);color:#8E2F27;font-size:13px;line-height:1.5">
+          <span style="display:flex;gap:10px;padding:14px 16px;border-radius:14px;background:rgba(242,132,130,.08);border:1px dashed rgba(242,132,130,.4);color:var(--red);font-size:13px;line-height:1.5">
             <Icon n="cal" size={16} stroke="var(--red)" />
             {(team ? 'Ekipte ' : '') + noDate.length + ' açık işin teslim tarihi yok. Tarih girilmeyen işler sabah özetine ve hatırlatmalara giremez; İş Planı\'nda tarih ver.'}
           </span>

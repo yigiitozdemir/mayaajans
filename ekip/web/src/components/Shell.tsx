@@ -2,9 +2,38 @@ import { useState } from 'preact/hooks';
 import type { ComponentChildren } from 'preact';
 import { api, loadMe, snack, shrinkImage, disconnectLive, store, initials } from '../api';
 import { Avatar, Icon, Link, Modal, Switch, meAsMember, navigate, useStore } from '../ui';
+import { applyTheme, useThemePref, type ThemePref } from '../theme';
+
+// Menünün altında: Sistem · Açık · Koyu
+const THEMES: { v: ThemePref; label: string; icon: string }[] = [
+  { v: 'system', label: 'Sistem', icon: 'monitor' },
+  { v: 'light', label: 'Açık', icon: 'sun' },
+  { v: 'dark', label: 'Koyu', icon: 'moon' },
+];
+function ThemePicker() {
+  const p = useThemePref();
+  function choose(v: ThemePref) {
+    if (v === p) return;
+    applyTheme(v);
+    if (store.get().me) api('PATCH', '/me', { settings: { theme: v } }).catch(() => {});
+  }
+  return (
+    <div class="themepick">
+      <span class="navh" id="maya-gorunum">Görünüm</span>
+      <div class="seg" role="radiogroup" aria-labelledby="maya-gorunum">
+        {THEMES.map((t) => (
+          <button type="button" role="radio" aria-checked={p === t.v} class={p === t.v ? 'on' : ''} title={t.v === 'system' ? 'Mac / telefon ayarına uyar' : t.label + ' tema'} onClick={() => choose(t.v)}>
+            <Icon n={t.icon} size={14} />{t.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 const NAV = [
   { href: '/', label: 'Bugün', icon: 'sun' },
+  { href: '/ajanda', label: 'Ajandam', icon: 'note' },
   { href: '/isler', label: 'İş Planı', icon: 'board' },
   { href: '/ozel-gunler', label: 'Özel Günler', icon: 'cal' },
   { href: '/cekim', label: 'Çekim Planı', icon: 'cam' },
@@ -35,6 +64,7 @@ export function Shell({ path, children }: { path: string; children: ComponentChi
             </>
           )}
         </nav>
+        <ThemePicker />
       </aside>
       <div class="main">{children}</div>
     </div>

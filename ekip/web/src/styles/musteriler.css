@@ -6,10 +6,10 @@
 .mu-note { font-size: 12px; line-height: 1.5; color: var(--mute2); }
 .mu-search { display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 12px; border-radius: 10px; background: var(--card); border: 1px solid var(--line); color: var(--mute2); }
 .mu-search input { flex: 1; min-width: 0; border: 0; outline: none; background: transparent; color: var(--ink); }
-.mu-add { display: flex; flex-direction: column; gap: 8px; padding: 12px; border-radius: 12px; background: var(--card); border: 1px solid rgba(155, 87, 63, .3); }
+.mu-add { display: flex; flex-direction: column; gap: 8px; padding: 12px; border-radius: 12px; background: var(--card); border: 1px solid rgba(var(--accent-rgb), .3); }
 .mu-items { display: flex; flex-direction: column; gap: 2px; }
 .mu-item { display: flex; align-items: center; gap: 10px; min-height: 50px; padding: 6px 10px; border-radius: 10px; border: 1px solid transparent; background: transparent; text-align: left; width: 100%; color: var(--ink); }
-.mu-item:hover { background: rgba(43, 30, 23, .03); }
+.mu-item:hover { background: rgba(var(--ink-rgb), .03); }
 .mu-item.on { background: var(--sel); border-color: var(--accent); }
 .mu-item .nm { font-size: 13px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .mu-item .sb { font-size: 11px; color: var(--mute2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -33,14 +33,14 @@ a.mu-pill { color: var(--ink); font-weight: 600; }
 .mu-dl { display: inline-flex; align-items: center; gap: 8px; min-height: 38px; padding: 0 12px 0 6px; border-radius: 10px; border: 1px solid var(--line2); background: var(--card); color: var(--ink); font-size: 13px; font-weight: 600; text-decoration: none; }
 .mu-dl:hover { color: var(--ink); border-color: var(--accent); }
 .mu-dl .ext { font-size: 11px; color: var(--mute2); }
-.mu-sw { width: 26px; height: 26px; border-radius: 7px; border: 1px solid rgba(43, 30, 23, .15); flex: none; }
+.mu-sw { width: 26px; height: 26px; border-radius: 7px; border: 1px solid rgba(var(--ink-rgb), .15); flex: none; }
 .mu-sw.Renkli { background: conic-gradient(#e5534b, #9B573F, #7fbf8e, #5B8DEF, #C77DFF, #e5534b); }
 .mu-sw.Beyaz { background: #fff; }
 .mu-sw.Siyah { background: #111; }
 .mu-sw.other { background: var(--track); }
 
 .mu-box { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 12px 14px; border-radius: 12px; background: var(--card); border: 1px solid var(--line); }
-.mu-ro { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-radius: 12px; background: rgba(43, 30, 23, .04); border: 1px dashed rgba(43, 30, 23, .15); font-size: 13px; color: var(--mute); }
+.mu-ro { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-radius: 12px; background: rgba(var(--ink-rgb), .04); border: 1px dashed rgba(var(--ink-rgb), .15); font-size: 13px; color: var(--mute); }
 .mu-chipbtn { display: inline-flex; align-items: center; gap: 5px; min-height: 30px; padding: 0 10px; border-radius: 99px; font-size: 12px; font-weight: 600; border: 1px solid var(--line2); background: transparent; color: var(--mute); }
 .mu-chipbtn.on { background: var(--accent-soft2); color: var(--accent-ink); border-color: var(--accent); }
 .mu-me { padding: 5px 10px; border-radius: 99px; background: var(--accent-soft2); color: var(--accent-ink); font-size: 12px; font-weight: 600; }
@@ -64,7 +64,7 @@ a.mu-pill { color: var(--ink); font-weight: 600; }
 .mu-prev { position: relative; height: 130px; padding: 14px; display: flex; align-items: center; justify-content: center; background: #F4F1EA; }
 .mu-prev.dark { background: #2B1E17; }
 .mu-prev img { max-width: 100%; max-height: 100px; object-fit: contain; }
-.mu-prev .tgl { position: absolute; top: 8px; right: 8px; width: 28px; height: 28px; border-radius: 8px; border: 1px solid rgba(43, 30, 23, .15); background: rgba(255, 255, 255, .85); color: var(--ink); display: inline-flex; align-items: center; justify-content: center; padding: 0; }
+.mu-prev .tgl { position: absolute; top: 8px; right: 8px; width: 28px; height: 28px; border-radius: 8px; border: 1px solid rgba(var(--ink-rgb), .15); background: rgba(255, 255, 255, .85); color: var(--ink); display: inline-flex; align-items: center; justify-content: center; padding: 0; }
 .mu-prev .ph { display: flex; flex-direction: column; align-items: center; gap: 6px; color: var(--ph); font-size: 13px; font-weight: 800; }
 .mu-prev.dark .ph { color: #C9C1B4; }
 .mu-vbody { display: flex; flex-direction: column; gap: 8px; padding: 10px 12px 12px; }
@@ -72,7 +72,7 @@ a.mu-pill { color: var(--ink); font-weight: 600; }
 .mu-frow { display: flex; align-items: center; gap: 6px; min-width: 0; }
 .mu-frow .fn { flex: 1; min-width: 0; font-size: 12px; color: var(--mute); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .mu-frow .fx { flex: none; font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 6px; background: var(--chip); color: var(--mute); }
-.mu-get { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 32px; padding: 0 10px; border-radius: 8px; background: var(--accent); color: #fff; font-size: 12px; font-weight: 700; text-decoration: none; flex: none; }
+.mu-get { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 32px; padding: 0 10px; border-radius: 8px; background: var(--accent-fill); color: #fff; font-size: 12px; font-weight: 700; text-decoration: none; flex: none; }
 .mu-get:hover { color: #fff; filter: brightness(.95); }
 .mu-up { position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 34px; border-radius: 8px; border: 1px dashed var(--accent); color: var(--accent-ink); font-size: 12px; font-weight: 700; cursor: pointer; }
 .mu-up input { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; }
@@ -84,15 +84,15 @@ a.mu-pill { color: var(--ink); font-weight: 600; }
 .mu-color > button.sw { display: block; height: 76px; border: 0; border-bottom: 1px solid var(--line); width: 100%; }
 .mu-color .meta { display: flex; flex-direction: column; gap: 2px; padding: 9px 11px; }
 .mu-color .hex { font-size: 12px; color: var(--mute2); font-family: ui-monospace, Menlo, monospace; }
-.mu-color .rm { position: absolute; top: 6px; right: 6px; width: 26px; height: 26px; border-radius: 7px; border: 0; background: rgba(43, 30, 23, .55); color: #fff; display: inline-flex; align-items: center; justify-content: center; padding: 0; }
+.mu-color .rm { position: absolute; top: 6px; right: 6px; width: 26px; height: 26px; border-radius: 7px; border: 0; background: rgba(var(--ink-rgb), .55); color: #fff; display: inline-flex; align-items: center; justify-content: center; padding: 0; }
 .mu-font { display: flex; align-items: center; gap: 10px; min-height: 42px; border-bottom: 1px solid var(--line); }
 .mu-font:last-of-type { border-bottom: 0; }
 .mu-font .n { flex: 1; font-size: 15px; font-weight: 600; min-width: 0; overflow-wrap: anywhere; }
 .mu-chips { display: flex; flex-wrap: wrap; gap: 6px; }
-.mu-chip { display: inline-flex; align-items: center; gap: 6px; padding: 5px 6px 5px 11px; border-radius: 99px; background: rgba(43, 30, 23, .08); font-size: 13px; }
+.mu-chip { display: inline-flex; align-items: center; gap: 6px; padding: 5px 6px 5px 11px; border-radius: 99px; background: rgba(var(--ink-rgb), .08); font-size: 13px; }
 .mu-chip.ro { padding-right: 11px; }
 .mu-chip.ban { background: transparent; border: 1px solid rgba(242, 132, 130, .45); color: var(--red); }
-.mu-chip button { width: 20px; height: 20px; border-radius: 99px; border: 0; background: rgba(43, 30, 23, .1); color: inherit; display: inline-flex; align-items: center; justify-content: center; padding: 0; }
+.mu-chip button { width: 20px; height: 20px; border-radius: 99px; border: 0; background: rgba(var(--ink-rgb), .1); color: inherit; display: inline-flex; align-items: center; justify-content: center; padding: 0; }
 .mu-tagset { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 10px 0; border-bottom: 1px solid var(--line); }
 .mu-tagset:last-of-type { border-bottom: 0; }
 .mu-tagset .tn { font-weight: 700; font-size: 13px; min-width: 80px; }

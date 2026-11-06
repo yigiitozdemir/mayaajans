@@ -2149,7 +2149,7 @@ dependencies = [
 
 [[package]]
 name = "maya-ekip"
-version = "1.0.1"
+version = "1.0.2"
 dependencies = [
  "serde",
  "serde_json",

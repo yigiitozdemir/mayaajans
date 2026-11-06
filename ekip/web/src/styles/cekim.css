@@ -51,7 +51,7 @@
 .ck-st { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 7px; white-space: nowrap; }
 .ck-st.s0 { background: rgba(91, 141, 239, .16); color: var(--blue); }
 .ck-st.s1 { background: var(--green-soft); color: var(--green); }
-.ck-st.s2 { background: rgba(43, 30, 23, .07); color: var(--mute2); }
+.ck-st.s2 { background: rgba(var(--ink-rgb), .07); color: var(--mute2); }
 .ck-st.late { background: var(--red-soft); color: var(--red); }
 .ck-dot0 { background: #5B8DEF; } .ck-dot1 { background: var(--green-dot); } .ck-dot2 { background: var(--ph); }
 
@@ -62,9 +62,9 @@
 .ck-wk, .ck-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
 .ck-wk span { text-align: center; font-size: 11px; font-weight: 600; color: var(--mute2); }
 .ck-day { position: relative; aspect-ratio: 1 / 1; min-height: 34px; border-radius: 9px; border: 0; background: transparent; color: var(--mute2); font-size: 13px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 0; }
-.ck-day.has { background: rgba(43, 30, 23, .06); color: var(--ink); font-weight: 600; }
+.ck-day.has { background: rgba(var(--ink-rgb), .06); color: var(--ink); font-weight: 600; }
 .ck-day.today { box-shadow: inset 0 0 0 1px var(--accent); color: var(--ink); font-weight: 700; }
-.ck-day.sel { background: var(--accent); color: #fff; font-weight: 700; }
+.ck-day.sel { background: var(--accent-fill); color: #fff; font-weight: 700; }
 .ck-day.blank { visibility: hidden; }
 .ck-dots { display: flex; gap: 2px; height: 5px; }
 .ck-dots i { width: 5px; height: 5px; border-radius: 99px; display: block; }
@@ -79,7 +79,7 @@
 .ck-ev.s0 { background: rgba(91, 141, 239, .14); color: var(--blue); }
 .ck-ev.s0.late { background: var(--red-soft); color: var(--red); }
 .ck-ev.s1 { background: var(--green-soft); color: var(--green); }
-.ck-ev.s2 { background: rgba(43, 30, 23, .06); color: var(--mute2); text-decoration: line-through; }
+.ck-ev.s2 { background: rgba(var(--ink-rgb), .06); color: var(--mute2); text-decoration: line-through; }
 .ck-more { font-size: 11px; color: var(--mute2); }
 @media (max-width: 640px) {
   .ck-cal.big .ck-day { min-height: 58px; padding: 4px; }

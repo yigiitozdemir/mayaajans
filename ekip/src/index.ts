@@ -12,6 +12,7 @@ import { r as ozelgunler } from './routes/ozelgunler';
 import { r as cekim, cekimHatirlatma } from './routes/cekim';
 import { r as sohbet } from './routes/sohbet';
 import { r as durt } from './routes/durt';
+import { r as ajanda, ajandaHatirlatma } from './routes/ajanda';
 import { sabahOzeti } from './sabah';
 
 export { Hub };
@@ -102,6 +103,7 @@ api.patch('/me', async (c) => {
   if (b.settings && typeof b.settings === 'object') {
     const next: Record<string, unknown> = { ...u.settings };
     for (const k of SETTING_BOOLS) if (typeof b.settings[k] === 'boolean') next[k] = b.settings[k];
+    if (['system', 'light', 'dark'].includes(b.settings.theme)) next.theme = b.settings.theme;
     if (typeof b.settings.morningTime === 'string' && /^([01]\d|2[0-3]):[0-5]\d$/.test(b.settings.morningTime)) next.morningTime = b.settings.morningTime;
     sets.push('settings = ?'); vals.push(JSON.stringify(next));
   }
@@ -215,6 +217,7 @@ api.route('/days', ozelgunler);
 api.route('/shoots', cekim);
 api.route('/chat', sohbet);
 api.route('/nudge', durt);
+api.route('/agenda', ajanda);
 
 // ---------- işler ----------
 api.get('/tasks', async (c) => {
@@ -367,7 +370,8 @@ async function hourlyReminders(env: Env) {
 export default {
   fetch: app.fetch,
   scheduled: async (e: ScheduledController, env: Env, ctx: ExecutionContext) => {
-    if (e.cron === '30 13 * * *') ctx.waitUntil(cekimHatirlatma(env)); // 16:30 İstanbul
+    if (e.cron === '* * * * *') ctx.waitUntil(ajandaHatirlatma(env)); // Ajandam anımsatıcıları (dakikalık)
+    else if (e.cron === '30 13 * * *') ctx.waitUntil(cekimHatirlatma(env)); // 16:30 İstanbul
     else ctx.waitUntil(Promise.all([hourlyReminders(env), sabahOzeti(env)]));
   },
 } satisfies ExportedHandler<Env>;

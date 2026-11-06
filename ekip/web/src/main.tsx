@@ -2,6 +2,7 @@ import { render } from 'preact';
 import { useEffect, useState } from 'preact/hooks';
 import './styles.css';
 import { connectLive, disconnectLive, loadAll, loadMe, store } from './api';
+import { applyTheme, themePref, type ThemePref } from './theme';
 import { navigate, usePath, useStore } from './ui';
 import { Shell } from './components/Shell';
 import { Toasts } from './components/Notify';
@@ -16,6 +17,7 @@ import { Cekim } from './pages/Cekim';
 import { Musteriler } from './pages/Musteriler';
 import { Sohbet } from './pages/Sohbet';
 import { Durt } from './pages/Durt';
+import { Ajanda } from './pages/Ajanda';
 import { NudgeReceiver } from './components/NudgeReceiver';
 import { ChatUnread } from './components/ChatUnread';
 
@@ -26,7 +28,10 @@ function App() {
   const [loaded, setLoaded] = useState(false);
   const [newTask, setNewTask] = useState(false);
 
-  useEffect(() => { loadMe(); }, []);
+  useEffect(() => { loadMe(); applyTheme(themePref()); }, []);
+  // hesaptaki tema seçimi başka cihazda değişirse buraya da uygula
+  const serverTheme = s.me?.settings?.theme as ThemePref | undefined;
+  useEffect(() => { if (serverTheme && serverTheme !== themePref()) applyTheme(serverTheme); }, [serverTheme]);
 
   // giriş yapıldıysa verileri yükle ve canlı bağlantıyı aç
   useEffect(() => {
@@ -64,6 +69,7 @@ function App() {
   else if (path === '/musteriler') page = <Musteriler openTask={openTask} />;
   else if (path === '/sohbet') page = <Sohbet openTask={openTask} />;
   else if (path === '/durt') page = <Durt openTask={openTask} />;
+  else if (path === '/ajanda') page = <Ajanda openTask={openTask} />;
   else page = <Bugun openTask={openTask} />;
 
   return (

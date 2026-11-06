@@ -23,7 +23,7 @@ html:has(#app.durt-shake) { overflow-x: clip; } /* titrerken yatay kaydırma çu
 
 /* Köşe balonu: sağ altta, yalnızca kendi kartı tıklanır */
 .durt-balloons { position: fixed; right: 16px; bottom: 16px; z-index: 75; width: 340px; max-width: calc(100% - 32px); display: flex; flex-direction: column-reverse; gap: 10px; pointer-events: none; }
-.durt-balloon { pointer-events: auto; display: flex; align-items: flex-start; gap: 12px; padding: 14px; border-radius: 16px; background: rgba(255, 255, 255, .98); border: 1px solid var(--line); box-shadow: 0 18px 40px rgba(43, 30, 23, .2); animation: durt-in .22s ease-out both; }
+.durt-balloon { pointer-events: auto; display: flex; align-items: flex-start; gap: 12px; padding: 14px; border-radius: 16px; background: var(--card); border: 1px solid var(--line); box-shadow: 0 18px 40px rgba(var(--shadow-rgb), .2); animation: durt-in .22s ease-out both; }
 .durt-balloon-txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; font-size: 13px; color: var(--mute); overflow-wrap: anywhere; }
 .durt-balloon-txt strong { font-size: 14px; color: var(--ink); }
 
@@ -56,14 +56,14 @@ html:has(#app.durt-shake) { overflow-x: clip; } /* titrerken yatay kaydırma çu
 
 .durt-note { display: flex; gap: 10px; padding: 12px 14px; border-radius: 12px; background: var(--accent-soft); font-size: 13px; color: var(--mute); line-height: 1.5; }
 .durt-log { display: flex; flex-direction: column; gap: 10px; }
-.durt-log-item { display: flex; align-items: center; gap: 10px; padding-bottom: 10px; border-bottom: 1px solid rgba(43, 30, 23, .05); }
+.durt-log-item { display: flex; align-items: center; gap: 10px; padding-bottom: 10px; border-bottom: 1px solid rgba(var(--ink-rgb), .05); }
 .durt-log-item:last-child { border-bottom: 0; padding-bottom: 0; }
 .durt-log-item .txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; font-size: 13px; line-height: 1.4; overflow-wrap: anywhere; }
 .durt-log-item .q { font-size: 12px; color: var(--mute); }
 .durt-log-item .when { flex: none; font-size: 11px; color: var(--mute2); text-align: right; }
 .durt-dir { font-size: 11px; font-weight: 600; padding: 1px 6px; border-radius: 6px; margin-right: 6px; }
 .durt-dir.in { background: var(--accent-soft2); color: var(--accent-ink); }
-.durt-dir.out { background: rgba(43, 30, 23, .06); color: var(--mute); }
+.durt-dir.out { background: rgba(var(--ink-rgb), .06); color: var(--mute); }
 
 @media (prefers-reduced-motion: reduce) {
   #app.durt-shake, body.durt-shake { animation: durt-shake-soft .4s ease-in-out both; }

@@ -8,8 +8,8 @@
 .ch-group h2 { margin: 0 0 4px 8px; font-size: 11px; font-weight: 700; color: var(--mute2); text-transform: uppercase; letter-spacing: .08em; }
 .ch-group h2 span { font-weight: 500; }
 .ch-row { display: flex; align-items: center; gap: 9px; min-height: 34px; padding: 0 8px; border-radius: 8px; border: 0; background: transparent; color: var(--mute); font-size: 13px; font-weight: 500; text-align: left; width: 100%; }
-.ch-row:hover { background: rgba(43, 30, 23, .04); }
-.ch-row.on { background: rgba(43, 30, 23, .08); color: var(--ink); font-weight: 700; }
+.ch-row:hover { background: rgba(var(--ink-rgb), .04); }
+.ch-row.on { background: rgba(var(--ink-rgb), .08); color: var(--ink); font-weight: 700; }
 .ch-row.unread { color: var(--ink); font-weight: 700; }
 .ch-row .lb { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ch-hash { width: 22px; flex: none; text-align: center; color: var(--mute2); font-weight: 700; }
@@ -32,7 +32,7 @@
 .ch-day::before, .ch-day::after { content: ''; flex: 1; height: 1px; background: var(--line); }
 .ch-msg { position: relative; display: flex; gap: 12px; padding: 6px 8px; margin: 0 -8px; border-radius: 10px; margin-top: 8px; }
 .ch-msg.compact { margin-top: 0; padding-top: 2px; padding-bottom: 2px; }
-.ch-msg:hover { background: rgba(43, 30, 23, .03); }
+.ch-msg:hover { background: rgba(var(--ink-rgb), .03); }
 .ch-msg.hit { background: var(--accent-soft); }
 .ch-av { width: 38px; flex: none; }
 .ch-t { display: block; visibility: hidden; padding-top: 3px; font-size: 10px; color: var(--mute2); text-align: center; }
@@ -64,7 +64,7 @@
 .ch-file .btn { text-decoration: none; flex: none; }
 
 .ch-empty { margin: auto; max-width: 360px; display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 30px 10px; text-align: center; }
-.ch-empty .ic { width: 52px; height: 52px; border-radius: 16px; background: rgba(43, 30, 23, .05); color: var(--mute2); display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 800; }
+.ch-empty .ic { width: 52px; height: 52px; border-radius: 16px; background: rgba(var(--ink-rgb), .05); color: var(--mute2); display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 800; }
 .ch-empty strong { font-size: 15px; }
 .ch-empty span:last-child { font-size: 13px; line-height: 1.5; color: var(--mute2); }
 
@@ -74,11 +74,11 @@
 .ch-box textarea { flex: 1; min-width: 0; min-height: 38px; max-height: 180px; padding: 9px 2px; border: 0; outline: none; background: transparent; color: var(--ink); font-size: 14px; line-height: 1.45; resize: none; }
 .ch-attach { width: 38px; height: 38px; flex: none; border-radius: 9px; border: 0; background: transparent; color: var(--mute2); display: flex; align-items: center; justify-content: center; }
 .ch-attach:hover { background: var(--chip); color: var(--ink); }
-.ch-send { width: 42px; height: 38px; flex: none; border-radius: 10px; border: 0; background: var(--accent); color: #fff; display: flex; align-items: center; justify-content: center; }
+.ch-send { width: 42px; height: 38px; flex: none; border-radius: 10px; border: 0; background: var(--accent-fill); color: #fff; display: flex; align-items: center; justify-content: center; }
 .ch-hint { display: block; margin-top: 6px; font-size: 11px; color: var(--mute2); }
 .ch-pending { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; padding: 6px 6px 6px 10px; border-radius: 10px; background: var(--chip); font-size: 13px; color: var(--mute); }
 .ch-pending .nm { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; color: var(--ink); }
-.ch-sugg { position: absolute; left: 24px; bottom: calc(100% - 2px); z-index: 5; width: 300px; max-width: calc(100% - 48px); padding: 6px; border-radius: 12px; background: var(--card); border: 1px solid var(--line); box-shadow: 0 14px 30px rgba(43, 30, 23, .14); display: flex; flex-direction: column; gap: 2px; }
+.ch-sugg { position: absolute; left: 24px; bottom: calc(100% - 2px); z-index: 5; width: 300px; max-width: calc(100% - 48px); padding: 6px; border-radius: 12px; background: var(--card); border: 1px solid var(--line); box-shadow: 0 14px 30px rgba(var(--shadow-rgb), .14); display: flex; flex-direction: column; gap: 2px; }
 .ch-sugg button { display: flex; align-items: center; gap: 8px; min-height: 34px; padding: 0 8px; border: 0; border-radius: 8px; background: transparent; text-align: left; font-size: 13px; }
 .ch-sugg button.on, .ch-sugg button:hover { background: var(--sel); }
 .ch-sugg .sub { font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
