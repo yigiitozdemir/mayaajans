@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'preact/hooks';
 import type { ComponentChildren } from 'preact';
+import { createPortal } from 'preact/compat';
 import { store, type State, type Member, type Me, initials, moodOf } from './api';
 
 export function useStore(): State {
@@ -109,15 +110,23 @@ export function Modal({ title, onClose, children, width }: { title: string; onCl
     const k = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
     window.addEventListener('keydown', k); return () => window.removeEventListener('keydown', k);
   }, [onClose]);
-  return (
+  // Pencere her zaman sayfanın en üst katmanında açılır (body'ye taşınır). Safari/Mac programında sol menü gibi
+  // kayan bir alanın içinden açılınca o alana hapsolup görünmez kalıyordu.
+  return createPortal(
     <div class="overlay">
       <button type="button" class="scrim" aria-label="Kapat" onClick={onClose} />
       <div class="dialog" role="dialog" aria-modal="true" aria-label={title} style={width ? { width: width + 'px' } : undefined}>
         <div class="row"><h2>{title}</h2><span class="spacer" /><button type="button" class="iconbtn" aria-label="Kapat" onClick={onClose}><Icon n="x" size={16} /></button></div>
         {children}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
+}
+
+/** Herhangi bir içeriği sayfanın en üst katmanına (body) taşır: açılır paneller, önizlemeler. */
+export function Portal({ children }: { children: ComponentChildren }) {
+  return createPortal(<>{children}</>, document.body);
 }
 
 export function meAsMember(me: Me): AvatarMember {

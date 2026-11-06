@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'preact/hooks';
 import { api, pushToast, snack, store } from '../api';
 import { Bell } from '../components/Notify';
 import { desktopCall, isDesktop, onDesktopEvent } from '../desktop';
-import { Icon, Modal, Switch, navigate, useStore } from '../ui';
+import { Icon, Modal, Portal, Switch, navigate, useStore } from '../ui';
 import { LDAY, LMON } from '../api';
 import '../styles/ekran.css';
 
@@ -139,7 +139,7 @@ export function EkranGoruntuleri({ openTask }: { openTask: (id: string) => void 
       ))}
 
       {view !== null && shots[view] && (
-        <Viewer shots={shots} index={view} onIndex={setView} onClose={() => setView(null)} onChanged={load} />
+        <Portal><Viewer shots={shots} index={view} onIndex={setView} onClose={() => setView(null)} onChanged={load} /></Portal>
       )}
     </div>
   );

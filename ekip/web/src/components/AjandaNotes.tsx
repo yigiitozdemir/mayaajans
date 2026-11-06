@@ -1,7 +1,7 @@
 // Ajandam: notlar (iş / kişisel), ekran görüntüleri ve dosyalar, büyük önizleme
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { snack, LMON } from '../api';
-import { Icon, useStore } from '../ui';
+import { Icon, useStore, Portal } from '../ui';
 import { type Note, type AFile, type Check, COLORS, agendaApi, uploadFile, fmtSize, lower, isoLocal, dayWord } from './AjandaData';
 
 const noteTitle = (n: Pick<Note, 'title' | 'body'>) => n.title.trim() || n.body.trim().split('\n')[0].slice(0, 80) || 'Başlıksız not';
@@ -306,7 +306,7 @@ function NoteEditor({ note, onChange, onClose, onDeleted, onDiscard }: {
           )}
         </div>
       </div>
-      {lb !== null && note.files[lb] && <Lightbox files={note.files} index={lb} setIndex={setLb} onDelete={delFile} />}
+      {lb !== null && note.files[lb] && <Portal><Lightbox files={note.files} index={lb} setIndex={setLb} onDelete={delFile} /></Portal>}
     </section>
   );
 }
