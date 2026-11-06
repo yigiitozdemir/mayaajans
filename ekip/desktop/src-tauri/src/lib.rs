@@ -203,7 +203,7 @@ static APP_UNREAD: std::sync::Mutex<Vec<(String, u32)>> = std::sync::Mutex::new(
 /// Şu an panelde görünen uygulama ("" = hiçbiri)
 static VISIBLE_APP: std::sync::Mutex<String> = std::sync::Mutex::new(String::new());
 /// Görünen uygulamanın sol/üst boşluğu (sol menü genişliği, üst boşluk)
-static LAYOUT: std::sync::Mutex<(f64, f64)> = std::sync::Mutex::new((0.0, 0.0));
+static LAYOUT: std::sync::Mutex<(f64, f64, f64, f64)> = std::sync::Mutex::new((0.0, 0.0, 0.0, 0.0));
 
 /// Okunmamış sayısı değişince menüye bildirir; arttıysa ve program önde değilse Mac bildirimi gönderir.
 fn on_app_title(app: &AppHandle, which: &str, title: &str) {
@@ -276,7 +276,6 @@ async fn ai_show(app: AppHandle, which: String, x: f64, y: f64, w: f64, h: f64, 
         }
     }
     if let Ok(mut v) = VISIBLE_APP.lock() { *v = which.clone(); }
-    if let Ok(mut l) = LAYOUT.lock() { *l = (x.max(0.0), y.max(0.0)); }
     let (pos, size, info) = app_rect(&app, x, y, w, h);
     // yüklenirken beyaz parlama olmasın: zemin programın temasıyla aynı
     let bg = if dark.unwrap_or(false) { tauri::window::Color(26, 21, 18, 255) } else { tauri::window::Color(244, 241, 236, 255) };
@@ -284,6 +283,7 @@ async fn ai_show(app: AppHandle, which: String, x: f64, y: f64, w: f64, h: f64, 
         let _ = v.set_background_color(Some(bg));
         let _ = v.set_position(pos);
         let _ = v.set_size(size);
+        round_corners(&v, 12.0);
         let _ = v.show();
         let _ = v.set_focus();
         return Ok(info);
@@ -294,34 +294,70 @@ async fn ai_show(app: AppHandle, which: String, x: f64, y: f64, w: f64, h: f64, 
     let v = create_app_view(&app, &which, label, url, pos, size, bg)?;
     let _ = v.set_position(pos); // bazı macOS sürümlerinde ilk konum uygulanmayabiliyor
     let _ = v.set_size(size);
+    round_corners(&v, 12.0);
     let _ = v.set_focus();
     Ok(info)
 }
 
-/// Uygulamanın yeri: sol menünün sağı (x) ve sayfanın üst boşluğu (y); genişlik/yükseklik pencerenin GERÇEK iç
-/// boyutundan (mantıksal nokta) hesaplanır. Böylece sayfa ölçüsüyle yerel pencere ölçüsü farkı kaymaya yol açmaz.
+/// Uygulamanın yeri. Sayfa, kartın iç dikdörtgenini (x, y, w, h — CSS pikseli = mantıksal nokta) gönderir.
+/// Pencere boyutu değişince aynı kenar boşluklarıyla yeniden hesaplanır.
+/// macOS: alt görünümün konumu pencere çerçevesine göre (başlık çubuğu dahil) uygulanıyor; bu yüzden y'ye başlık
+/// çubuğu yüksekliği eklenir (dış yükseklik − iç yükseklik). Aksi hâlde uygulama başlık çubuğu kadar yukarı kayıyordu.
+fn window_metrics(app: &AppHandle) -> Option<(f64, f64, f64, f64)> {
+    let win = main_window(app)?;
+    let sf = win.scale_factor().ok()?;
+    let inner = win.inner_size().ok()?.to_logical::<f64>(sf);
+    let outer = win.outer_size().ok()?.to_logical::<f64>(sf);
+    let titlebar = if cfg!(target_os = "macos") { (outer.height - inner.height).clamp(0.0, 120.0) } else { 0.0 };
+    Some((inner.width, inner.height, sf, titlebar))
+}
+
+fn place(app: &AppHandle, x: f64, y: f64, right: f64, bottom: f64) -> (tauri::LogicalPosition<f64>, tauri::LogicalSize<f64>, serde_json::Value) {
+    let (ww, hh, sf, tb) = window_metrics(app).unwrap_or((x + 800.0 + right, y + 600.0 + bottom, 1.0, 0.0));
+    let width = (ww - x - right).max(200.0);
+    let height = (hh - y - bottom).max(200.0);
+    let info = serde_json::json!({ "window": [ww, hh], "scale": sf, "titlebar": tb, "rect": [x, y, width, height], "margins": [right, bottom] });
+    (tauri::LogicalPosition::new(x, y + tb), tauri::LogicalSize::new(width, height), info)
+}
+
 fn app_rect(app: &AppHandle, x: f64, y: f64, w: f64, h: f64) -> (tauri::LogicalPosition<f64>, tauri::LogicalSize<f64>, serde_json::Value) {
     let x = x.max(0.0);
     let y = y.max(0.0);
-    let win = main_window(app).and_then(|win| {
-        let sf = win.scale_factor().ok()?;
-        let sz = win.inner_size().ok()?.to_logical::<f64>(sf);
-        Some((sz.width, sz.height, sf))
-    });
-    let (ww, hh, sf) = win.unwrap_or((x + w, y + h, 1.0));
-    let width = (ww - x).max(200.0);
-    let height = (hh - y).max(200.0);
-    let info = serde_json::json!({ "window": [ww, hh], "scale": sf, "rect": [x, y, width, height], "page": [x, y, w, h] });
-    (tauri::LogicalPosition::new(x, y), tauri::LogicalSize::new(width, height), info)
+    let (ww, hh) = window_metrics(app).map(|m| (m.0, m.1)).unwrap_or((x + w, y + h));
+    // sayfanın verdiği ölçüden sağ/alt boşluğu çıkar (kartın kenar payı)
+    let right = if w > 0.0 { (ww - x - w).clamp(0.0, 400.0) } else { 0.0 };
+    let bottom = if h > 0.0 { (hh - y - h).clamp(0.0, 400.0) } else { 0.0 };
+    if let Ok(mut l) = LAYOUT.lock() { *l = (x, y, right, bottom); }
+    place(app, x, y, right, bottom)
 }
+
+/// Uygulama görünümünün köşelerini yuvarlat (kartın köşeleriyle aynı).
+#[cfg(target_os = "macos")]
+fn round_corners(v: &tauri::Webview, radius: f64) {
+    let _ = v.with_webview(move |pw| unsafe {
+        use objc2::runtime::AnyObject;
+        let view = pw.inner() as *mut AnyObject;
+        if view.is_null() {
+            return;
+        }
+        let _: () = objc2::msg_send![view, setWantsLayer: true];
+        let layer: *mut AnyObject = objc2::msg_send![view, layer];
+        if !layer.is_null() {
+            let _: () = objc2::msg_send![layer, setCornerRadius: radius];
+            let _: () = objc2::msg_send![layer, setMasksToBounds: true];
+        }
+    });
+}
+#[cfg(not(target_os = "macos"))]
+fn round_corners(_v: &tauri::Webview, _radius: f64) {}
 
 /// Pencere boyutu değişince görünen uygulamayı anında yeniden yerleştir (sayfanın haber vermesini beklemeden).
 fn relayout_visible(app: &AppHandle) {
     let which = VISIBLE_APP.lock().map(|v| v.clone()).unwrap_or_default();
     if which.is_empty() { return; }
     let Some(&(_, label, _)) = AI_EMBED.iter().find(|(id, _, _)| *id == which) else { return };
-    let (x, y) = LAYOUT.lock().map(|l| *l).unwrap_or((0.0, 0.0));
-    let (pos, size, _) = app_rect(app, x, y, 0.0, 0.0);
+    let (x, y, right, bottom) = LAYOUT.lock().map(|l| *l).unwrap_or((0.0, 0.0, 0.0, 0.0));
+    let (pos, size, _) = place(app, x, y, right, bottom);
     if let Some(v) = app.get_webview(label) {
         let _ = v.set_position(pos);
         let _ = v.set_size(size);
