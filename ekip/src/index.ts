@@ -1,4 +1,5 @@
 // Maya Ajans ekip programı — API
+import { gecikmeUyarisi } from './gecikme';
 import { Hono } from 'hono';
 import type { Context } from 'hono';
 import type { Env, UserRow, Vars } from './types';
@@ -61,7 +62,7 @@ api.use('*', requireUser);
 
 // ---------- yardımcılar ----------
 const PALETTE = ['#2F6F8F', '#7A4E9C', '#3E7A55', '#9C4A5E', '#8A5A2B', '#5B6B3A', '#4C6A9E', '#8E5B8A'];
-const SETTING_BOOLS = ['remindHourly', 'quietHours', 'morning', 'weekendQuiet', 'nudgeSound', 'nudgeShake', 'nudgeMac', 'dnd', 'launchWindow', 'sesler', 'titresim', 'havaUyarisi'];
+const SETTING_BOOLS = ['remindHourly', 'quietHours', 'morning', 'weekendQuiet', 'nudgeSound', 'nudgeShake', 'nudgeMac', 'dnd', 'launchWindow', 'sesler', 'titresim', 'havaUyarisi', 'gecikmeUyari'];
 
 function teamView(u: UserRow, admin: boolean) {
   return {
@@ -496,6 +497,6 @@ export default {
     if (e.cron === '* * * * *') ctx.waitUntil(ajandaHatirlatma(env)); // Ajandam anımsatıcıları (dakikalık)
     else if (e.cron === '17 0 * * 1') ctx.waitUntil(haftalikYedek(env)); // haftalık yedek
     else if (e.cron === '30 13 * * *') ctx.waitUntil(cekimHatirlatma(env)); // 16:30 İstanbul
-    else ctx.waitUntil(Promise.all([hourlyReminders(env), sabahOzeti(env), onayHatirlatma(env), havaUyarisi(env), haftalikRozetler(env)]));
+    else ctx.waitUntil(Promise.all([hourlyReminders(env), sabahOzeti(env), onayHatirlatma(env), havaUyarisi(env), haftalikRozetler(env), gecikmeUyarisi(env)]));
   },
 } satisfies ExportedHandler<Env>;

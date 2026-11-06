@@ -118,6 +118,9 @@ input::placeholder, textarea::placeholder { color: var(--ph); }
 .nav .count { margin-left: auto; font-size: 12px; color: var(--mute); }
 .pill-soon { margin-left: auto; font-size: 11px; border: 1px solid var(--line2); border-radius: 99px; padding: 2px 8px; color: var(--mute2); }
 .navh { margin: 20px 10px 6px; font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--mute2); }
+.navg:first-child > .navh { margin-top: 6px; }
+.navg > .navh { margin-top: 18px; }
+.shell.rail .navg + .navg { border-top: 1px solid var(--line); margin-top: 8px; padding-top: 8px; }
 /* geniş ekranda sol menü sabit: sayfa kayarken yerinde kalır, menü uzunsa kendi içinde kayar */
 @media (min-width: 761px) {
   .side { position: sticky; top: 0; align-self: flex-start; height: 100vh; height: 100dvh; overflow-y: auto; overscroll-behavior: contain; }

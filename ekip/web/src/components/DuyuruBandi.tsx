@@ -1,13 +1,13 @@
-// Bugün ekranında başlığın altında: okunmamış ya da sabitlenmiş duyurular (en çok 2). Gösterecek bir şey yoksa null.
+// Bugün ekranında başlığın altında: okunmamış duyurular (en çok 2); okununca banttan kalkar. Gösterecek bir şey yoksa null.
 import { useStore, Icon, Avatar, Link, navigate } from '../ui';
 import { useDuyurular, okudum, since, type Duyuru } from '../pages/Duyurular';
 import '../styles/duyuru.css';
 
-/** Saf: bantta gösterilecekler — önce okunmamış önemliler, sonra okunmamışlar, sonra sabitler (her grupta yeniye göre). */
+/** Saf: bantta gösterilecekler — yalnızca okunmamışlar; önce önemliler, sonra sabitler, sonra yeniler. */
 export function bantSecimi(items: Duyuru[]): Duyuru[] {
   const rank = (d: Duyuru) => (!d.readByMe ? (d.important ? 0 : 1) : 2);
   return items
-    .filter((d) => !d.archived && (!d.readByMe || d.pinned))
+    .filter((d) => !d.archived && !d.readByMe)
     .sort((a, b) => rank(a) - rank(b) || (a.pinned === b.pinned ? 0 : a.pinned ? -1 : 1) || b.createdAt.localeCompare(a.createdAt));
 }
 

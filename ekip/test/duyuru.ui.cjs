@@ -302,14 +302,15 @@ const AUDIT = () => {
     await Yg.page.locator(`#dy-${id}`).getByRole('button', { name: 'Okudum' }).click();
     await Yg.page.locator(`#dy-${id}`).getByText('Okudun').waitFor();
   });
-  await t('Bugün bandı: sabitlenmiş (okunmuş) duyuru da görünür, en çok 2 + "Tümü"', async () => {
+  await t('Bugün bandı: yalnızca okunmamışlar (okunmuş sabit duyuru banttan kalkar), en çok 2 + "Tümü"', async () => {
     await Pe.post('/api/duyurular', { title: 'Kahve makinesi tamirde', body: 'Cuma gelecek.' });
     await Pe.post('/api/duyurular', { title: 'Yeni müşteri: Gizem Eczane', body: 'Hoş geldin postu perşembe.' });
     await go(Yg.page, '/');
     const band = Yg.page.locator('.dyb'); await band.waitFor();
     await band.locator('.dyb-item').nth(1).waitFor({ timeout: 6000 });
     eq(await band.locator('.dyb-item').count(), 2);
-    await band.getByRole('link', { name: /Tümü \(\+1\)/ }).waitFor();
+    await band.getByRole('link', { name: /^Tümü/ }).waitFor();
+    eq(await band.locator('.dyb-item:not(.unread)').count(), 0, 'okunmuş duyuru bantta');
     await shot(Yg.page, 'bugun-bant-iki-koyu');
   });
   await t('Pelin: sil → onay penceresi → kaldırılır', async () => {

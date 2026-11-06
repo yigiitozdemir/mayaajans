@@ -21,11 +21,19 @@ export function haftaYazi(start: string, end: string) {
 }
 export const birimYazi = (m: RozetMeta | undefined, v: number) => (m ? (m.key === 'dakik' ? `${v} iş zamanında` : `${v} ${m.birim}`) : String(v));
 
+/** İstanbul saatine göre haftanın günü (0 = pazar, 1 = pazartesi). */
+export function istanbulGun(d = new Date()): number {
+  const g = new Intl.DateTimeFormat('en-US', { timeZone: 'Europe/Istanbul', weekday: 'short' }).format(d);
+  return ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].indexOf(g);
+}
+
 export function HaftaninYildizi({ openTask }: { openTask: (id: string) => void }) {
   void openTask;
   const s = useStore();
   const [d, setD] = useState<Durum | null>(null);
   const [acik, setAcik] = useState(false);
+  // Akıllı gösterim: pazartesi tam kart; diğer günler küçük rozet (tıklayınca açılır)
+  const [genis, setGenis] = useState(() => istanbulGun() === 1);
 
   useEffect(() => {
     let alive = true, timer: any;
@@ -46,6 +54,22 @@ export function HaftaninYildizi({ openTask }: { openTask: (id: string) => void }
   const first = (id: string) => member(id)?.firstName || '';
   const meId = s.me?.id;
   const meInTop = top.some((x) => x.userId === meId);
+
+  if (!genis) {
+    const lider = top[0];
+    return (
+      <button type="button" class="hy-mini" onClick={() => setGenis(true)} aria-label="Haftanın yıldızını göster">
+        {stars.length > 0 ? (
+          <><span aria-hidden="true">🌟</span><span class="hy-mini-k">{d.last?.current ? 'Bu haftanın yıldızı' : 'Geçen haftanın yıldızı'}</span><b>{stars.map((w) => first(w.userId)).join(', ')}</b></>
+        ) : others.length > 0 ? (
+          <><span aria-hidden="true">{meta(others[0].badge)?.emoji}</span><span class="hy-mini-k">Rozetler</span><b>{others.slice(0, 2).map((w) => first(w.userId)).join(', ')}</b></>
+        ) : (
+          <><i class="hy-pulse" aria-hidden="true" /><span class="hy-mini-k">Bu hafta önde</span><b>{first(lider.userId)}</b><span class="hy-n">{lider.done} iş</span></>
+        )}
+        {stars.length + others.length > 0 && lider && !d.last?.current && <span class="hy-mini-sep">· Bu hafta önde <b>{first(lider.userId)}</b></span>}
+      </button>
+    );
+  }
 
   return (
     <section class={'hy card' + (acik ? ' open' : '')} aria-label="Haftanın yıldızı">

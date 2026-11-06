@@ -196,6 +196,20 @@ const audit = (p, sel) => p.evaluate((sel) => {
   await theme(C.u_pelin, 'dark');
   const P = await mk('pelin@mayaajans.net', 'Pelin', undefined, false, 'dark');
   const card = P.page.locator('section.hy');
+  // Akıllı gösterim: pazartesi dışında önce küçük rozet görünür; tıklayınca tam kart açılır
+  const genislet = async (pg) => {
+    await pg.locator('.hy-mini, section.hy').first().waitFor({ timeout: 8000 });
+    if (await pg.locator('.hy-mini').count()) { await pg.locator('.hy-mini').click(); await pg.locator('section.hy').waitFor({ timeout: 4000 }); await pg.waitForTimeout(700); }
+  };
+  await t('Bugün: pazartesi dışında küçük rozet (tek satır), tıklayınca tam kart', async () => {
+    const pzt = await P.page.evaluate(() => new Intl.DateTimeFormat('en-US', { timeZone: 'Europe/Istanbul', weekday: 'short' }).format(new Date()) === 'Mon');
+    if (pzt) { await card.waitFor({ timeout: 8000 }); return; }
+    const m = P.page.locator('.hy-mini'); await m.waitFor({ timeout: 8000 });
+    ok(/Geçen haftanın yıldızı/.test(await m.innerText()) && /Emre/.test(await m.innerText()), await m.innerText());
+    ok((await m.evaluate((e) => e.getBoundingClientRect().height)) <= 40, 'küçük rozet yüksekliği');
+    await shot(P.page, 'bugun-kucuk-rozet-koyu');
+    await genislet(P.page);
+  });
   await t('Bugün: geçen haftanın yıldızı (Emre) ve bu haftanın ilk 3\'ü', async () => {
     await card.waitFor({ timeout: 8000 });
     const txt = await card.innerText();
@@ -288,13 +302,13 @@ const audit = (p, sel) => p.evaluate((sel) => {
   await theme(C.u_ilayda, 'light');
   const I = await mk('ilayda@mayaajans.net', 'İlayda', undefined, false, 'light');
   await t('açık tema: Bugün kartı ve kontrast', async () => {
-    await I.page.locator('section.hy').waitFor({ timeout: 8000 });
+    await genislet(I.page);
     const b = await audit(I.page, '.hy'); eq(b.length, 0, b.join(' | '));
     await shot(I.page, 'bugun-acik');
   });
   await t('rozeti olmayan kişide boş durum', async () => {
     await openProfile(I.page);
-    await I.page.locator('.dialog .rr-empty').waitFor({ timeout: 6000 });
+    await I.page.locator('.dialog .rr-empty').waitFor({ timeout: 6000 }); await I.page.waitForTimeout(700); // açılış animasyonu
     ok(/Henüz rozetin yok/.test(await I.page.locator('.dialog .rr').innerText()));
     eq(await I.page.locator('.dialog .rr-slot.on').count(), 0);
     const b = await audit(I.page, '.dialog .rr'); eq(b.length, 0, b.join(' | '));
@@ -308,7 +322,7 @@ const audit = (p, sel) => p.evaluate((sel) => {
     await theme(C.u_emre, th);
     const M = await mk('emre@mayaajans.net', 'Emre-' + th, { width: 390, height: 844 }, true, th);
     await t(`telefon (${th}): kart tek satır, yatay taşma yok`, async () => {
-      const c = M.page.locator('section.hy'); await c.waitFor({ timeout: 8000 });
+      await genislet(M.page); const c = M.page.locator('section.hy');
       const h = await c.locator('.hy-row').evaluate((e) => e.getBoundingClientRect().height);
       ok(h <= 60, 'kart yüksekliği ' + h);
       const over = await M.page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);

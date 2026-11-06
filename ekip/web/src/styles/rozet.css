@@ -99,3 +99,11 @@
 .ses-chip:hover { background: var(--sel); }
 .ses-chip:active { transform: scale(.97); }
 .ses-chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+/* küçük rozet (pazartesi dışındaki günler) */
+.hy-mini { align-self: flex-start; display: inline-flex; align-items: center; gap: 7px; max-width: 100%; min-height: 34px; padding: 6px 13px; border-radius: 99px; border: 1px solid var(--edge); background: var(--card); box-shadow: var(--glass-shadow); color: var(--ink2); font: inherit; font-size: 13px; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hy-mini:hover { color: var(--ink); }
+.hy-mini b { color: var(--ink); font-weight: 650; }
+.hy-mini-k { color: var(--mute); }
+.hy-mini-sep { color: var(--mute); overflow: hidden; text-overflow: ellipsis; }
+@media (max-width: 480px) { .hy-mini-sep { display: none; } }

@@ -78,18 +78,27 @@ function ThemePicker() {
   );
 }
 
-const NAV = [
-  { href: '/', label: 'Bugün', icon: 'sun' },
-  { href: '/ajanda', label: 'Ajandam', icon: 'note' },
-  { href: '/isler', label: 'İş Planı', icon: 'board' },
-  { href: '/ozel-gunler', label: 'Özel Günler', icon: 'cal' },
-  { href: '/cekim', label: 'Çekim Planı', icon: 'cam' },
-  { href: '/musteriler', label: 'Müşteriler', icon: 'clients' },
-  { href: '/sohbet', label: 'Sohbet', icon: 'chat' },
-  { href: '/durt', label: 'Dürtme', icon: 'hand' },
-  { href: '/duyurular', label: 'Duyurular', icon: 'megafon' },
-  { href: '/krizler', label: 'Kriz kayıtları', icon: 'uyari' },
+type NavItem = { href: string; label: string; icon: string };
+// Menü grupları (başlıklı, her zaman açık)
+const NAV_GROUPS: { title: string; items: NavItem[] }[] = [
+  { title: 'Günlük', items: [
+    { href: '/', label: 'Bugün', icon: 'sun' },
+    { href: '/ajanda', label: 'Ajandam', icon: 'note' },
+    { href: '/sohbet', label: 'Sohbet', icon: 'chat' },
+  ] },
+  { title: 'Planlama', items: [
+    { href: '/isler', label: 'İş Planı', icon: 'board' },
+    { href: '/cekim', label: 'Çekim Planı', icon: 'cam' },
+    { href: '/ozel-gunler', label: 'Özel Günler', icon: 'cal' },
+    { href: '/musteriler', label: 'Müşteriler', icon: 'clients' },
+  ] },
+  { title: 'Ekip', items: [
+    { href: '/duyurular', label: 'Duyurular', icon: 'megafon' },
+    { href: '/durt', label: 'Dürtme', icon: 'hand' },
+    { href: '/krizler', label: 'Kriz kayıtları', icon: 'uyari' },
+  ] },
 ];
+const EKRAN: NavItem = { href: '/ekran', label: 'Ekran Görüntüleri', icon: 'image' }; // yalnızca Mac uygulamasında
 
 // Telefonda alttaki sekmeler (geri kalanı "Menü"de)
 const TABS = [
@@ -140,14 +149,19 @@ export function Shell({ path, children }: { path: string; children: ComponentChi
         </button>
         <ProfileCard />
         <nav class="nav" aria-label="Ana menü">
-          {(isDesktop ? [...NAV.slice(0, 2), { href: '/ekran', label: 'Ekran Görüntüleri', icon: 'image' }, ...NAV.slice(2)] : NAV).map((n) => (
-            <Link href={n.href} class={path === n.href ? 'on' : ''} aria-current={path === n.href ? 'page' : undefined} title={n.label}>
-              <Icon n={n.icon} />{n.label}{n.href === '/isler' && <span class="count">{open}</span>}{n.href === '/sohbet' && s.chatUnread > 0 && <span class="count" style="background:var(--badge);color:#fff">{s.chatUnread}</span>}{n.href === '/duyurular' && duyuruSayi > 0 && <span class="count" style="background:var(--badge);color:#fff">{duyuruSayi}</span>}
-            </Link>
+          {NAV_GROUPS.map((g, gi) => (
+            <div class="navg" role="group" aria-labelledby={'navg-' + gi}>
+              <div class="navh" id={'navg-' + gi}>{g.title}</div>
+              {(isDesktop && gi === 0 ? [...g.items.slice(0, 2), EKRAN, ...g.items.slice(2)] : g.items).map((n) => (
+                <Link href={n.href} class={path === n.href ? 'on' : ''} aria-current={path === n.href ? 'page' : undefined} title={n.label}>
+                  <Icon n={n.icon} />{n.label}{n.href === '/isler' && <span class="count">{open}</span>}{n.href === '/sohbet' && s.chatUnread > 0 && <span class="count" style="background:var(--badge);color:#fff">{s.chatUnread}</span>}{n.href === '/duyurular' && duyuruSayi > 0 && <span class="count" style="background:var(--badge);color:#fff">{duyuruSayi}</span>}
+                </Link>
+              ))}
+              {gi === 1 && me.portals?.includes('vatan') && (
+                <Link href="/vatan" class={'nav-portal' + (path === '/vatan' ? ' on' : '')} aria-current={path === '/vatan' ? 'page' : undefined} title="Vatan Onay"><Icon n="check" />Vatan Onay<span class="nav-lock" title="Yalnızca sana özel"><Icon n="lock" size={12} /></span></Link>
+              )}
+            </div>
           ))}
-          {me.portals?.includes('vatan') && (
-            <Link href="/vatan" class={'nav-portal' + (path === '/vatan' ? ' on' : '')} aria-current={path === '/vatan' ? 'page' : undefined} title="Vatan Onay"><Icon n="check" />Vatan Onay<span class="nav-lock" title="Yalnızca sana özel"><Icon n="lock" size={12} /></span></Link>
-          )}
           {me.role === 'admin' && (
             <>
               <div class="navh">Yönetim</div>
@@ -304,7 +318,7 @@ function ProfileModal({ onClose }: { onClose: () => void }) {
     setBusy(true);
     try {
       // yalnızca bu pencerenin kendi ayarlarını gönder; anında kaydedilen ayarlar (ses, titreşim, hava, tema…) geri dönmesin
-      const OWN = ['remindHourly', 'quietHours', 'morning', 'morningTime', 'weekendQuiet'];
+      const OWN = ['remindHourly', 'gecikmeUyari', 'quietHours', 'morning', 'morningTime', 'weekendQuiet'];
       const own = Object.fromEntries(OWN.filter((k) => k in settings).map((k) => [k, (settings as any)[k]]));
       await api('PATCH', '/me', { firstName: first, lastName: last, photo: photo || null, settings: own });
       await loadMe(); snack('Profilin güncellendi'); onClose();
@@ -335,6 +349,7 @@ function ProfileModal({ onClose }: { onClose: () => void }) {
       <span class="sub">Ekipte görünen adın: <strong style="color:var(--ink)">{(first + ' ' + last).trim() || '—'}</strong> · bütün ekranlarda bu bilgi kullanılır.</span>
       <div style="display:flex;flex-direction:column;border-top:1px solid var(--line);padding-top:6px">
         <Switch on={flag('remindHourly')} label="Okumadığım atamaları saatte bir hatırlat" hint="İşi açana kadar" onToggle={() => toggle('remindHourly')} />
+        <Switch on={flag('gecikmeUyari')} label="Teslimi yaklaşan başlanmamış işlerimi hatırlat" hint="2 iş günü ve 1 iş günü kala, sabah 10:00" onToggle={() => toggle('gecikmeUyari')} />
         <Switch on={flag('quietHours')} label="Mesai dışında hatırlatma gönderme" hint="19:00 – 09:00 arası sessiz" onToggle={() => toggle('quietHours')} />
         <PushToggle />
         <SesAyari />
