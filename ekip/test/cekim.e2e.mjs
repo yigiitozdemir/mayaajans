@@ -204,8 +204,7 @@ await t('16:30 hatırlatması: yarınki çekim için ekibe bildirim + #çekim-pl
   await wait(300);
   const remOf = (id) => sql(`SELECT user_id FROM notifications WHERE title='Yarın çekim var' AND link='/cekim?id=${id}' ORDER BY user_id`).map((x) => x.user_id).join(',');
   eq(remOf(s1.id), 'u_emre,u_pelin', 'yarınki planlanan çekimin ekibi');
-  // cumartesi: pazar bildirim olmadığından pazartesinin (öbür gün) çekimleri de hatırlatılır
-  const cmt = new Date(SIMDI() + 3 * 3600_000).getUTCDay() === 6;
+  const cmt = false; // her gün yalnızca yarın (pazar dahil)
   eq(remOf(s2.id) + remOf(s4.id), '', 'iptal / bugün hatırlatılmaz');
   if (cmt) ok(sql(`SELECT title FROM notifications WHERE link='/cekim?id=${s3.id}'`).some((x) => x.title === 'Pazartesi çekim var'), 'cumartesi → pazartesi');
   else eq(remOf(s3.id), '', 'öbür gün hatırlatılmaz');

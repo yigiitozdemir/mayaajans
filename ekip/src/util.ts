@@ -65,7 +65,8 @@ export function clean(s: unknown, max = 500): string {
   return typeof s === 'string' ? s.trim().slice(0, max) : '';
 }
 
-// Bildirim saatleri herkes için sabit (kişi değiştiremez): Pazartesi–Cumartesi 09:00–18:00 İstanbul. Pazar bildirim yok.
+// Bildirim saatleri herkes için sabit (kişi değiştiremez): Pazartesi–Cumartesi 09:00–18:00 İstanbul. Pazar otomatik hatırlatma yok;
+// istisnalar: duyurular (her an) ve ertesi günün çekim / hava uyarıları (pazar dahil her gün).
 export const BILDIRIM_ILK = 9, BILDIRIM_SON = 18;
 /** İstanbul'a göre haftanın günü (0 = pazar). */
 export function istanbulGunNo(d = new Date()): number {
@@ -76,13 +77,9 @@ export function bildirimSaatinde(d = new Date()): boolean {
   const h = istanbulHour(d);
   return istanbulGunNo(d) !== 0 && h >= BILDIRIM_ILK && h < BILDIRIM_SON;
 }
-/** Hatırlatılacak ertesi iş günleri: yarın; bugün cumartesiyse pazar + pazartesi (pazar bildirim gitmediği için). Pazar boş. */
+/** Çekim ve hava hatırlatmalarının günü: her gün (pazar dahil) yarın. Pazar bildirim yasağının istisnası — pazartesi çekimi pazar mutlaka hatırlatılır. */
 export function hatirlatmaGunleri(d = new Date()): { date: string; ad: string }[] {
-  const g = istanbulGunNo(d);
-  const gun = (n: number) => new Date(d.getTime() + 3 * 3600_000 + n * 86_400_000).toISOString().slice(0, 10);
-  if (g === 0) return [];
-  if (g === 6) return [{ date: gun(1), ad: 'Yarın' }, { date: gun(2), ad: 'Pazartesi' }];
-  return [{ date: gun(1), ad: 'Yarın' }];
+  return [{ date: new Date(d.getTime() + 3 * 3600_000 + 86_400_000).toISOString().slice(0, 10), ad: 'Yarın' }];
 }
 
 // İstanbul saati (UTC+3, yaz saati yok)

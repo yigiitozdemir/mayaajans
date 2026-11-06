@@ -229,7 +229,7 @@ export async function cekimHavalari(env: Env, shoots: HavaCekim[]): Promise<Reco
   return out;
 }
 
-// ---------- 17:00 uyarısı (Pzt–Cmt; cumartesi pazartesinin çekimlerini de kapsar) ----------
+// ---------- 17:00 uyarısı (her gün, pazar dahil: ertesi günün dış çekimleri) ----------
 interface UyariRow { id: string; title: string; client: string; date: string; time: string; location: string; crew: string }
 
 /** "🌧️ Yarın Çavuşdent dış çekiminde yağmur bekleniyor (%70, 14:00)" */

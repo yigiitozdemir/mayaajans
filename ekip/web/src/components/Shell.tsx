@@ -350,7 +350,7 @@ function ProfileModal({ onClose }: { onClose: () => void }) {
       <div style="display:flex;flex-direction:column;border-top:1px solid var(--line);padding-top:6px">
         <div class="bildirim-saat" role="note">
           <Icon n="bell" size={15} />
-          <span><b>Bildirim saatleri:</b> Pazartesi–Cumartesi 09:00–18:00. Pazar bildirim gelmez. Teslimi yaklaşan başlanmamış işlerin hatırlatması herkese açıktır.</span>
+          <span><b>Bildirim saatleri:</b> Pazartesi–Cumartesi 09:00–18:00, pazar hatırlatma gelmez. Duyurular her an, ertesi günün çekim ve hava uyarıları pazar dahil her gün gelir.</span>
         </div>
         <Switch on={flag('remindHourly')} label="Okumadığım atamaları saatte bir hatırlat" hint="İşi açana kadar" onToggle={() => toggle('remindHourly')} />
         <PushToggle />

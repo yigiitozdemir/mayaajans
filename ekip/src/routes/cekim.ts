@@ -247,7 +247,7 @@ export function istanbulTomorrow(now = new Date()): string {
   return new Date(now.getTime() + 3 * 3600_000 + 86_400_000).toISOString().slice(0, 10);
 }
 
-/** Pzt–Cmt 16:30 (İstanbul): yarın çekimi olan ekibe ve #çekim-planı kanalına hatırlatma. Cumartesi pazartesinin çekimleri de; pazar bildirim yok. */
+/** Her gün 16:30 (İstanbul, pazar dahil): yarın çekimi olan ekibe ve #çekim-planı kanalına hatırlatma. */
 export async function cekimHatirlatma(env: Env, now = new Date()): Promise<void> {
   for (const g of hatirlatmaGunleri(now)) await cekimGunuHatirlat(env, g.date, g.ad);
 }
