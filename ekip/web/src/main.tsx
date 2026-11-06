@@ -95,7 +95,7 @@ function App() {
 
   return (
     <>
-      {!s.online && <div class="offline" role="status">Bağlantı yok · değişiklikler bağlanınca güncellenecek</div>}
+      <OfflineNote online={s.online} />
       <Shell path={path}>{loaded ? page : <div class="page"><span class="sub">Yükleniyor…</span></div>}</Shell>
       {taskId && <TaskDrawer taskId={taskId} onClose={() => setTaskId(null)} />}
       {newTask && <NewTaskModal onClose={() => setNewTask(false)} />}
@@ -109,6 +109,18 @@ function App() {
       {s.snack && <div class="snack" role="status">{s.snack}</div>}
     </>
   );
+}
+
+// Kısa kopmalarda (uykudan uyanma, ağ değişimi) uyarı hemen çıkmasın; 4 sn sürerse göster.
+function OfflineNote({ online }: { online: boolean }) {
+  const [show, setShow] = useState(false);
+  useEffect(() => {
+    if (online) { setShow(false); return; }
+    const t = setTimeout(() => setShow(true), 4000);
+    return () => clearTimeout(t);
+  }, [online]);
+  if (!show) return null;
+  return <div class="offline" role="status">İnternet bağlantısı bekleniyor… Bağlanınca her şey kendiliğinden güncellenir.</div>;
 }
 
 render(<App />, document.getElementById('app')!);

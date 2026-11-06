@@ -122,12 +122,32 @@ let ws: WebSocket | null = null;
 let retry = 0;
 let pingTimer: any;
 let stopped = false;
+let lastHeard = 0; // sunucudan son haber (mesaj/pong) zamanı
+let retryTimer: any;
+
+/** Uygulama öne gelince / internet dönünce: bağlantı kopuk ya da uykuda öldüyse hemen yeniden bağlan. */
+function wakeUp() {
+  if (stopped || !store.get().me) return;
+  const dead = !ws || ws.readyState === WebSocket.CLOSED || ws.readyState === WebSocket.CLOSING
+    || (ws.readyState === WebSocket.OPEN && Date.now() - lastHeard > 60_000);
+  if (!dead) return;
+  clearTimeout(retryTimer); retry = 0;
+  const old = ws; ws = null;
+  if (old) { old.onclose = null; try { old.close(); } catch { /* */ } }
+  connectLive();
+}
+if (typeof window !== 'undefined') {
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') wakeUp(); });
+  window.addEventListener('online', wakeUp);
+  window.addEventListener('focus', wakeUp);
+}
 
 export function connectLive() {
   stopped = false;
   const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
   ws = new WebSocket(`${proto}//${location.host}/api/live`);
   ws.onopen = () => {
+    lastHeard = Date.now();
     const wasOffline = !store.get().online;
     retry = 0; store.set({ online: true });
     api<string[]>('GET', '/online').then((ids) => Array.isArray(ids) && store.set({ presence: ids })).catch(() => {});
@@ -136,6 +156,7 @@ export function connectLive() {
     if (wasOffline) { loadAll().catch(() => {}); window.dispatchEvent(new CustomEvent('maya-live', { detail: { type: '*' } })); } // kopukken olan değişiklikleri al
   };
   ws.onmessage = (e) => {
+    lastHeard = Date.now();
     if (e.data === 'pong') return;
     let msg: any; try { msg = JSON.parse(e.data); } catch { return; }
     window.dispatchEvent(new CustomEvent('maya-live', { detail: msg }));
@@ -158,7 +179,8 @@ export function connectLive() {
     if (stopped || !store.get().me) return;
     store.set({ online: false });
     const delay = Math.min(30_000, 1000 * 2 ** retry++);
-    setTimeout(() => { if (!stopped && store.get().me) connectLive(); }, delay);
+    clearTimeout(retryTimer);
+    retryTimer = setTimeout(() => { if (!stopped && store.get().me) connectLive(); }, delay);
   };
 }
 export function disconnectLive() { stopped = true; try { ws?.close(); } catch { /* */ } ws = null; }
