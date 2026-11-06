@@ -7,8 +7,9 @@
     "dev:web": "vite --config web/vite.config.ts",
     "build:web": "vite build --config web/vite.config.ts",
     "typecheck": "tsc --noEmit -p tsconfig.json",
-    "test": "vitest run",
-    "deploy": "npm run build:web && wrangler deploy"
+    "deploy": "npm run build:web && wrangler deploy",
+    "test:api": "node test/api.e2e.mjs",
+    "test:ui": "node test/ui.e2e.cjs"
   },
   "dependencies": {
     "hono": "^4.13.16"

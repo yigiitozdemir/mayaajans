@@ -3,6 +3,7 @@ import { Hono } from 'hono';
 import { getCookie, setCookie, deleteCookie } from 'hono/cookie';
 import type { MiddlewareHandler } from 'hono';
 import type { Env, SessionUser, UserRow, Vars } from './types';
+import { broadcast } from './hub';
 import { DAY, clean, hashPassword, isEmail, randomToken, sha256, sqlNow, timingSafeEqual } from './util';
 
 export const COOKIE = 'maya_s';
@@ -74,8 +75,12 @@ export const requireAdmin: MiddlewareHandler<{ Bindings: Env; Variables: Vars }>
 export const sameOrigin: MiddlewareHandler = async (c, next) => {
   if (c.req.method !== 'GET' && c.req.method !== 'HEAD') {
     const origin = c.req.header('Origin');
-    const host = new URL(c.req.url).host;
-    if (origin && new URL(origin).host !== host) return c.json({ error: 'Geçersiz istek kaynağı' }, 403);
+    if (origin) {
+      let oh = '';
+      try { oh = new URL(origin).host; } catch { /* geçersiz */ }
+      const allowed = [new URL(c.req.url).host, c.req.header('Host') || ''];
+      if (!allowed.includes(oh)) return c.json({ error: 'Geçersiz istek kaynağı' }, 403);
+    }
   }
   await next();
 };
@@ -153,8 +158,18 @@ authRoutes.post('/accept', async (c) => {
     c.env.DB.prepare('DELETE FROM sessions WHERE user_id = ?').bind(u.id),
   ]);
   await createSession(c, u.id, true);
+  // ekipteki herkesin listesi güncellensin (yeni üye artık atanabilir)
+  c.executionCtx.waitUntil(broadcast(c.env, { type: 'team' }));
   return c.json({ ok: true });
 });
+
+// Bağlantı adresi: isteği yapan sayfanın adresi (yerelde localhost, canlıda https://ekip.mayaajans.net)
+export function publicOrigin(c: any): string {
+  const o = c.req.header('Origin');
+  if (o) { try { return new URL(o).origin; } catch { /* */ } }
+  const host = c.req.header('Host') || new URL(c.req.url).host;
+  return (/^(localhost|127\.0\.0\.1)(:\d+)?$/.test(host) ? 'http://' : 'https://') + host;
+}
 
 export async function createInviteLink(env: Env, origin: string, userId: string, kind: 'invite' | 'reset'): Promise<string> {
   const token = randomToken(24);

@@ -1,0 +1,55 @@
+import { render } from 'preact';
+import { useEffect, useState } from 'preact/hooks';
+import './styles.css';
+import { connectLive, disconnectLive, loadAll, loadMe } from './api';
+import { navigate, usePath, useStore } from './ui';
+import { Shell } from './components/Shell';
+import { Toasts } from './components/Notify';
+import { TaskDrawer } from './components/TaskPanels';
+import { Login, Invite } from './pages/Auth';
+import { Bugun } from './pages/Bugun';
+import { IsPlani } from './pages/IsPlani';
+import { Ekip } from './pages/Ekip';
+
+function App() {
+  const s = useStore();
+  const path = usePath();
+  const [taskId, setTaskId] = useState<string | null>(null);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => { loadMe(); }, []);
+
+  // giriş yapıldıysa verileri yükle ve canlı bağlantıyı aç
+  useEffect(() => {
+    if (!s.me) { disconnectLive(); setLoaded(false); return; }
+    let alive = true;
+    loadAll().then(() => alive && setLoaded(true)).catch(() => alive && setLoaded(true));
+    connectLive();
+    try { if (typeof Notification !== 'undefined' && Notification.permission === 'default') Notification.requestPermission(); } catch { /* */ }
+    return () => { alive = false; };
+  }, [s.me?.id]);
+
+  const invite = /^\/davet\/([A-Za-z0-9_-]+)$/.exec(path);
+  if (invite) return <Invite token={invite[1]} />;
+  if (!s.ready) return null;
+  if (!s.me) { if (path !== '/giris') history.replaceState({}, '', '/giris'); return <Login />; }
+  if (path === '/giris') { navigate('/'); return null; }
+
+  const openTask = (id: string) => setTaskId(id);
+  let page;
+  if (path === '/isler') page = <IsPlani openTask={openTask} />;
+  else if (path === '/ekip') page = <Ekip />;
+  else page = <Bugun openTask={openTask} />;
+
+  return (
+    <>
+      {!s.online && <div class="offline" role="status">Bağlantı yok · değişiklikler bağlanınca güncellenecek</div>}
+      <Shell path={path}>{loaded ? page : <div class="page"><span class="sub">Yükleniyor…</span></div>}</Shell>
+      {taskId && <TaskDrawer taskId={taskId} onClose={() => setTaskId(null)} />}
+      <Toasts onOpenTask={openTask} />
+      {s.snack && <div class="snack" role="status">{s.snack}</div>}
+    </>
+  );
+}
+
+render(<App />, document.getElementById('app')!);

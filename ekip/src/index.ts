@@ -2,7 +2,7 @@
 import { Hono } from 'hono';
 import type { Context } from 'hono';
 import type { Env, UserRow, Vars } from './types';
-import { authRoutes, createInviteLink, requireAdmin, requireUser, sameOrigin } from './auth';
+import { authRoutes, createInviteLink, publicOrigin, requireAdmin, requireUser, sameOrigin } from './auth';
 import { Hub, broadcast } from './hub';
 import { clean, isDate, isEmail, istanbulHour, newId } from './util';
 
@@ -146,7 +146,7 @@ admin.post('/invite', async (c) => {
     await c.env.DB.prepare('INSERT INTO users (id, email, first_name, color, role, status) VALUES (?, ?, ?, ?, ?, ?)')
       .bind(id, email, first.charAt(0).toLocaleUpperCase('tr') + first.slice(1), PALETTE[(count?.n ?? 0) % PALETTE.length], 'member', 'pending').run();
   }
-  const link = await createInviteLink(c.env, new URL(c.req.url).origin, id, 'invite');
+  const link = await createInviteLink(c.env, publicOrigin(c), id, 'invite');
   teamChanged(c);
   return c.json({ id, link });
 });
@@ -155,7 +155,7 @@ admin.post('/invite', async (c) => {
 admin.post('/users/:id/link', async (c) => {
   const u = await c.env.DB.prepare("SELECT * FROM users WHERE id = ? AND status != 'removed'").bind(c.req.param('id')).first<UserRow>();
   if (!u) return c.json({ error: 'Üye bulunamadı' }, 404);
-  const link = await createInviteLink(c.env, new URL(c.req.url).origin, u.id, u.status === 'active' ? 'reset' : 'invite');
+  const link = await createInviteLink(c.env, publicOrigin(c), u.id, u.status === 'active' ? 'reset' : 'invite');
   return c.json({ link, kind: u.status === 'active' ? 'reset' : 'invite' });
 });
 
