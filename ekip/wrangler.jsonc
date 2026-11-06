@@ -18,7 +18,14 @@
   ],
 
   // Dosyalar: Mac uygulaması güncellemeleri (desktop/…), sonra logolar ve profil fotoğrafları
-  "r2_buckets": [{ "binding": "FILES", "bucket_name": "maya-ekip-dosyalar" }],
+  "r2_buckets": [
+    { "binding": "FILES", "bucket_name": "maya-ekip-dosyalar" },
+    // Haftalık veritabanı yedekleri (yalnızca sunucu yazar; dışarıya kapalı)
+    { "binding": "BACKUP", "bucket_name": "maya-ekip-yedek" }
+  ],
+
+  // iPhone / tarayıcı bildirimleri (Web Push) — açık anahtar burada, gizli anahtar `wrangler secret` ile
+  "vars": { "VAPID_PUBLIC": "" },
 
   // Canlı güncelleme merkezi (WebSocket). Ücretsiz planda SQLite tabanlı Durable Object.
   "durable_objects": {
@@ -27,8 +34,8 @@
   "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Hub"] }],
 
   // Saatlik: okunmamış atama hatırlatması + sabah özeti · 13:30 UTC = 16:30 İstanbul: yarın çekim var
-  // Dakikalık: Ajandam anımsatıcıları
-  "triggers": { "crons": ["5 * * * *", "30 13 * * *", "* * * * *"] },
+  // Dakikalık: Ajandam anımsatıcıları · Pazartesi 03:17 İstanbul: haftalık yedek
+  "triggers": { "crons": ["5 * * * *", "30 13 * * *", "* * * * *", "17 0 * * 1"] },
 
   "routes": [{ "pattern": "ekip.mayaajans.net", "custom_domain": true }],
 

@@ -2,6 +2,7 @@
 import type { Env } from './types';
 import { broadcast } from './hub';
 import { newId } from './util';
+import { sendPush } from './push';
 
 export interface NotifyInput {
   userId: string;          // kime
@@ -24,7 +25,9 @@ export async function notify(env: Env, n: NotifyInput, waitUntil?: (p: Promise<u
     type: 'notify',
     notification: { id, kind: n.kind, taskId: n.taskId ?? null, actorId: n.actorId ?? null, title: n.title, body: n.body, link: n.link ?? null, meta: n.meta ?? '', readAt: null, reminders: 0 },
   }, { to: n.userId });
-  if (waitUntil) waitUntil(p); else await p;
+  // iPhone / tarayıcı bildirimi (abone olduysa)
+  const push = sendPush(env, n.userId, { title: n.title, body: n.body, link: n.link ?? null, tag: n.kind }).catch(() => {});
+  if (waitUntil) { waitUntil(p); waitUntil(push); } else await Promise.all([p, push]);
   return id;
 }
 

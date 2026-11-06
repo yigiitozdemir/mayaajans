@@ -20,6 +20,9 @@ import { Durt } from './pages/Durt';
 import { Ajanda } from './pages/Ajanda';
 import { YapayZeka } from './pages/YapayZeka';
 import { EkranGoruntuleri, ShotWatcher } from './pages/EkranGoruntuleri';
+import { YoneticiOzeti } from './pages/YoneticiOzeti';
+import { AramaPaleti } from './components/AramaPaleti';
+import { PushBanner } from './components/PushToggle';
 import { NudgeReceiver } from './components/NudgeReceiver';
 import { ChatUnread } from './components/ChatUnread';
 
@@ -31,6 +34,12 @@ function App() {
   const [newTask, setNewTask] = useState(false);
 
   useEffect(() => { loadMe(); applyTheme(themePref()); }, []);
+  // bildirimden gelen bağlantı: herhangi bir sayfada ?is=<id> o işin detayını açar
+  useEffect(() => {
+    const f = () => { const id = new URLSearchParams(location.search).get('is'); if (id) setTaskId(id); };
+    f(); window.addEventListener('maya-nav', f); window.addEventListener('popstate', f);
+    return () => { window.removeEventListener('maya-nav', f); window.removeEventListener('popstate', f); };
+  }, []);
   // hesaptaki tema seçimi başka cihazda değişirse buraya da uygula
   const serverTheme = s.me?.settings?.theme as ThemePref | undefined;
   useEffect(() => { if (serverTheme && serverTheme !== themePref()) applyTheme(serverTheme); }, [serverTheme]);
@@ -74,6 +83,7 @@ function App() {
   else if (path === '/ajanda') page = <Ajanda openTask={openTask} />;
   else if (path === '/yapay-zeka') page = <YapayZeka openTask={openTask} />;
   else if (path === '/ekran') page = <EkranGoruntuleri openTask={openTask} />;
+  else if (path === '/yonetici' && s.me.role === 'admin') page = <YoneticiOzeti openTask={openTask} />;
   else page = <Bugun openTask={openTask} />;
 
   return (
@@ -86,6 +96,8 @@ function App() {
       <NudgeReceiver />
       <ChatUnread />
       <ShotWatcher />
+      <AramaPaleti openTask={openTask} />
+      <PushBanner />
       {s.snack && <div class="snack" role="status">{s.snack}</div>}
     </>
   );

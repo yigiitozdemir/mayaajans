@@ -3,6 +3,7 @@ import type { ComponentChildren } from 'preact';
 import { api, loadMe, snack, shrinkImage, disconnectLive, store, initials } from '../api';
 import { Avatar, Icon, Link, Modal, Switch, meAsMember, navigate, useStore } from '../ui';
 import { applyTheme, useThemePref, type ThemePref } from '../theme';
+import { PushToggle } from './PushToggle';
 import { isDesktop, onDesktopEvent } from '../desktop';
 import { lastAi, openAppOutside } from '../pages/YapayZeka';
 
@@ -96,6 +97,7 @@ export function Shell({ path, children }: { path: string; children: ComponentChi
           {me.role === 'admin' && (
             <>
               <div class="navh">Yönetim</div>
+              <Link href="/yonetici" class={path === '/yonetici' ? 'on' : ''}><Icon n="board" />Yönetici özeti</Link>
               <Link href="/ekip" class={path === '/ekip' ? 'on' : ''}><Icon n="team" />Ekip yönetimi</Link>
             </>
           )}
@@ -181,6 +183,7 @@ function ProfileModal({ onClose }: { onClose: () => void }) {
       <div style="display:flex;flex-direction:column;border-top:1px solid var(--line);padding-top:6px">
         <Switch on={flag('remindHourly')} label="Okumadığım atamaları saatte bir hatırlat" hint="İşi açana kadar" onToggle={() => toggle('remindHourly')} />
         <Switch on={flag('quietHours')} label="Mesai dışında hatırlatma gönderme" hint="19:00 – 09:00 arası sessiz" onToggle={() => toggle('quietHours')} />
+        <PushToggle />
         <Switch on={flag('morning')} label="Sabah özeti gönder" hint="Bugünkü işlerim, çekimlerim ve özel günler" onToggle={() => toggle('morning')} />
         {flag('morning') && (
           <div class="row" style="gap:10px;padding:4px 0 8px">

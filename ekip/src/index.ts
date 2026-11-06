@@ -14,6 +14,12 @@ import { r as sohbet } from './routes/sohbet';
 import { r as durt } from './routes/durt';
 import { r as ajanda, ajandaHatirlatma } from './routes/ajanda';
 import { sabahOzeti } from './sabah';
+import { r as arama } from './routes/arama';
+import { r as yonetim } from './routes/yonetim';
+import { r as pushRoutes } from './routes/push';
+import { haftalikYedek } from './yedek';
+import { sendPush } from './push';
+import { onayHatirlatma } from './onay';
 
 export { Hub };
 
@@ -76,6 +82,7 @@ async function notifyAssign(c: C, task: TaskRow) {
     type: 'notify',
     notification: { id: n.id, kind: n.kind, taskId: n.task_id, actorId: n.actor_id, title: n.title, body: n.body, task: taskView(task), readAt: null, reminders: 0 },
   }, { to: n.user_id }));
+  c.executionCtx.waitUntil(sendPush(c.env, n.user_id, { title: n.title, body: task.title + (task.client ? ' · ' + task.client : ''), link: '/isler?is=' + task.id, tag: 'assign' }).catch(() => {}));
 }
 
 const tasksChanged = (c: C) => c.executionCtx.waitUntil(broadcast(c.env, { type: 'tasks' }));
@@ -218,6 +225,9 @@ api.route('/shoots', cekim);
 api.route('/chat', sohbet);
 api.route('/nudge', durt);
 api.route('/agenda', ajanda);
+api.route('/search', arama);
+api.route('/admin-summary', yonetim);
+api.route('/push', pushRoutes);
 
 // ---------- işler ----------
 api.get('/tasks', async (c) => {
@@ -359,6 +369,7 @@ async function hourlyReminders(env: Env) {
       type: 'remind',
       notification: { id: n.id, kind: 'assign', taskId: n.task_id, title: 'Hatırlatma: bu iş seni bekliyor', body: n.task_title, reminders: n.reminders + 1, task: { title: n.task_title, client: n.task_client, dueDate: n.task_due } },
     }, { to: n.user_id });
+    await sendPush(env, n.user_id, { title: 'Hatırlatma: bu iş seni bekliyor', body: n.task_title, link: '/isler?is=' + n.task_id, tag: 'remind' }).catch(() => {});
   }
   // eski denemeleri ve süresi dolmuş oturumları temizle
   await env.DB.batch([
@@ -371,7 +382,8 @@ export default {
   fetch: app.fetch,
   scheduled: async (e: ScheduledController, env: Env, ctx: ExecutionContext) => {
     if (e.cron === '* * * * *') ctx.waitUntil(ajandaHatirlatma(env)); // Ajandam anımsatıcıları (dakikalık)
+    else if (e.cron === '17 0 * * 1') ctx.waitUntil(haftalikYedek(env)); // haftalık yedek
     else if (e.cron === '30 13 * * *') ctx.waitUntil(cekimHatirlatma(env)); // 16:30 İstanbul
-    else ctx.waitUntil(Promise.all([hourlyReminders(env), sabahOzeti(env)]));
+    else ctx.waitUntil(Promise.all([hourlyReminders(env), sabahOzeti(env), onayHatirlatma(env)]));
   },
 } satisfies ExportedHandler<Env>;

@@ -2,6 +2,9 @@ export interface Env {
   DB: D1Database;
   HUB: DurableObjectNamespace;
   FILES: R2Bucket;
+  BACKUP: R2Bucket;
+  VAPID_PUBLIC: string;
+  VAPID_PRIVATE?: string;
 }
 
 export interface UserRow {
