@@ -40,6 +40,7 @@ const NAV = [
   { href: '/musteriler', label: 'Müşteriler', icon: 'clients' },
   { href: '/sohbet', label: 'Sohbet', icon: 'chat' },
   { href: '/durt', label: 'Dürtme', icon: 'hand' },
+  { href: '/yapay-zeka', label: 'Yapay Zekâ', icon: 'spark' },
 ];
 
 export function Shell({ path, children }: { path: string; children: ComponentChildren }) {

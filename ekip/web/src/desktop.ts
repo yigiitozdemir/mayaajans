@@ -20,3 +20,9 @@ export function onDesktopEvent(fn: (e: DesktopEvent) => void): () => void {
   window.addEventListener('maya-desktop', h);
   return () => window.removeEventListener('maya-desktop', h);
 }
+
+/** Mac uygulamasında komutu dener; yoksa (tarayıcı ya da eski sürüm) yedek davranışı çalıştırır. */
+export function desktopOr(cmd: string, args: Record<string, unknown>, fallback: () => void) {
+  if (!isDesktop) { fallback(); return; }
+  tauri.core.invoke(cmd, args).catch(fallback);
+}

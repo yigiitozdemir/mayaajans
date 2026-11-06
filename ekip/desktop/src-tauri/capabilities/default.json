@@ -4,5 +4,5 @@
   "description": "ekip.mayaajans.net sayfasının Mac özelliklerine erişimi (üst çubuk sayısı, bildirim)",
   "windows": ["main"],
   "remote": { "urls": ["https://ekip.mayaajans.net/*"] },
-  "permissions": ["allow-set-unread", "allow-notify", "allow-app-info", "allow-set-theme"]
+  "permissions": ["allow-set-unread", "allow-notify", "allow-app-info", "allow-set-theme", "allow-open-ai"]
 }

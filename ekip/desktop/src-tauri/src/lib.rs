@@ -100,6 +100,76 @@ fn download_target(app: &AppHandle, suggested: &std::path::Path, url: &tauri::Ur
     Some(path)
 }
 
+/// İndirme: İndirilenler klasörüne (çakışmayan adla) kaydet, bitince bildir.
+fn handle_download(app: &AppHandle, event: tauri::webview::DownloadEvent<'_>) -> bool {
+    match event {
+        tauri::webview::DownloadEvent::Requested { url, destination } => {
+            if let Some(p) = download_target(app, destination, &url) {
+                *destination = p;
+            }
+        }
+        tauri::webview::DownloadEvent::Finished { success, .. } => {
+            let body = if success { "Dosya İndirilenler klasörüne kaydedildi." } else { "Dosya indirilemedi." };
+            let _ = app.notification().builder().title("İndirme").body(body).show();
+        }
+        _ => {}
+    }
+    true
+}
+
+// ---------- Yapay Zekâ: ChatGPT ve Claude, kişinin kendi hesabıyla ----------
+// Bu pencerelerin programın komutlarına HİÇBİR erişimi yoktur (yetki dosyası yalnızca "main" penceresine izin verir).
+
+const SAFARI_UA: &str = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.5 Safari/605.1.15";
+
+/// Giriş (OAuth) pencereleri programın içinde açılsın; diğer dış bağlantılar tarayıcıda.
+fn is_auth_or_ai_host(url: &tauri::Url) -> bool {
+    let h = url.host_str().unwrap_or("");
+    let ends = |d: &str| h == d || h.ends_with(&format!(".{d}"));
+    ["chatgpt.com", "openai.com", "claude.ai", "anthropic.com", "accounts.google.com", "appleid.apple.com",
+     "login.microsoftonline.com", "login.live.com", "auth0.com", "oaistatic.com", "oaiusercontent.com"]
+        .iter()
+        .any(|d| ends(d))
+}
+
+fn open_ai_window(app: &AppHandle, which: &str) -> tauri::Result<()> {
+    let (label, title, url) = match which {
+        "chatgpt" => ("ai-chatgpt", "ChatGPT · Maya Ekip", "https://chatgpt.com/"),
+        "claude" => ("ai-claude", "Claude · Maya Ekip", "https://claude.ai/new"),
+        _ => return Ok(()),
+    };
+    if let Some(w) = app.get_webview_window(label) {
+        let _ = w.unminimize();
+        let _ = w.show();
+        let _ = w.set_focus();
+        return Ok(());
+    }
+    let ext = app.clone();
+    let dl = app.clone();
+    WebviewWindowBuilder::new(app, label, WebviewUrl::External(url.parse().expect("geçerli adres")))
+        .title(title)
+        .inner_size(1180.0, 820.0)
+        .min_inner_size(640.0, 520.0)
+        .user_agent(SAFARI_UA)
+        .on_new_window(move |url, _features| {
+            if is_auth_or_ai_host(&url) {
+                tauri::webview::NewWindowResponse::Allow
+            } else {
+                open_external(&ext, &url);
+                tauri::webview::NewWindowResponse::Deny
+            }
+        })
+        .on_download(move |_webview, event| handle_download(&dl, event))
+        .build()?;
+    Ok(())
+}
+
+/// Sayfadaki "ChatGPT'yi aç" / "Claude'u aç" düğmeleri.
+#[tauri::command]
+fn open_ai(app: AppHandle, which: String) -> Result<(), String> {
+    open_ai_window(&app, &which).map_err(|e| e.to_string())
+}
+
 // ---------- sayfanın çağırdığı komutlar ----------
 
 /// Okunmamış bildirim sayısı: üst çubuk simgesinin yanında ve Dock'ta gösterilir.
@@ -239,6 +309,8 @@ fn build_tray(app: &AppHandle) -> tauri::Result<()> {
         false,
         None::<&str>,
     )?;
+    let chatgpt = MenuItem::with_id(app, "chatgpt", "ChatGPT", true, None::<&str>)?;
+    let claude = MenuItem::with_id(app, "claude", "Claude", true, None::<&str>)?;
     let quit = MenuItem::with_id(app, "cik", "Maya Ekip'ten çık", true, Some("CmdOrCtrl+Q"))?;
 
     let menu = Menu::with_items(
@@ -249,6 +321,9 @@ fn build_tray(app: &AppHandle) -> tauri::Result<()> {
             &PredefinedMenuItem::separator(app)?,
             &today,
             &plan,
+            &PredefinedMenuItem::separator(app)?,
+            &chatgpt,
+            &claude,
             &PredefinedMenuItem::separator(app)?,
             &autostart,
             &show_on_start,
@@ -288,6 +363,8 @@ fn build_tray(app: &AppHandle) -> tauri::Result<()> {
                 let app = app.clone();
                 tauri::async_runtime::spawn(check_update(app, true));
             }
+            "chatgpt" => { let _ = open_ai_window(app, "chatgpt"); }
+            "claude" => { let _ = open_ai_window(app, "claude"); }
             "cik" => app.exit(0),
             _ => {}
         })
@@ -314,7 +391,7 @@ pub fn run() {
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
-        .invoke_handler(tauri::generate_handler![set_unread, notify, app_info, set_theme])
+        .invoke_handler(tauri::generate_handler![set_unread, notify, app_info, set_theme, open_ai])
         .setup(|app| {
             let handle = app.handle().clone();
 
@@ -350,21 +427,7 @@ pub fn run() {
                 })
                 .on_download({
                     let app = handle.clone();
-                    move |_webview, event| {
-                        match event {
-                            tauri::webview::DownloadEvent::Requested { url, destination } => {
-                                if let Some(p) = download_target(&app, destination, &url) {
-                                    *destination = p;
-                                }
-                            }
-                            tauri::webview::DownloadEvent::Finished { success, .. } => {
-                                let body = if success { "Dosya İndirilenler klasörüne kaydedildi." } else { "Dosya indirilemedi." };
-                                let _ = app.notification().builder().title("İndirme").body(body).show();
-                            }
-                            _ => {}
-                        }
-                        true
-                    }
+                    move |_webview, event| handle_download(&app, event)
                 })
                 .build()?;
 

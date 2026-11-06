@@ -18,6 +18,7 @@ import { Musteriler } from './pages/Musteriler';
 import { Sohbet } from './pages/Sohbet';
 import { Durt } from './pages/Durt';
 import { Ajanda } from './pages/Ajanda';
+import { YapayZeka } from './pages/YapayZeka';
 import { NudgeReceiver } from './components/NudgeReceiver';
 import { ChatUnread } from './components/ChatUnread';
 
@@ -70,6 +71,7 @@ function App() {
   else if (path === '/sohbet') page = <Sohbet openTask={openTask} />;
   else if (path === '/durt') page = <Durt openTask={openTask} />;
   else if (path === '/ajanda') page = <Ajanda openTask={openTask} />;
+  else if (path === '/yapay-zeka') page = <YapayZeka openTask={openTask} />;
   else page = <Bugun openTask={openTask} />;
 
   return (
