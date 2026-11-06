@@ -114,6 +114,20 @@ function ProfileModal({ onClose }: { onClose: () => void }) {
       <div style="display:flex;flex-direction:column;border-top:1px solid var(--line);padding-top:6px">
         <Switch on={flag('remindHourly')} label="Okumadığım atamaları saatte bir hatırlat" hint="İşi açana kadar" onToggle={() => toggle('remindHourly')} />
         <Switch on={flag('quietHours')} label="Mesai dışında hatırlatma gönderme" hint="19:00 – 09:00 arası sessiz" onToggle={() => toggle('quietHours')} />
+        <Switch on={flag('morning')} label="Sabah özeti gönder" hint="Bugünkü işlerim, çekimlerim ve özel günler" onToggle={() => toggle('morning')} />
+        {flag('morning') && (
+          <div class="row" style="gap:10px;padding:4px 0 8px">
+            <label class="sub" for="maya-sabah">Saat</label>
+            <select id="maya-sabah" class="input" style="width:auto" value={typeof settings.morningTime === 'string' ? settings.morningTime : '09:00'}
+              onChange={(e) => setSettings({ ...settings, morningTime: (e.target as HTMLSelectElement).value })}>
+              {['07:00', '08:00', '09:00', '10:00', '11:00'].map((h) => <option value={h}>{h}</option>)}
+            </select>
+            <span class="spacer" />
+            <label class="sub" style="display:flex;align-items:center;gap:6px">
+              <input type="checkbox" checked={flag('weekendQuiet')} onChange={() => toggle('weekendQuiet')} />Hafta sonu gönderme
+            </label>
+          </div>
+        )}
       </div>
       {err && <span class="errtext" role="alert">{err}</span>}
       <div class="row">

@@ -70,7 +70,7 @@ export function NewTaskModal({ initial, onClose }: { initial?: Partial<Task>; on
         </div>
       </div>
       <label class="field">Not<textarea class="input" rows={3} value={f.note} placeholder="Müşteri isteği, revize notu, dikkat edilecekler…" onInput={(e) => set('note', (e.target as HTMLTextAreaElement).value)} /></label>
-      <label class="field">Drive linki<input type="url" class="input" value={f.link} placeholder="https://drive.google.com/…" onInput={(e) => set('link', (e.target as HTMLInputElement).value)} /></label>
+      <label class="field">Drive linki<input type="text" inputMode="url" class="input" value={f.link} placeholder="https://drive.google.com/…" onInput={(e) => set('link', (e.target as HTMLInputElement).value)} /></label>
       <label class="field"><span>Kapsam <span style="font-weight:500;color:var(--mute2)">· isteğe bağlı, her satıra bir firma ya da kalem</span></span><textarea class="input" rows={3} value={f.items} placeholder={'Miradent (Post)\nÇavuşdent (Story)'} onInput={(e) => set('items', (e.target as HTMLTextAreaElement).value)} /></label>
       {err && <span class="errtext" role="alert">{err}</span>}
       <div class="row"><span class="spacer" /><button type="button" class="btn" onClick={onClose}>Vazgeç</button><button type="button" class="btn primary" disabled={busy} onClick={save}>İşi ekle</button></div>

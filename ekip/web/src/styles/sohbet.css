@@ -1,0 +1,109 @@
+/* Sohbet bölümü */
+.chat { display: flex; height: 100vh; height: 100dvh; min-height: 420px; }
+.ch-side { flex: none; width: 260px; padding: 22px 10px 24px 14px; border-right: 1px solid var(--line); display: flex; flex-direction: column; gap: 14px; overflow-y: auto; }
+.ch-search { display: flex; align-items: center; gap: 8px; height: 38px; padding: 0 10px; border-radius: 10px; background: var(--card); border: 1px solid var(--line); color: var(--mute2); flex: none; }
+.ch-search input { flex: 1; min-width: 0; border: 0; outline: none; background: transparent; color: var(--ink); font-size: 13px; }
+.ch-search:focus-within { border-color: var(--accent); }
+.ch-group { display: flex; flex-direction: column; gap: 1px; }
+.ch-group h2 { margin: 0 0 4px 8px; font-size: 11px; font-weight: 700; color: var(--mute2); text-transform: uppercase; letter-spacing: .08em; }
+.ch-group h2 span { font-weight: 500; }
+.ch-row { display: flex; align-items: center; gap: 9px; min-height: 34px; padding: 0 8px; border-radius: 8px; border: 0; background: transparent; color: var(--mute); font-size: 13px; font-weight: 500; text-align: left; width: 100%; }
+.ch-row:hover { background: rgba(43, 30, 23, .04); }
+.ch-row.on { background: rgba(43, 30, 23, .08); color: var(--ink); font-weight: 700; }
+.ch-row.unread { color: var(--ink); font-weight: 700; }
+.ch-row .lb { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ch-hash { width: 22px; flex: none; text-align: center; color: var(--mute2); font-weight: 700; }
+.ch-badge { flex: none; min-width: 20px; height: 18px; padding: 0 6px; border-radius: 99px; background: var(--badge); color: #fff; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; }
+
+.ch-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.ch-head { display: flex; align-items: center; gap: 12px; min-height: 72px; padding: 12px 24px; border-bottom: 1px solid var(--line); flex: none; }
+.ch-title { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.ch-title h1 { margin: 0; font-family: var(--display); font-size: 20px; font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ch-title span { font-size: 12px; color: var(--mute2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ch-live { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--green); flex: none; }
+.ch-live .dot { width: 7px; height: 7px; border-radius: 99px; background: var(--green-dot); }
+.ch-live.off { color: var(--mute2); }
+.ch-live.off .dot { background: var(--track); }
+.ch-back { display: none; flex: none; }
+
+.ch-list { flex: 1; min-height: 0; overflow-y: auto; padding: 16px 24px 10px; display: flex; flex-direction: column; }
+.ch-older { display: flex; justify-content: center; padding: 4px 0 10px; }
+.ch-day { display: flex; align-items: center; gap: 12px; margin: 14px 0 8px; font-size: 12px; font-weight: 600; color: var(--mute2); }
+.ch-day::before, .ch-day::after { content: ''; flex: 1; height: 1px; background: var(--line); }
+.ch-msg { position: relative; display: flex; gap: 12px; padding: 6px 8px; margin: 0 -8px; border-radius: 10px; margin-top: 8px; }
+.ch-msg.compact { margin-top: 0; padding-top: 2px; padding-bottom: 2px; }
+.ch-msg:hover { background: rgba(43, 30, 23, .03); }
+.ch-msg.hit { background: var(--accent-soft); }
+.ch-av { width: 38px; flex: none; }
+.ch-t { display: block; visibility: hidden; padding-top: 3px; font-size: 10px; color: var(--mute2); text-align: center; }
+.ch-msg.compact:hover .ch-t { visibility: visible; }
+.ch-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.ch-meta { display: flex; align-items: baseline; gap: 8px; }
+.ch-meta span { font-size: 12px; color: var(--mute2); }
+.ch-text { margin: 0; line-height: 1.55; color: var(--ink2); white-space: pre-wrap; overflow-wrap: anywhere; }
+.ch-text a { word-break: break-all; }
+.ch-text.deleted { color: var(--mute2); font-style: italic; }
+.ch-edited { font-size: 11px; color: var(--mute2); }
+.ch-mention { padding: 0 3px; border-radius: 5px; background: rgba(47, 85, 184, .1); color: var(--blue); font-weight: 600; }
+.ch-mention.me { background: var(--accent-soft2); color: var(--accent-ink); }
+.ch-edit { display: flex; flex-direction: column; gap: 6px; }
+.ch-edit textarea { resize: vertical; min-height: 60px; }
+.ch-acts { position: absolute; top: -10px; right: 8px; display: none; align-items: center; gap: 4px; padding: 3px; border-radius: 9px; background: var(--card); border: 1px solid var(--line); box-shadow: var(--shadow); }
+.ch-msg:hover .ch-acts, .ch-msg:focus-within .ch-acts, .ch-acts.on { display: flex; }
+.ch-act { border: 0; background: transparent; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: 600; color: var(--mute); }
+.ch-act:hover { background: var(--chip); color: var(--ink); }
+@media (hover: none) { .ch-acts { position: static; display: flex; align-self: flex-start; box-shadow: none; border: 0; background: transparent; } }
+
+.ch-img { align-self: flex-start; display: block; margin-top: 2px; border-radius: 12px; overflow: hidden; border: 1px solid var(--line); background: var(--chip); }
+.ch-img img { display: block; min-width: 64px; min-height: 64px; max-width: min(320px, 100%); max-height: 220px; object-fit: contain; }
+.ch-file { align-self: flex-start; display: flex; align-items: center; gap: 10px; margin-top: 2px; padding: 10px 12px 10px 14px; border-radius: 12px; border: 1px solid var(--line); background: var(--card); max-width: 100%; }
+.ch-file .ic { width: 34px; height: 34px; flex: none; border-radius: 9px; background: var(--accent-soft); color: var(--accent); display: flex; align-items: center; justify-content: center; }
+.ch-file .nm { display: flex; flex-direction: column; min-width: 0; }
+.ch-file .nm strong { font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ch-file .nm span { font-size: 12px; color: var(--mute2); }
+.ch-file .btn { text-decoration: none; flex: none; }
+
+.ch-empty { margin: auto; max-width: 360px; display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 30px 10px; text-align: center; }
+.ch-empty .ic { width: 52px; height: 52px; border-radius: 16px; background: rgba(43, 30, 23, .05); color: var(--mute2); display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 800; }
+.ch-empty strong { font-size: 15px; }
+.ch-empty span:last-child { font-size: 13px; line-height: 1.5; color: var(--mute2); }
+
+.ch-compose { position: relative; padding: 6px 24px 18px; flex: none; }
+.ch-box { display: flex; align-items: flex-end; gap: 8px; padding: 6px 6px 6px 8px; border-radius: 14px; border: 1px solid var(--line2); background: var(--card); }
+.ch-box:focus-within { border-color: var(--accent); }
+.ch-box textarea { flex: 1; min-width: 0; min-height: 38px; max-height: 180px; padding: 9px 2px; border: 0; outline: none; background: transparent; color: var(--ink); font-size: 14px; line-height: 1.45; resize: none; }
+.ch-attach { width: 38px; height: 38px; flex: none; border-radius: 9px; border: 0; background: transparent; color: var(--mute2); display: flex; align-items: center; justify-content: center; }
+.ch-attach:hover { background: var(--chip); color: var(--ink); }
+.ch-send { width: 42px; height: 38px; flex: none; border-radius: 10px; border: 0; background: var(--accent); color: #fff; display: flex; align-items: center; justify-content: center; }
+.ch-hint { display: block; margin-top: 6px; font-size: 11px; color: var(--mute2); }
+.ch-pending { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; padding: 6px 6px 6px 10px; border-radius: 10px; background: var(--chip); font-size: 13px; color: var(--mute); }
+.ch-pending .nm { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; color: var(--ink); }
+.ch-sugg { position: absolute; left: 24px; bottom: calc(100% - 2px); z-index: 5; width: 300px; max-width: calc(100% - 48px); padding: 6px; border-radius: 12px; background: var(--card); border: 1px solid var(--line); box-shadow: 0 14px 30px rgba(43, 30, 23, .14); display: flex; flex-direction: column; gap: 2px; }
+.ch-sugg button { display: flex; align-items: center; gap: 8px; min-height: 34px; padding: 0 8px; border: 0; border-radius: 8px; background: transparent; text-align: left; font-size: 13px; }
+.ch-sugg button.on, .ch-sugg button:hover { background: var(--sel); }
+.ch-sugg .sub { font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.ch-aside { flex: none; width: 250px; padding: 22px 18px; border-left: 1px solid var(--line); background: var(--panel); display: flex; flex-direction: column; gap: 14px; overflow-y: auto; }
+.ch-cav { width: 44px; height: 44px; flex: none; border-radius: 12px; color: #fff; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+.ch-alink { display: flex; align-items: center; justify-content: space-between; min-height: 42px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--line); color: var(--ink); font-size: 13px; font-weight: 600; text-decoration: none; background: var(--card); }
+.ch-alink:hover { color: var(--ink); border-color: var(--line2); }
+
+@media (max-width: 1280px) { .ch-aside { display: none; } }
+@media (max-width: 760px) {
+  .chat { height: calc(100dvh - 8px); }
+  .ch-side { width: 100%; border-right: 0; }
+  .chat.m-list .ch-main { display: none; }
+  .chat.m-conv .ch-side { display: none; }
+  /* telefonda konuşma tam ekran (menü geri düğmesiyle döner) */
+  .chat.m-conv { position: fixed; inset: 0; z-index: 40; height: auto; background: var(--bg); }
+  .ch-back { display: inline-flex; }
+  .ch-head { padding: 10px 14px; gap: 10px; min-height: 60px; }
+  .ch-title h1 { font-size: 17px; }
+  .ch-live { display: none; }
+  .ch-list { padding: 12px 14px 8px; }
+  .ch-compose { padding: 6px 12px 12px; }
+  .ch-sugg { left: 12px; max-width: calc(100% - 24px); }
+}
+
+/* menüdeki Sohbet okunmamış sayısı (Shell'deki rozet) */
+.nav a[href="/sohbet"] .count { min-width: 20px; height: 20px; padding: 0 6px; border-radius: 99px; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; }
