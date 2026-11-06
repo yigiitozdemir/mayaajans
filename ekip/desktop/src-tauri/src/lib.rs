@@ -14,6 +14,7 @@ use tauri::{
 use tauri_plugin_autostart::{MacosLauncher, ManagerExt as _};
 use tauri_plugin_dialog::{DialogExt, MessageDialogButtons};
 use tauri_plugin_notification::NotificationExt;
+use tauri_plugin_opener::OpenerExt;
 use tauri_plugin_updater::UpdaterExt;
 use tauri_plugin_window_state::StateFlags;
 
@@ -60,6 +61,43 @@ fn page_event(app: &AppHandle, detail: &str) {
         );
         let _ = w.eval(&js);
     }
+}
+
+/// Program içinde açılabilecek adres mi? (yükleniyor sayfası + ekip.mayaajans.net)
+fn is_internal(url: &tauri::Url) -> bool {
+    match url.scheme() {
+        "tauri" | "asset" | "about" | "data" | "blob" => true,
+        "http" | "https" => matches!(url.host_str(), Some("ekip.mayaajans.net") | Some("tauri.localhost") | Some("localhost")),
+        _ => false,
+    }
+}
+
+/// Dış bağlantıyı (müşteri sitesi, WhatsApp, mailto:…) Mac'in varsayılan uygulamasında aç.
+fn open_external(app: &AppHandle, url: &tauri::Url) {
+    if matches!(url.scheme(), "http" | "https" | "mailto" | "tel") {
+        let _ = app.opener().open_url(url.as_str(), None::<&str>);
+    }
+}
+
+/// İndirilen dosya için İndirilenler klasöründe çakışmayan bir yol: "Logo.png", "Logo (2).png"…
+fn download_target(app: &AppHandle, suggested: &std::path::Path, url: &tauri::Url) -> Option<PathBuf> {
+    let dir = app.path().download_dir().ok()?;
+    let name = suggested
+        .file_name()
+        .map(|n| n.to_string_lossy().to_string())
+        .filter(|n| !n.is_empty())
+        .or_else(|| url.path_segments().and_then(|mut s| s.next_back().map(|x| x.to_string())))
+        .unwrap_or_else(|| "dosya".to_string());
+    let p = std::path::Path::new(&name);
+    let stem = p.file_stem().map(|x| x.to_string_lossy().to_string()).unwrap_or_else(|| name.clone());
+    let ext = p.extension().map(|x| format!(".{}", x.to_string_lossy())).unwrap_or_default();
+    let mut path = dir.join(&name);
+    let mut i = 2;
+    while path.exists() && i < 1000 {
+        path = dir.join(format!("{stem} ({i}){ext}"));
+        i += 1;
+    }
+    Some(path)
 }
 
 // ---------- sayfanın çağırdığı komutlar ----------
@@ -253,6 +291,7 @@ pub fn run() {
         )
         .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
         .invoke_handler(tauri::generate_handler![set_unread, notify, app_info])
         .setup(|app| {
@@ -273,6 +312,39 @@ pub fn run() {
                 .min_inner_size(960.0, 620.0)
                 .center()
                 .visible(visible)
+                .on_navigation({
+                    let app = handle.clone();
+                    move |url| {
+                        if is_internal(url) { return true; }
+                        open_external(&app, url);
+                        false
+                    }
+                })
+                .on_new_window({
+                    let app = handle.clone();
+                    move |url, _features| {
+                        open_external(&app, &url);
+                        tauri::webview::NewWindowResponse::Deny
+                    }
+                })
+                .on_download({
+                    let app = handle.clone();
+                    move |_webview, event| {
+                        match event {
+                            tauri::webview::DownloadEvent::Requested { url, destination } => {
+                                if let Some(p) = download_target(&app, destination, &url) {
+                                    *destination = p;
+                                }
+                            }
+                            tauri::webview::DownloadEvent::Finished { success, .. } => {
+                                let body = if success { "Dosya İndirilenler klasörüne kaydedildi." } else { "Dosya indirilemedi." };
+                                let _ = app.notification().builder().title("İndirme").body(body).show();
+                            }
+                            _ => {}
+                        }
+                        true
+                    }
+                })
                 .build()?;
 
             // kapat düğmesi programı kapatmaz, arka plana alır

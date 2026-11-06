@@ -2,6 +2,17 @@ import { useEffect, useState } from 'preact/hooks';
 import { api, reloadTeam, snack } from '../api';
 import { Avatar, Icon, Switch, useStore } from '../ui';
 
+type LinkInfo = { who: string; email: string; url: string; kind: string };
+function inviteText(l: LinkInfo) {
+  return l.kind === 'reset'
+    ? `Merhaba, Maya Ekip şifreni yeniden belirlemek için bu bağlantıyı aç (tek kullanımlık):\n${l.url}`
+    : `Merhaba! Maya Ajans ekip programına davetlisin.\n\n1) Hesabını aç (tek kullanımlık bağlantı): ${l.url}\n2) Mac uygulamasını kur: https://ekip.mayaajans.net/indir\n\nTelefonda: ekip.mayaajans.net adresini Safari'de açıp Paylaş → Ana Ekrana Ekle.`;
+}
+function inviteMail(l: LinkInfo) {
+  const subject = l.kind === 'reset' ? 'Maya Ekip · şifre belirleme' : 'Maya Ekip programına davet';
+  return `mailto:${encodeURIComponent(l.email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(inviteText(l))}`;
+}
+
 interface AdminUser {
   id: string; name: string; firstName: string; lastName: string; color: string; photo: string | null; email: string;
   role: 'admin' | 'member'; status: 'pending' | 'active'; canEditClients: boolean;
@@ -21,7 +32,7 @@ export function Ekip() {
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [email, setEmail] = useState('');
   const [err, setErr] = useState('');
-  const [link, setLink] = useState<{ who: string; url: string; kind: string } | null>(null);
+  const [link, setLink] = useState<{ who: string; email: string; url: string; kind: string } | null>(null);
   const [confirm, setConfirm] = useState<string | null>(null);
   const load = async () => setUsers(await api<AdminUser[]>('GET', '/admin/users'));
   useEffect(() => { load().catch((e) => snack(e.message)); }, [s.team]);
@@ -31,12 +42,12 @@ export function Ekip() {
     setErr('');
     try {
       const r = await api<{ link: string }>('POST', '/admin/invite', { email });
-      setLink({ who: email, url: r.link, kind: 'invite' }); setEmail(''); await reloadTeam(); await load();
+      setLink({ who: email, email, url: r.link, kind: 'invite' }); setEmail(''); await reloadTeam(); await load();
     } catch (e: any) { setErr(e.message); }
   }
   async function newLink(u: AdminUser) {
     const r = await api<{ link: string; kind: string }>('POST', `/admin/users/${u.id}/link`);
-    setLink({ who: u.name, url: r.link, kind: r.kind });
+    setLink({ who: u.name, email: u.email, url: r.link, kind: r.kind });
   }
   async function act(fn: () => Promise<unknown>, msg: string) {
     try { await fn(); snack(msg); await load(); await reloadTeam(); } catch (e: any) { snack(e.message); }
@@ -66,7 +77,11 @@ export function Ekip() {
           <div class="row"><input class="input" readOnly value={link.url} style="flex:1" onFocus={(e) => (e.target as HTMLInputElement).select()} />
             <button type="button" class="btn primary" onClick={async () => { try { await navigator.clipboard.writeText(link.url); snack('Bağlantı kopyalandı'); } catch { snack('Kopyalanamadı, elle seç'); } }}><Icon n="copy" size={15} />Kopyala</button>
           </div>
-          <span class="sub">Bu bağlantı sadece bir kez gösterilir. Kaybolursa yeni bağlantı oluşturabilirsin.</span>
+          <div class="row" style="gap:8px;flex-wrap:wrap">
+            <a class="btn" href={inviteMail(link)}><Icon n="mail" size={15} />E-postayla gönder</a>
+            <a class="btn" href={'https://wa.me/?text=' + encodeURIComponent(inviteText(link))} target="_blank" rel="noopener noreferrer"><Icon n="chat" size={15} />WhatsApp'ta gönder</a>
+          </div>
+          <span class="sub">Program e-postayı kendisi göndermez: bağlantıyı kopyalayıp ilet ya da yukarıdaki düğmelerle kendi e-postandan / WhatsApp'tan gönder. Bağlantı tek kullanımlık ve 14 gün geçerli; sadece bir kez gösterilir, kaybolursa yenisini oluşturabilirsin.</span>
         </section>
       )}
 
