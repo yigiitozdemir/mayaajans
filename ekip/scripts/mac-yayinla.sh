@@ -1,10 +1,17 @@
 #!/bin/bash
 # GitHub'da derlenen Mac uygulamasını imzalar ve ekip.mayaajans.net/indir'e yükler.
-# Kullanım: TAURI_KEY=/yol/maya-ekip.key scripts/mac-yayinla.sh
-# (Cloudflare için CLOUDFLARE_API_TOKEN / CLOUDFLARE_ACCOUNT_ID tanımlı olmalı.)
+# Kullanım: scripts/mac-yayinla.sh   (Cloudflare için CLOUDFLARE_API_TOKEN / CLOUDFLARE_ACCOUNT_ID tanımlı olmalı)
+# İmza anahtarı Cloudflare'deki gizli R2 deposundan (maya-ekip-gizli, dışarıya kapalı) alınır;
+# istenirse TAURI_KEY=/yol/anahtar ile verilebilir.
 set -euo pipefail
 cd "$(dirname "$0")/.."
-: "${TAURI_KEY:?İmza anahtarı yolu (TAURI_KEY) gerekli}"
+KEYTMP=""
+if [ -z "${TAURI_KEY:-}" ]; then
+  KEYTMP="$(mktemp)"; chmod 600 "$KEYTMP"
+  npx wrangler r2 object get maya-ekip-gizli/guncelleme-imza.key --file "$KEYTMP" --remote >/dev/null
+  TAURI_KEY="$KEYTMP"
+fi
+trap '[ -n "$KEYTMP" ] && rm -f "$KEYTMP"' EXIT
 
 W="$(mktemp -d)"
 git fetch -q origin masaustu-derleme
