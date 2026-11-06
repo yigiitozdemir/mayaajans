@@ -3,3 +3,4 @@ ekip/
 .assetsignore
 wrangler.jsonc
 functions/
+.github/

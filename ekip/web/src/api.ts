@@ -1,3 +1,4 @@
+import { desktopInvoke, isDesktop } from './desktop';
 // Sunucu ile konuşma + ortak uygulama durumu + canlı bağlantı
 export interface Me {
   id: string; email: string; firstName: string; lastName: string; photo: string | null; color: string;
@@ -83,10 +84,13 @@ export async function loadAll() {
   await Promise.all([reloadTasks(), reloadTeam(), reloadNotifications(), reloadClients()]);
 }
 
+
 // ---------- masaüstü bildirimi (tarayıcı / Mac uygulaması) ----------
 export function systemNotify(title: string, body: string) {
   try {
-    if (typeof Notification === 'undefined' || document.hasFocus()) return;
+    if (document.hasFocus()) return;
+    if (isDesktop) { desktopInvoke('notify', { title, body }); return; }
+    if (typeof Notification === 'undefined') return;
     if (Notification.permission === 'granted') new Notification(title, { body, icon: '/icon-192.png' });
   } catch { /* */ }
 }

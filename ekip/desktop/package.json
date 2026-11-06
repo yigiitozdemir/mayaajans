@@ -1,0 +1,12 @@
+{
+  "name": "maya-ekip-masaustu",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "tauri": "tauri",
+    "build:mac": "tauri build --target universal-apple-darwin --bundles app,dmg"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.12.4"
+  }
+}

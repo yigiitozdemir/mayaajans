@@ -1,6 +1,7 @@
 export interface Env {
   DB: D1Database;
   HUB: DurableObjectNamespace;
+  FILES: R2Bucket;
 }
 
 export interface UserRow {

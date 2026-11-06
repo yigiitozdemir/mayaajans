@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Maya Ekip</title>
+<style>
+  :root { color-scheme: light; }
+  html, body { height: 100%; margin: 0; }
+  body { background: #F4F1EC; color: #2B1E17; font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
+         display: flex; align-items: center; justify-content: center; -webkit-user-select: none; user-select: none; }
+  main { text-align: center; padding: 24px; }
+  img { width: 220px; height: auto; display: block; margin: 0 auto 28px; }
+  p { margin: 0; color: #6E5F55; }
+  .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #9B573F; margin-right: 8px; animation: p 1.2s ease-in-out infinite; }
+  @keyframes p { 50% { opacity: .25; } }
+  button { margin-top: 18px; font: inherit; font-weight: 600; color: #fff; background: #9B573F; border: 0; border-radius: 8px; padding: 8px 16px; cursor: pointer; display: none; }
+</style>
+</head>
+<body>
+<main>
+  <img src="logo.png" alt="Maya Ajans">
+  <p id="msg"><span class="dot"></span>Bağlanıyor…</p>
+  <button id="again" type="button">Tekrar dene</button>
+</main>
+<script>
+  // İnternet gelene kadar bekler, sonra ekip programını açar (bilgisayar açılışında Wi-Fi geç bağlanabilir).
+  var SITE = 'https://ekip.mayaajans.net';
+  var tries = 0, timer;
+  var msg = document.getElementById('msg'), again = document.getElementById('again');
+  function go() {
+    clearTimeout(timer);
+    fetch(SITE + '/api/health', { mode: 'no-cors', cache: 'no-store' })
+      .then(function () { location.replace(SITE + '/'); })
+      .catch(function () {
+        tries++;
+        if (tries > 3) { msg.textContent = 'İnternet bağlantısı bekleniyor…'; again.style.display = 'inline-block'; }
+        timer = setTimeout(go, Math.min(2000 * tries, 15000));
+      });
+  }
+  again.onclick = function () { tries = 0; msg.innerHTML = '<span class="dot"></span>Bağlanıyor…'; go(); };
+  window.addEventListener('online', function () { tries = 0; go(); });
+  go();
+</script>
+</body>
+</html>

@@ -17,6 +17,9 @@
     }
   ],
 
+  // Dosyalar: Mac uygulaması güncellemeleri (desktop/…), sonra logolar ve profil fotoğrafları
+  "r2_buckets": [{ "binding": "FILES", "bucket_name": "maya-ekip-dosyalar" }],
+
   // Canlı güncelleme merkezi (WebSocket). Ücretsiz planda SQLite tabanlı Durable Object.
   "durable_objects": {
     "bindings": [{ "name": "HUB", "class_name": "Hub" }]

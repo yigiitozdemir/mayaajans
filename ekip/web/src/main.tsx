@@ -1,11 +1,12 @@
 import { render } from 'preact';
 import { useEffect, useState } from 'preact/hooks';
 import './styles.css';
-import { connectLive, disconnectLive, loadAll, loadMe } from './api';
+import { connectLive, disconnectLive, loadAll, loadMe, store } from './api';
 import { navigate, usePath, useStore } from './ui';
 import { Shell } from './components/Shell';
 import { Toasts } from './components/Notify';
-import { TaskDrawer } from './components/TaskPanels';
+import { NewTaskModal, TaskDrawer } from './components/TaskPanels';
+import { isDesktop, onDesktopEvent, setDesktopUnread } from './desktop';
 import { Login, Invite } from './pages/Auth';
 import { Bugun } from './pages/Bugun';
 import { IsPlani } from './pages/IsPlani';
@@ -16,6 +17,7 @@ function App() {
   const path = usePath();
   const [taskId, setTaskId] = useState<string | null>(null);
   const [loaded, setLoaded] = useState(false);
+  const [newTask, setNewTask] = useState(false);
 
   useEffect(() => { loadMe(); }, []);
 
@@ -25,9 +27,20 @@ function App() {
     let alive = true;
     loadAll().then(() => alive && setLoaded(true)).catch(() => alive && setLoaded(true));
     connectLive();
-    try { if (typeof Notification !== 'undefined' && Notification.permission === 'default') Notification.requestPermission(); } catch { /* */ }
+    if (!isDesktop) try { if (typeof Notification !== 'undefined' && Notification.permission === 'default') Notification.requestPermission(); } catch { /* */ }
     return () => { alive = false; };
   }, [s.me?.id]);
+
+  // Mac uygulaması: üst çubuk ve Dock'taki okunmamış sayısı
+  const unread = s.me ? s.notifications.filter((n) => !n.readAt).length : 0;
+  useEffect(() => { setDesktopUnread(unread); }, [unread]);
+
+  // Mac uygulaması menüsü: "Yeni iş ekle", "Bugün", "İş Planı"
+  useEffect(() => onDesktopEvent((e) => {
+    if (!store.get().me) return;
+    if (e.action === 'new-task') setNewTask(true);
+    else if (e.action === 'go') navigate(e.path);
+  }), []);
 
   const invite = /^\/davet\/([A-Za-z0-9_-]+)$/.exec(path);
   if (invite) return <Invite token={invite[1]} />;
@@ -46,6 +59,7 @@ function App() {
       {!s.online && <div class="offline" role="status">Bağlantı yok · değişiklikler bağlanınca güncellenecek</div>}
       <Shell path={path}>{loaded ? page : <div class="page"><span class="sub">Yükleniyor…</span></div>}</Shell>
       {taskId && <TaskDrawer taskId={taskId} onClose={() => setTaskId(null)} />}
+      {newTask && <NewTaskModal onClose={() => setNewTask(false)} />}
       <Toasts onOpenTask={openTask} />
       {s.snack && <div class="snack" role="status">{s.snack}</div>}
     </>

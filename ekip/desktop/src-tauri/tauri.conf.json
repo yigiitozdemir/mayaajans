@@ -1,0 +1,31 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Maya Ekip",
+  "version": "1.0.0",
+  "identifier": "net.mayaajans.ekip",
+  "build": { "frontendDist": "../yukleniyor" },
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [],
+    "security": { "csp": null }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["app", "dmg"],
+    "createUpdaterArtifacts": false,
+    "category": "public.app-category.productivity",
+    "copyright": "© Maya Ajans",
+    "icon": ["icons/32x32.png", "icons/128x128.png", "icons/256x256.png", "icons/icon.icns", "icons/icon.png"],
+    "macOS": {
+      "minimumSystemVersion": "11.0",
+      "signingIdentity": "-",
+      "dmg": { "appPosition": { "x": 180, "y": 170 }, "applicationFolderPosition": { "x": 480, "y": 170 }, "windowSize": { "width": 660, "height": 400 } }
+    }
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEY5OUM1RDcwRkQ4MkU3NEMKUldSTTU0TDljRjJjK2VLUi9pZXk1ZmtzSCtGWTN4UXZZWnVNb1MyWGl0cWg4dWMyb25PSU50RmIK",
+      "endpoints": ["https://ekip.mayaajans.net/indir/latest.json"]
+    }
+  }
+}

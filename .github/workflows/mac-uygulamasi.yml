@@ -1,0 +1,81 @@
+# Maya Ekip Mac uygulamasını GitHub'ın Mac makinesinde derler.
+# Çıktı (DMG + güncelleme paketi) "masaustu-derleme" dalına konur; imzalanıp
+# ekip.mayaajans.net/indir'e yüklenmesi ayrıca yapılır (imza anahtarı GitHub'da tutulmaz).
+name: Mac uygulaması
+
+on:
+  push:
+    branches: [ekip-programi, main]
+    paths:
+      - 'ekip/desktop/**'
+      - '.github/workflows/mac-uygulamasi.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: mac-uygulamasi
+  cancel-in-progress: true
+
+jobs:
+  mac:
+    runs-on: macos-14
+    timeout-minutes: 45
+    defaults:
+      run:
+        working-directory: ekip/desktop
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-darwin,x86_64-apple-darwin
+
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            ekip/desktop/src-tauri/target
+          key: mac-${{ hashFiles('ekip/desktop/src-tauri/Cargo.lock') }}
+          restore-keys: mac-
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Bağımlılıklar
+        run: npm ci
+
+      - name: Derle (Apple Silicon + Intel)
+        run: npx tauri build --target universal-apple-darwin --bundles app,dmg
+
+      - name: Paketle
+        run: |
+          B=src-tauri/target/universal-apple-darwin/release/bundle
+          VERSION=$(node -p "require('./src-tauri/tauri.conf.json').version")
+          mkdir -p out
+          cp "$B"/dmg/*.dmg out/MayaEkip.dmg
+          COPYFILE_DISABLE=1 tar -czf out/MayaEkip.app.tar.gz -C "$B/macos" "Maya Ekip.app"
+          codesign -dv "$B/macos/Maya Ekip.app" 2>&1 | head -5 || true
+          echo "$VERSION" > out/VERSION
+          echo "${GITHUB_SHA}" > out/COMMIT
+          ls -la out
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: maya-ekip-mac
+          path: ekip/desktop/out/
+          retention-days: 14
+
+      - name: Derlemeyi dala koy
+        working-directory: ekip/desktop/out
+        run: |
+          git init -q
+          git config user.name "maya-derleme"
+          git config user.email "derleme@mayaajans.net"
+          git checkout -q -b masaustu-derleme
+          git add -A
+          git commit -q -m "Mac derlemesi $(cat VERSION) · ${GITHUB_SHA::7}"
+          git push -f -q "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" masaustu-derleme
