@@ -3,3 +3,4 @@ node_modules/
 web/dist/
 .dev.vars
 *.log
+src/static.gen.ts

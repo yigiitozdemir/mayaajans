@@ -5,6 +5,7 @@ import type { Env, UserRow, Vars } from './types';
 import { authRoutes, createInviteLink, publicOrigin, requireAdmin, requireUser, sameOrigin } from './auth';
 import { Hub, broadcast } from './hub';
 import { clean, isDate, isEmail, istanbulHour, newId } from './util';
+import { serveStatic } from './static';
 
 export { Hub };
 
@@ -318,6 +319,7 @@ api.get('/live', async (c) => {
 
 app.route('/api', api);
 app.all('/api/*', (c) => c.json({ error: 'Bulunamadı' }, 404));
+app.get('*', (c) => serveStatic(c.req.raw));
 
 // ---------- saatlik hatırlatma ----------
 async function hourlyReminders(env: Env) {

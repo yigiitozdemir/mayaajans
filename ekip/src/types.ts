@@ -1,7 +1,6 @@
 export interface Env {
   DB: D1Database;
   HUB: DurableObjectNamespace;
-  ASSETS: Fetcher;
 }
 
 export interface UserRow {
