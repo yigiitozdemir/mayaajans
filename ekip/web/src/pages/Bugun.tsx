@@ -5,6 +5,7 @@ import { Bell } from '../components/Notify';
 import { DuyuruBandi } from '../components/DuyuruBandi';
 import { HaftaninYildizi } from '../components/HaftaninYildizi';
 import { BugunToplantilar } from './Toplantilar';
+import { BugunCekimTakvimi } from '../components/BugunCekimTakvimi';
 import { ClientMark } from '../components/ClientMark';
 import { dueTag } from '../components/TaskPanels';
 import { bySentAsc, daysLabel, sentAge, waitingApproval } from '../components/Onay';
@@ -64,6 +65,7 @@ export function Bugun({ openTask }: { openTask: (id: string) => void }) {
       <DuyuruBandi openTask={openTask} />
       <HaftaninYildizi openTask={openTask} />
       <BugunToplantilar />
+      <BugunCekimTakvimi />
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;align-items:start">
         {blocks.map((b) => (
           <section class="card" style={'padding:16px;display:flex;flex-direction:column;gap:6px;' + ((b as any).warn ? 'border-color:rgba(242,132,130,.4)' : '')}>

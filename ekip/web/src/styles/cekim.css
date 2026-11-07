@@ -138,3 +138,26 @@
 .ck-hv.risk { background: rgba(var(--ck-amber-rgb), .13); border-color: rgba(var(--ck-amber-rgb), .45); }
 .ck-hv .hv-w { display: flex; gap: 6px; align-items: flex-start; font-size: 12.5px; font-weight: 600; line-height: 1.45; color: var(--amber-ink); }
 .ck-hv .hv-w svg { flex: none; margin-top: 2px; }
+
+/* Bugün sayfasındaki küçük çekim takvimi */
+.bct { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+.bct-h { display: flex; align-items: center; gap: 8px; }
+.bct-h h2 { margin: 0; font-size: 14px; font-weight: 800; }
+.bct-ic { width: 26px; height: 26px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; background: var(--accent-soft); color: var(--accent); }
+.bct-ic svg { stroke: currentColor; }
+.bct-ic-g { display: grid; grid-template-columns: minmax(260px, 320px) minmax(0, 1fr); gap: 16px; align-items: start; }
+.bct .ck-cal.panel { padding: 12px; gap: 8px; }
+.bct .ck-cal .ck-cal-h h2 { font-size: 14px; }
+.bct .ck-day { min-height: 30px; font-size: 12.5px; }
+.bct-list { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.bct-lh { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 12px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--mute); min-height: 30px; }
+.bct-it { display: flex; align-items: center; gap: 12px; width: 100%; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--edge); background: var(--chip); color: var(--ink); text-align: left; font: inherit; cursor: pointer; min-width: 0; }
+.bct-it:hover { background: var(--sel); }
+.bct-it.late { border-color: rgba(242, 132, 130, .45); }
+.bct-when { display: flex; flex-direction: column; flex: none; width: 112px; font-size: 11.5px; color: var(--mute); }
+.bct-when b { font-size: 14px; color: var(--ink); font-weight: 700; }
+.bct-t { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.bct-tt { font-size: 13.5px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bct-sub { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--mute); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@media (max-width: 760px) { .bct-ic-g { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 480px) { .bct-when { width: 92px; } }
