@@ -2,7 +2,7 @@
 // RFC 8291 (ileti şifreleme), RFC 8188 (aes128gcm içerik kodlaması), RFC 8292 (VAPID).
 import type { Env } from './types';
 
-export interface PushPayload { title: string; body: string; link?: string | null; tag?: string }
+export interface PushPayload { title: string; body: string; link?: string | null; tag?: string; badge?: number }
 
 const SUBJECT = 'https://ekip.mayaajans.net';
 const TTL = 86400;           // bir gün: telefon kapalıysa bu süre içinde açılınca gelir
@@ -107,12 +107,28 @@ export function payloadBytes(p: PushPayload): Bytes {
   const title = cut(String(p.title || 'Maya Ekip'), 120);
   const tag = cut(String(p.tag || 'maya'), 40);
   let body = cut(String(p.body || ''), 600);
-  let out: Uint8Array = enc.encode(JSON.stringify({ title, body, link, tag }));
-  while (out.length > 3000 && body.length > 20) { body = cut(body, Math.floor(body.length / 2)); out = enc.encode(JSON.stringify({ title, body, link, tag })); }
+  const badge = typeof p.badge === 'number' && isFinite(p.badge) ? Math.max(0, Math.floor(p.badge)) : undefined;
+  const b = (title: string, body: string) => (badge === undefined ? { title, body, link, tag } : { title, body, link, tag, badge });
+  let out: Uint8Array = enc.encode(JSON.stringify(b(title, body)));
+  while (out.length > 3000 && body.length > 20) { body = cut(body, Math.floor(body.length / 2)); out = enc.encode(JSON.stringify(b(title, body))); }
   return concat(out);
 }
 
 export interface PushResult { ready: boolean; devices: number; delivered: number; removed: number; failed: number }
+
+/** Ana ekran simgesindeki sayı: okunmamış bildirimler + okunmamış birebir/genel sohbet mesajları
+ * (müşteri kanallarının bahsetmeleri dahil değil; uygulama açılınca sayfa kesin sayıyı yazar). */
+export async function rozetSayisi(env: Env, userId: string): Promise<number> {
+  const r = await env.DB.prepare(
+    `SELECT (SELECT COUNT(*) FROM notifications WHERE user_id = ?1 AND read_at IS NULL)
+          + (SELECT COUNT(*) FROM messages m JOIN channels ch ON ch.id = m.channel_id
+             LEFT JOIN channel_reads rd ON rd.channel_id = ch.id AND rd.user_id = ?1
+             WHERE ch.archived = 0 AND ch.kind != 'client' AND m.deleted = 0 AND m.user_id != ?1
+               AND m.created_at > COALESCE(rd.last_read_at, '')
+               AND (ch.kind != 'dm' OR substr(ch.dm_key, 1, length(?1) + 1) = ?1 || '|' OR substr(ch.dm_key, -(length(?1) + 1)) = '|' || ?1)) AS n`,
+  ).bind(userId).first<{ n: number }>();
+  return Math.min(999, r?.n || 0);
+}
 
 /** Kişinin bütün cihazlarına gönderir ve sonucu döndürür (deneme bildirimi bunu kullanır). */
 export async function pushToUser(env: Env, userId: string, p: PushPayload): Promise<PushResult> {
@@ -123,6 +139,7 @@ export async function pushToUser(env: Env, userId: string, p: PushPayload): Prom
   const { results } = await env.DB.prepare('SELECT id, endpoint, p256dh, auth, fail_count FROM push_subscriptions WHERE user_id = ?').bind(userId).all<SubRow>();
   res.devices = results.length;
   if (!results.length) return res;
+  if (p.badge === undefined) p = { ...p, badge: await rozetSayisi(env, userId).catch(() => undefined) };
   const plain = payloadBytes(p);
   const urgency = p.tag === 'nudge' ? 'high' : 'normal';
   await Promise.all(results.map(async (s) => {

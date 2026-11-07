@@ -179,6 +179,7 @@ await t('saatlik hatırlatma push (remind)', async () => {
   const p = decrypt(rp, g.body);
   eq(p.title, 'Hatırlatma: bu iş seni bekliyor'); eq(p.tag, 'remind'); eq(p.link, '/isler?is=' + assignTask);
   eq(p.body, 'Gizem Eczane reels kurgusu');
+  ok(typeof p.badge === 'number' && p.badge >= 1, 'simge sayısı push yükünde: ' + p.badge);
 });
 await t('uzun içerik 3KB altında kalır', async () => {
   const wait = await nextPush('/push/pelin');

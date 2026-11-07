@@ -1,0 +1,8 @@
+/* Aşağı çek, yenile göstergesi */
+.cy { position: fixed; left: 50%; top: calc(env(safe-area-inset-top, 0px) + 58px); z-index: 60; width: 40px; height: 40px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; color: var(--mute); background: var(--card); border: 1px solid var(--edge);
+  box-shadow: var(--glass-shadow); pointer-events: none; transition: color .15s ease; will-change: transform; }
+.cy.hazir, .cy.don { color: var(--accent); }
+.cy.don svg { animation: cy-don .8s linear infinite; }
+@keyframes cy-don { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .cy.don svg { animation-duration: 2s; } }

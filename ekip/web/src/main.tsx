@@ -1,3 +1,5 @@
+import { UygulamaRozeti } from './components/UygulamaRozeti';
+import { CekYenile } from './components/CekYenile';
 import { render } from 'preact';
 import { useEffect, useState } from 'preact/hooks';
 import './styles.css';
@@ -111,6 +113,8 @@ function App() {
       <Toasts onOpenTask={openTask} />
       <NudgeReceiver />
       <ChatUnread />
+      <UygulamaRozeti />
+      <CekYenile />
       <ShotWatcher />
       <AramaPaleti openTask={openTask} />
       <PushBanner />

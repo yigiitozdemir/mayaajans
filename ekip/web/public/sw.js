@@ -31,6 +31,12 @@ self.addEventListener('push', (e) => {
       lang: 'tr',
       data: { link },
     });
+    // ana ekran simgesindeki kırmızı sayı (iPhone ana ekran uygulaması)
+    try {
+      if (typeof d.badge === 'number' && self.navigator.setAppBadge) {
+        if (d.badge > 0) await self.navigator.setAppBadge(d.badge); else if (self.navigator.clearAppBadge) await self.navigator.clearAppBadge();
+      }
+    } catch (_) {}
   })());
 });
 
