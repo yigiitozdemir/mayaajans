@@ -125,7 +125,7 @@ export function sesDinle(tur: SesTuru): void { etkilesim = true; cal(tur, true);
 export function bildirimTuru(kind: string): SesTuru | null {
   switch (kind) {
     case 'morning': case 'backup': case 'nudge': return null;
-    case 'assign': case 'remind': case 'gecikme': case 'reminder': case 'work': case 'special': case 'shoot': return 'atama';
+    case 'assign': case 'remind': case 'gecikme': case 'reminder': case 'work': case 'special': case 'shoot': case 'toplanti': return 'atama';
     case 'chat': case 'mention': return 'mesaj';
     case 'portal': case 'approval': case 'onay': case 'content': return 'onay';
     case 'rozet': return 'tamam';

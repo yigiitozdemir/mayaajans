@@ -3,7 +3,7 @@ import { api, closeToast, reloadNotifications, store, memberName } from '../api'
 import { Avatar, Icon, navigate, useStore } from '../ui';
 
 // Bildirimin gideceği yer: iş → iş detayı; link → o sayfa; eski kayıtlarda link yoksa türüne göre
-const KIND_PAGE: Record<string, string> = { nudge: '/durt', morning: '/', reminder: '/ajanda', shoot: '/cekim', special: '/ozel-gunler', approval: '/isler', chat: '/sohbet' };
+const KIND_PAGE: Record<string, string> = { nudge: '/durt', morning: '/', reminder: '/ajanda', shoot: '/cekim', toplanti: '/toplantilar', special: '/ozel-gunler', approval: '/isler', chat: '/sohbet' };
 export function openNotification(n: { id: string; taskId?: string | null; link?: string | null; kind?: string; readAt?: string | null }, onOpenTask: (id: string) => void) {
   if (!n.readAt) {
     store.set({ notifications: store.get().notifications.map((x) => (x.id === n.id ? { ...x, readAt: new Date().toISOString() } : x)) });

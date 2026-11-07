@@ -1,4 +1,4 @@
-// ⌘K hızlı arama: müşteri, iş, çekim, özel gün, (kendi) Ajandam notları/yapılacakları, (erişebildiği) sohbet mesajları, kişiler
+// ⌘K hızlı arama: müşteri, iş, çekim, toplantı, özel gün, (kendi) Ajandam notları/yapılacakları, (erişebildiği) sohbet mesajları, kişiler
 //
 // Türkçe duyarsız eşleştirme: SQLite LIKE/lower() yalnızca ASCII harfleri bilir. Bu yüzden alanlar SQL içinde iç içe
 // replace() ile "katlanır" (Ç→c, Ş→s, Ğ→g, Ü→u, Ö→o, İ/I/ı→i, Â→a …) ve lower() ile küçültülür; sorgu da JS'te aynı
@@ -49,7 +49,7 @@ r.get('/', async (c) => {
   const q = fold(raw);
   const tokens = [...new Set(q.split(' ').filter(Boolean))].slice(0, MAX_TOKENS);
   if (Array.from(q.replace(/ /g, '')).length < 2) {
-    return c.json({ q: raw, tasks: [], clients: [], shoots: [], days: [], agenda: [], messages: [], people: [], ms: 0 });
+    return c.json({ q: raw, tasks: [], clients: [], shoots: [], meetings: [], days: [], agenda: [], messages: [], people: [], ms: 0 });
   }
 
   const DB = c.env.DB;
@@ -61,7 +61,7 @@ r.get('/', async (c) => {
     return DB.prepare(sql.replace('%W', where)).bind(...binds);
   };
 
-  const [tasks, clients, shoots, days, notes, todos, events, msgs, people] = await DB.batch([
+  const [tasks, clients, shoots, days, notes, todos, events, msgs, people, meetings] = await DB.batch([
     q1(`SELECT id, title, client, due_date, status, assignee_id FROM tasks WHERE %W
         ORDER BY status = 2, due_date IS NULL, due_date, created_at DESC LIMIT ${PER}`, ['title', 'client', 'note']),
     q1(`SELECT id, name FROM clients WHERE archived = 0 AND %W ORDER BY name LIMIT ${PER}`, ['name']),
@@ -84,6 +84,9 @@ r.get('/', async (c) => {
         ORDER BY m.created_at DESC LIMIT ${PER}`, ['m.text'], [me.id]),
     q1(`SELECT id, first_name, last_name, color, photo FROM users WHERE status = 'active' AND id != ?1 AND %W
         ORDER BY first_name LIMIT ${PER}`, ['first_name', 'last_name'], [me.id]),
+    // Toplantılar: bütün ekibe açık; yaklaşanlar önce
+    q1(`SELECT id, title, client, date, start_time, type, location, status FROM meetings WHERE %W
+        ORDER BY date < ?1, CASE WHEN date >= ?1 THEN date END, date DESC, start_time LIMIT ${PER}`, ['title', 'client', 'location', 'notes', 'client_attendees'], [today]),
   ]);
 
   type Row = Record<string, any>;
@@ -108,6 +111,7 @@ r.get('/', async (c) => {
     tasks: rows(tasks).map((t) => ({ id: t.id, title: t.title, client: t.client, dueDate: t.due_date, status: t.status, assigneeId: t.assignee_id, done: t.status === 2 })),
     clients: rows(clients).map((x) => ({ id: x.id, name: x.name, link: '/musteriler?id=' + x.id })),
     shoots: rows(shoots).map((s) => ({ id: s.id, title: s.title, client: s.client, date: s.date, time: s.time, location: s.location, status: s.status, done: s.status !== 0, link: '/cekim?id=' + s.id })),
+    meetings: rows(meetings).map((m) => ({ id: m.id, title: m.title, client: m.client, date: m.date, time: m.start_time, type: m.type, location: m.location, status: m.status, done: m.status !== 'planlandi' || m.date < today, link: '/toplantilar?id=' + m.id })),
     days: rows(days).map((d) => ({ id: d.id, name: d.name, date: d.date, range: d.range_label, done: d.date < today, link: '/ozel-gunler?id=' + d.id })),
     agenda,
     messages,

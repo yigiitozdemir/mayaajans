@@ -31,6 +31,7 @@ import { Misafir } from './pages/Misafir';
 import { Duyurular } from './pages/Duyurular';
 import { GeriBildirimler } from './pages/GeriBildirimler';
 import { Krizler } from './pages/Krizler';
+import { Toplantilar } from './pages/Toplantilar';
 import './styles/tema.css'; // yeni görünüm — en sonda yüklenir
 
 function App() {
@@ -86,6 +87,7 @@ function App() {
   else if (path === '/ekip') page = <Ekip />;
   else if (path === '/ozel-gunler') page = <OzelGunler openTask={openTask} />;
   else if (path === '/cekim') page = <Cekim openTask={openTask} />;
+  else if (path === '/toplantilar') page = <Toplantilar openTask={openTask} />;
   else if (path === '/musteriler') page = <Musteriler openTask={openTask} />;
   else if (path === '/sohbet') page = <Sohbet openTask={openTask} />;
   else if (path === '/durt') page = <Durt openTask={openTask} />;

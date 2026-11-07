@@ -89,6 +89,7 @@ const NAV_GROUPS: { title: string; items: NavItem[] }[] = [
   { title: 'Planlama', items: [
     { href: '/isler', label: 'İş Planı', icon: 'board' },
     { href: '/cekim', label: 'Çekim Planı', icon: 'cam' },
+    { href: '/toplantilar', label: 'Toplantılar', icon: 'toplanti' },
     { href: '/ozel-gunler', label: 'Özel Günler', icon: 'cal' },
     { href: '/musteriler', label: 'Müşteriler', icon: 'clients' },
   ] },

@@ -8,10 +8,10 @@ import { randomToken, sha256 } from '../util';
 export const r = new Hono<{ Bindings: Env; Variables: Vars }>();
 export const feed = new Hono<{ Bindings: Env }>();
 
-export const GROUPS = ['shoots', 'tasks', 'agenda', 'special'] as const;
+export const GROUPS = ['shoots', 'meetings', 'tasks', 'agenda', 'special'] as const;
 type Group = typeof GROUPS[number];
 type Groups = Record<Group, boolean>;
-const ALL_ON: Groups = { shoots: true, tasks: true, agenda: true, special: true };
+const ALL_ON: Groups = { shoots: true, meetings: true, tasks: true, agenda: true, special: true };
 
 interface FeedRow { user_id: string; token_hash: string | null; groups: string; created_at: string; updated_at: string; last_fetched_at: string | null }
 
@@ -190,6 +190,42 @@ export async function buildIcs(env: Env, uid: string, firstName: string, groups:
     }
   }
 
+  if (groups.meetings) {
+    // Toplantılar: katılımcısı olduğu ya da kendi eklediği (iptal edilenler hariç)
+    const ms = await q<{ id: string; title: string; client: string; date: string; start_time: string; end_time: string; type: string; location: string; link: string; participants: string; client_attendees: string; agenda: string; status: string; updated_at: string }>(
+      `SELECT m.id, m.title, m.client, m.date, m.start_time, m.end_time, m.type, m.location, m.link, m.participants, m.client_attendees, m.agenda, m.status, m.updated_at
+       FROM meetings m WHERE m.status != 'iptal' AND m.date >= ?
+         AND (m.created_by = ? OR EXISTS (SELECT 1 FROM json_each(m.participants) j WHERE j.value = ?))`, addDay(today, -120), uid, uid);
+    const users = await q<{ id: string; first_name: string; last_name: string }>("SELECT id, first_name, last_name FROM users WHERE status != 'removed'");
+    const nm = new Map(users.map((u) => [u.id, (u.first_name + ' ' + u.last_name).trim()]));
+    const TUR: Record<string, string> = { yuzyuze: 'Yüz yüze', online: 'Online', telefon: 'Telefon' };
+    for (const m of ms) {
+      const st = hm(m.start_time);
+      const en = hm(m.end_time);
+      let endMin = 60;
+      if (st && en) { const d = en.h * 60 + en.m - (st.h * 60 + st.m); if (d > 0) endMin = d; }
+      const people = parseArr(m.participants).map((x) => nm.get(x)).filter(Boolean);
+      const agenda = parseArr(m.agenda).map((x) => (x && typeof x === 'object' ? String(x.text || '') : String(x || ''))).filter(Boolean);
+      const desc = [
+        m.client && 'Firma: ' + m.client,
+        'Tür: ' + (TUR[m.type] || m.type),
+        m.link && 'Bağlantı: ' + m.link,
+        people.length ? 'Ekipten: ' + people.join(', ') : '',
+        m.client_attendees && 'Firma tarafı: ' + m.client_attendees,
+        m.status === 'yapildi' ? 'Durum: Yapıldı' : m.status === 'ertelendi' ? 'Durum: Ertelendi' : '',
+        agenda.length ? '\nGündem:\n' + agenda.map((x) => '• ' + x).join('\n') : '',
+        '\n' + origin + '/toplantilar?id=' + m.id,
+      ].filter(Boolean).join('\n');
+      evs.push({
+        uid: 'toplanti-' + m.id + '@' + host, date: m.date, start: st || undefined, endMin,
+        summary: '🤝 ' + [m.title, m.client].filter(Boolean).join(' · '),
+        location: m.type === 'yuzyuze' ? m.location : m.type === 'online' ? m.link || 'Online' : 'Telefon',
+        description: desc, url: origin + '/toplantilar?id=' + m.id, modified: sqlUtc(m.updated_at),
+        status: m.status === 'ertelendi' ? 'TENTATIVE' : 'CONFIRMED', categories: 'Toplantı',
+      });
+    }
+  }
+
   if (groups.tasks) {
     const tasks = await q<{ id: string; title: string; client: string; due_date: string; note: string; status: number; updated_at: string }>(
       `SELECT id, title, client, due_date, note, status, updated_at FROM tasks WHERE assignee_id = ? AND status != 2 AND due_date IS NOT NULL AND due_date >= ?`,
@@ -238,7 +274,7 @@ export async function buildIcs(env: Env, uid: string, firstName: string, groups:
   const lines = [
     'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Maya Ajans//Maya Ekip//TR', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH',
     'X-WR-CALNAME:' + icsText('Maya Ekip · ' + (firstName || 'Ekip')),
-    'X-WR-CALDESC:' + icsText('Maya Ekip programından çekimler, teslimler, Ajandam ve özel günler'),
+    'X-WR-CALDESC:' + icsText('Maya Ekip programından çekimler, toplantılar, teslimler, Ajandam ve özel günler'),
     'X-WR-TIMEZONE:Europe/Istanbul',
     'REFRESH-INTERVAL;VALUE=DURATION:PT1H', 'X-PUBLISHED-TTL:PT1H',
     ...VTIMEZONE,

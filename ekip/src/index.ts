@@ -29,6 +29,7 @@ import { r as takvim, feed as takvimFeed } from './routes/takvim';
 import { r as kriz } from './routes/kriz';
 import { r as ilham } from './routes/ilham';
 import { r as rozet } from './routes/rozet';
+import { r as toplanti, toplantiHatirlatma } from './routes/toplanti';
 import { havaUyarisi } from './hava';
 import { haftalikRozetler } from './rozet';
 import { r as drive } from './drive';
@@ -272,6 +273,7 @@ api.route('/takvim', takvim);
 api.route('/krizler', kriz);
 api.route('/ilham', ilham);
 api.route('/rozetler', rozet);
+api.route('/toplantilar', toplanti);
 api.route('/drive', drive);
 
 // ---------- işler ----------
@@ -495,7 +497,7 @@ export default {
   scheduled: async (e: ScheduledController, env: Env, ctx: ExecutionContext) => {
     const sahte = env.SIMDI_SAHTE ? new Date(env.SIMDI_SAHTE) : null;
     const now = sahte && !isNaN(sahte.getTime()) ? sahte : new Date();
-    if (e.cron === '* * * * *') ctx.waitUntil(ajandaHatirlatma(env)); // Ajandam anımsatıcıları (dakikalık)
+    if (e.cron === '* * * * *') ctx.waitUntil(Promise.all([ajandaHatirlatma(env), toplantiHatirlatma(env, now)])); // Ajandam anımsatıcıları + toplantıdan 30 dk önce (dakikalık)
     else if (e.cron === '17 0 * * 1') ctx.waitUntil(haftalikYedek(env)); // haftalık yedek
     else if (e.cron === '30 13 * * *') ctx.waitUntil(cekimHatirlatma(env, now)); // 16:30 İstanbul
     else ctx.waitUntil(Promise.all([hourlyReminders(env, now), sabahOzeti(env, now), onayHatirlatma(env, now), havaUyarisi(env), haftalikRozetler(env), gecikmeUyarisi(env, now)]));

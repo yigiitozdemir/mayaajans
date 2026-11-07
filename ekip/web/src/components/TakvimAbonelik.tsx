@@ -4,12 +4,13 @@ import { api, snack, store } from '../api';
 import { Icon, Switch, useStore } from '../ui';
 import '../styles/takvim.css';
 
-type Group = 'shoots' | 'tasks' | 'agenda' | 'special';
+type Group = 'shoots' | 'meetings' | 'tasks' | 'agenda' | 'special';
 interface FeedState { active: boolean; groups: Record<Group, boolean>; hint: string | null; createdAt: string | null; fetchedAt: string | null }
 interface Links { url: string; webcal: string; google: string }
 
 const GROUPS: { k: Group; label: string; icon: string }[] = [
   { k: 'shoots', label: 'Çekimlerim', icon: 'cam' },
+  { k: 'meetings', label: 'Toplantılarım', icon: 'toplanti' },
   { k: 'tasks', label: 'Teslimlerim', icon: 'check' },
   { k: 'agenda', label: 'Ajandam', icon: 'note' },
   { k: 'special', label: 'Özel günler', icon: 'yildiz' },
@@ -129,7 +130,7 @@ export function TakvimAbonelik() {
 
       {open && st && (
         <div class="tk-body" id="tk-body">
-          <p class="tk-p">Çekimlerin, teslim günlerin, Ajandam ve özel günler kendi takviminde görünsün. Bağlantı <b>sana özel</b> — kimseyle paylaşma.</p>
+          <p class="tk-p">Çekimlerin, toplantıların, teslim günlerin, Ajandam ve özel günler kendi takviminde görünsün. Bağlantı <b>sana özel</b> — kimseyle paylaşma.</p>
 
           {!on && (
             <button type="button" class="btn primary sm tk-go" disabled={busy} onClick={yenile}><Icon n="link" size={14} />Takvim bağlantımı oluştur</button>

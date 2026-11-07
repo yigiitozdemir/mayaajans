@@ -4,6 +4,7 @@ import { api, memberName, reloadTeam, snack, type Member } from '../api';
 import { Icon as BaseIcon, Modal, navigate, useStore } from '../ui';
 import { IlhamPanosu } from './IlhamPanosu';
 import { KrizRozet, MusteriKrizleri } from '../pages/Krizler';
+import { MusteriToplantilari } from '../pages/Toplantilar';
 
 // ui.tsx'te olmayan simgeler
 const EXTRA: Record<string, string> = {
@@ -93,8 +94,8 @@ function SaveInput({ value, onSave, ...p }: { value: string; onSave: (v: string)
     onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); (e.target as HTMLInputElement).blur(); } if (e.key === 'Escape') { setV(value); } }} />;
 }
 
-type Tab = 'kit' | 'logos' | 'voice' | 'links' | 'notes' | 'ilham' | 'kriz';
-const TABS: [Tab, string][] = [['kit', 'Marka kiti'], ['logos', 'Logolar'], ['voice', 'Marka sesi'], ['links', 'Bağlantılar'], ['notes', 'Notlar'], ['ilham', 'İlham'], ['kriz', 'Kriz kayıtları']];
+type Tab = 'kit' | 'logos' | 'voice' | 'links' | 'notes' | 'toplanti' | 'ilham' | 'kriz';
+const TABS: [Tab, string][] = [['kit', 'Marka kiti'], ['logos', 'Logolar'], ['voice', 'Marka sesi'], ['links', 'Bağlantılar'], ['notes', 'Notlar'], ['toplanti', 'Toplantılar'], ['ilham', 'İlham'], ['kriz', 'Kriz kayıtları']];
 const tabFromUrl = (): Tab | null => { const t = new URLSearchParams(location.search).get('sekme'); return t && TABS.some(([k]) => k === t) ? (t as Tab) : null; };
 
 export function MusteriKart({ d, onChange, onRemoved, onBack, kriz }: { d: CDetail; onChange: (d: CDetail) => void; onRemoved: (id: string) => void | Promise<void>; onBack: () => void; kriz?: { count: number; priority: string } | null }) {
@@ -190,6 +191,7 @@ export function MusteriKart({ d, onChange, onRemoved, onBack, kriz }: { d: CDeta
       {tab === 'links' && <LinksTab key={d.id} d={d} canEdit={canEdit} patch={patch} />}
       {tab === 'ilham' && <IlhamPanosu key={d.id} client={d.name} />}
       {tab === 'kriz' && <MusteriKrizleri key={d.id} client={d.name} />}
+      {tab === 'toplanti' && <MusteriToplantilari key={d.id} client={d.name} />}
       {tab === 'notes' && <NotesTab key={d.id} d={d} canEdit={canEdit} onChange={onChange} setConfirm={setConfirm} team={s.team} />}
 
       {confirm && <Confirm title={confirm.title} text={confirm.text} ok={confirm.ok} onOk={confirm.run} onClose={() => setConfirm(null)} />}

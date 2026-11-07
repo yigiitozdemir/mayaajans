@@ -61,6 +61,7 @@ interface Results {
   tasks: { id: string; title: string; client: string; dueDate: string | null; status: number; assigneeId: string | null; done: boolean }[];
   clients: { id: string; name: string; link: string }[];
   shoots: { id: string; title: string; client: string; date: string; time: string; location: string; status: number; done: boolean; link: string }[];
+  meetings?: { id: string; title: string; client: string; date: string; time: string; type: string; location: string; status: string; done: boolean; link: string }[];
   days: { id: string; name: string; date: string; range: string | null; done: boolean; link: string }[];
   agenda: { type: 'todo' | 'event' | 'note'; id: string; title: string; date: string | null; time?: string; done: boolean; link: string }[];
   messages: { id: string; channelId: string; userId: string; text: string; channel: string | null; kind: string; dmWith: string | null; link: string }[];
@@ -73,6 +74,7 @@ const NAV_CMDS: { id: string; title: string; path: string; icon: string; kw?: st
   { id: 'go-ajanda', title: 'Ajandam', path: '/ajanda', icon: 'note', kw: 'notlar yapilacaklar takvim' },
   { id: 'go-ozel', title: 'Özel Günler', path: '/ozel-gunler', icon: 'cal' },
   { id: 'go-cekim', title: 'Çekim Planı', path: '/cekim', icon: 'cam' },
+  { id: 'go-toplanti', title: 'Toplantılar', path: '/toplantilar', icon: 'toplanti', kw: 'musteri toplantisi gorusme not ses kaydi' },
   { id: 'go-musteri', title: 'Müşteriler', path: '/musteriler', icon: 'clients', kw: 'firmalar marka' },
   { id: 'go-sohbet', title: 'Sohbet', path: '/sohbet', icon: 'chat', kw: 'mesaj kanal' },
   { id: 'go-durt', title: 'Dürtme', path: '/durt', icon: 'hand' },
@@ -199,6 +201,11 @@ export function AramaPaleti({ openTask }: { openTask: (id: string) => void }) {
       sub: [x.client, fmtDate(x.date) + (x.time ? ' ' + x.time : ''), x.location].filter(Boolean).join(' · '),
       done: x.done, tag: x.status === 1 ? 'Tamamlandı' : x.status === 2 ? 'İptal' : undefined, action: { t: 'nav', path: x.link }, hlSub: true,
     }));
+    (res.meetings || []).forEach((x) => out.push({
+      key: 'meet:' + x.id, group: 'Toplantılar', icon: 'toplanti', title: x.title,
+      sub: [x.client, fmtDate(x.date) + ' ' + x.time, x.type === 'online' ? 'Online' : x.type === 'telefon' ? 'Telefon' : x.location].filter(Boolean).join(' · '),
+      done: x.done, tag: x.status === 'yapildi' ? 'Yapıldı' : x.status === 'iptal' ? 'İptal' : x.status === 'ertelendi' ? 'Ertelendi' : undefined, action: { t: 'nav', path: x.link }, hlSub: true,
+    }));
     res.days.forEach((d) => out.push({ key: 'day:' + d.id, group: 'Özel günler', icon: 'cal', title: d.name, sub: d.range || fmtDate(d.date), done: d.done, tag: d.done ? 'Geçti' : undefined, action: { t: 'nav', path: d.link } }));
     res.agenda.forEach((a) => out.push({
       key: 'ag:' + a.id, group: 'Ajandam', icon: a.type === 'note' ? 'note' : a.type === 'event' ? 'cal' : 'check', title: a.title,
@@ -286,7 +293,7 @@ export function AramaPaleti({ openTask }: { openTask: (id: string) => void }) {
       <div class="ap" role="dialog" aria-modal="true" aria-label="Hızlı arama ve komutlar">
         <div class="ap-in">
           <Icon n="search" size={18} />
-          <input ref={inputRef} type="text" value={q} placeholder="İş, müşteri, çekim, mesaj ara ya da komut yaz…"
+          <input ref={inputRef} type="text" value={q} placeholder="İş, müşteri, çekim, toplantı, mesaj ara ya da komut yaz…"
             role="combobox" aria-expanded="true" aria-controls="ap-list" aria-autocomplete="list" aria-activedescendant={activeId}
             aria-label="Ara" autoComplete="off" autoCorrect="off" spellcheck={false} enterKeyHint="go"
             onInput={(e) => setQ((e.target as HTMLInputElement).value)} onKeyDown={onKey} />
