@@ -1,6 +1,10 @@
 # Maya Ekip — sürüm notları
 # Her sürüm için "## <sürüm>" başlığı altına kısa maddeler yaz. Güncelleme penceresinde ekibe aynen gösterilir.
 
+## 1.0.10
+• WhatsApp'tan gelen dosyaya tıklayınca artık hemen açılıyor: video QuickTime'da oynar, fotoğraf ve PDF Önizleme'de açılır (dosya yine İndirilenler'e kaydedilir).
+• ChatGPT, Claude ve WhatsApp yüklenirken arka plan yeni koyu temaya uygun.
+
 ## 1.0.9
 • Dosya sürükle-bırak: masaüstünden WhatsApp'a fotoğraf/dosya sürükleyip bırakabilirsiniz (artıya basmaya gerek yok). Ajandam'a sürükleme de çalışıyor.
 

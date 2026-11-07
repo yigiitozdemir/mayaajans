@@ -117,13 +117,39 @@ fn download_target(app: &AppHandle, suggested: &std::path::Path, url: &tauri::Ur
 
 /// İndirme: İndirilenler klasörüne (çakışmayan adla) kaydet, bitince bildir.
 fn handle_download(app: &AppHandle, event: tauri::webview::DownloadEvent<'_>) -> bool {
+    handle_download_ac(app, event, false)
+}
+
+/// İndirilen dosyaların hedef yolu (macOS bitiş olayında yolu vermediği için istekte saklanır).
+static INDIRME_YOLLARI: std::sync::Mutex<Vec<(String, PathBuf)>> = std::sync::Mutex::new(Vec::new());
+
+/// `ac`: indirme bitince dosyayı Mac'in varsayılan uygulamasında aç (WhatsApp: video QuickTime'da, PDF/görsel Önizleme'de).
+fn handle_download_ac(app: &AppHandle, event: tauri::webview::DownloadEvent<'_>, ac: bool) -> bool {
     match event {
         tauri::webview::DownloadEvent::Requested { url, destination } => {
             if let Some(p) = download_target(app, destination, &url) {
-                *destination = p;
+                *destination = p.clone();
+                if let Ok(mut l) = INDIRME_YOLLARI.lock() {
+                    l.retain(|(u, _)| u != url.as_str());
+                    l.push((url.to_string(), p));
+                    if l.len() > 50 { l.remove(0); }
+                }
             }
         }
-        tauri::webview::DownloadEvent::Finished { success, .. } => {
+        tauri::webview::DownloadEvent::Finished { url, path, success } => {
+            let yol = path.or_else(|| {
+                INDIRME_YOLLARI.lock().ok().and_then(|mut l| {
+                    let i = l.iter().position(|(u, _)| u == url.as_str())?;
+                    Some(l.remove(i).1)
+                })
+            });
+            if success && ac {
+                if let Some(p) = yol.filter(|p| p.exists()) {
+                    if app.opener().open_path(p.to_string_lossy(), None::<&str>).is_ok() {
+                        return true; // açıldı; ayrıca bildirim gösterme
+                    }
+                }
+            }
             let body = if success { "Dosya İndirilenler klasörüne kaydedildi." } else { "Dosya indirilemedi." };
             let _ = app.notification().builder().title("İndirme").body(body).show();
         }
@@ -369,7 +395,10 @@ fn create_app_view(app: &AppHandle, which: &str, label: &str, url: &str, pos: ta
                 tauri::webview::NewWindowResponse::Deny
             }
         })
-        .on_download(move |_webview, event| handle_download(&dl, event))
+        .on_download({
+            let ac = which == "whatsapp"; // WhatsApp'tan gelen dosya indirilince hemen açılsın
+            move |_webview, event| handle_download_ac(&dl, event, ac)
+        })
         .on_document_title_changed(move |_w, title| on_app_title(&tt, &which_s, &title));
     let builder = if which == "whatsapp" { builder.initialization_script(WA_BRIDGE) } else { builder };
     window.add_child(builder, pos, size).map_err(|e| e.to_string())
@@ -381,7 +410,7 @@ fn preload_whatsapp(app: &AppHandle) {
         return;
     }
     if let Ok(v) = create_app_view(app, "whatsapp", "ai-in-whatsapp", "https://web.whatsapp.com/",
-        tauri::LogicalPosition::new(-20000.0, -20000.0), tauri::LogicalSize::new(800.0, 600.0), tauri::window::Color(244, 241, 236, 255)) {
+        tauri::LogicalPosition::new(-20000.0, -20000.0), tauri::LogicalSize::new(800.0, 600.0), tauri::window::Color(11, 11, 15, 255)) {
         park(&v);
     }
 }
@@ -402,7 +431,7 @@ async fn ai_show(app: AppHandle, which: String, x: f64, y: f64, w: f64, h: f64, 
     if let Ok(mut v) = VISIBLE_APP.lock() { *v = which.clone(); }
     let (pos, size, info) = app_rect(&app, x, y, w, h);
     // yüklenirken beyaz parlama olmasın: zemin programın temasıyla aynı
-    let bg = if dark.unwrap_or(false) { tauri::window::Color(26, 21, 18, 255) } else { tauri::window::Color(244, 241, 236, 255) };
+    let bg = if dark.unwrap_or(false) { tauri::window::Color(11, 11, 15, 255) } else { tauri::window::Color(244, 241, 236, 255) };
     if let Some(v) = app.get_webview(label) {
         let _ = v.set_background_color(Some(bg));
         let _ = v.set_position(pos);
